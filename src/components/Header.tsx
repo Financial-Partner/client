@@ -1,9 +1,18 @@
 import React from 'react';
 import {View, Text, StyleSheet, Pressable, StatusBar, Platform} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
+import type {StackNavigationProp} from '@react-navigation/stack';
+
+type RootStackParamList = {
+  MainTabs: undefined;
+  Bag: undefined;
+  Settings: undefined;
+};
+
+type NavigationProp = StackNavigationProp<RootStackParamList>;
 
 const Header = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp>();
 
   return (
     <View style={styles.container}>
@@ -12,9 +21,7 @@ const Header = () => {
           styles.settingsButton,
           pressed && styles.buttonPressed
         ]}
-        onPress={() => {
-          // 設定按鈕功能待實作
-        }}>
+        onPress={() => navigation.navigate('Settings')}>
         <Text style={styles.icon}>⚙️</Text>
       </Pressable>
       
@@ -25,7 +32,7 @@ const Header = () => {
             pressed && styles.buttonPressed
           ]}
           onPress={() => {
-            // 導航到背包頁面
+            navigation.navigate('Bag');
           }}>
           <Text style={styles.icon}>🎒</Text>
         </Pressable>

@@ -1,57 +1,47 @@
 import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {Text} from 'react-native';
+import {createStackNavigator} from '@react-navigation/stack';
 
 import HomeScreen from '../screens/HomeScreen';
 import GachaScreen from '../screens/GachaScreen';
 import InvestScreen from '../screens/InvestScreen';
 import AnalysisScreen from '../screens/AnalysisScreen';
+import BagScreen from '../screens/BagScreen';
+import SettingsScreen from '../screens/SettingsScreen';
 
 const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
+
+const TabNavigator = () => {
+  return (
+    <Tab.Navigator
+      screenOptions={{
+        headerShown: false,
+        tabBarStyle: { display: 'none' },
+      }}>
+      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Gacha" component={GachaScreen} />
+      <Tab.Screen name="Invest" component={InvestScreen} />
+      <Tab.Screen name="Analysis" component={AnalysisScreen} />
+      <Tab.Screen name="Bag" component={BagScreen} />
+    </Tab.Navigator>
+  );
+};
 
 const AppNavigator = () => {
   return (
     <NavigationContainer>
-      <Tab.Navigator
-        screenOptions={{
-          headerShown: false,
-          tabBarShowLabel: false,
-          tabBarStyle: {
-            backgroundColor: '#fff',
-            borderTopWidth: 1,
-            borderTopColor: '#eee',
-          },
-        }}>
-        <Tab.Screen 
-          name="Home" 
-          component={HomeScreen}
+      <Stack.Navigator screenOptions={{headerShown: false}}>
+        <Stack.Screen name="MainTabs" component={TabNavigator} />
+        <Stack.Screen 
+          name="Settings" 
+          component={SettingsScreen}
           options={{
-            tabBarIcon: ({color}) => <Text style={{color, fontSize: 24}}>🏠</Text>,
+            presentation: 'modal',
           }}
         />
-        <Tab.Screen 
-          name="Gacha" 
-          component={GachaScreen}
-          options={{
-            tabBarIcon: ({color}) => <Text style={{color, fontSize: 24}}>🎲</Text>,
-          }}
-        />
-        <Tab.Screen 
-          name="Invest" 
-          component={InvestScreen}
-          options={{
-            tabBarIcon: ({color}) => <Text style={{color, fontSize: 24}}>📈</Text>,
-          }}
-        />
-        <Tab.Screen 
-          name="Analysis" 
-          component={AnalysisScreen}
-          options={{
-            tabBarIcon: ({color}) => <Text style={{color, fontSize: 24}}>📊</Text>,
-          }}
-        />
-      </Tab.Navigator>
+      </Stack.Navigator>
     </NavigationContainer>
   );
 };

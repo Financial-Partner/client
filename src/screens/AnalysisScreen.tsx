@@ -1,24 +1,19 @@
 import React from 'react';
 import {View, Text, StyleSheet, StatusBar} from 'react-native';
-import Header from '../components/Header';
+import Layout from '../components/Layout';
 
 const AnalysisScreen = () => {
   return (
-    <View style={styles.container}>
+    <Layout>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-      <Header />
       <View style={styles.content}>
         <Text>分析畫面</Text>
       </View>
-    </View>
+    </Layout>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
   content: {
     flex: 1,
     justifyContent: 'center',

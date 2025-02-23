@@ -34,7 +34,18 @@ const Footer = () => {
             route.name === tab.name && styles.tabActive,
           ]}
           onPress={() => navigation.navigate(tab.name)}>
-          <Text style={styles.icon}>{tab.icon}</Text>
+          <Text style={[
+            styles.icon,
+            route.name === tab.name && styles.iconActive
+          ]}>
+            {tab.icon}
+          </Text>
+          <Text style={[
+            styles.label,
+            route.name === tab.name && styles.labelActive
+          ]}>
+            {tab.label}
+          </Text>
         </Pressable>
       ))}
     </View>
@@ -47,22 +58,34 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderTopWidth: 1,
     borderTopColor: '#eee',
-    paddingBottom: 8,
-    marginBottom: Platform.OS === 'ios' ? 20 : 10,
+    paddingBottom: Platform.OS === 'ios' ? 20 : 10,
   },
   tab: {
     flex: 1,
-    paddingVertical: 12,
+    paddingVertical: 8,
     alignItems: 'center',
+    gap: 4,
   },
   tabPressed: {
-    backgroundColor: '#f0f0f0',
+    opacity: 0.7,
   },
   tabActive: {
     backgroundColor: '#f8f8f8',
   },
   icon: {
     fontSize: 24,
+    color: '#666',
+  },
+  iconActive: {
+    color: '#000',
+  },
+  label: {
+    fontSize: 12,
+    color: '#666',
+  },
+  labelActive: {
+    color: '#000',
+    fontWeight: '600',
   },
 });
 

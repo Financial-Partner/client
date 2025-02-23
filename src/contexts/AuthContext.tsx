@@ -1,7 +1,7 @@
-import React, {createContext, useState, useContext, useEffect} from 'react';
-import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth';
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import { getAuth, FirebaseAuthTypes, firebase } from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import Config from 'react-native-config';
 
 type AuthContextType = {
@@ -16,9 +16,11 @@ type AuthContextType = {
   updatePassword: (currentPassword: string, newPassword: string) => Promise<void>;
 };
 
+const auth = getAuth();
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({children}: {children: React.ReactNode}) => {
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState<string | null>(null);
@@ -28,7 +30,7 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
       webClientId: Config.GOOGLE_WEB_CLIENT_ID,
     });
 
-    const unsubscribe = auth().onAuthStateChanged(async userState => {
+    const unsubscribe = auth.onAuthStateChanged(async userState => {
       setUser(userState);
       if (userState) {
         const idToken = await userState.getIdToken();
@@ -49,8 +51,8 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
       if (!email || !password) {
         throw new Error('請輸入電子郵件和密碼');
       }
-      
-      const userCredential = await auth().signInWithEmailAndPassword(email, password);
+
+      const userCredential = await auth.signInWithEmailAndPassword(email, password);
       const idToken = await userCredential.user.getIdToken();
       setToken(idToken);
       await AsyncStorage.setItem('userToken', idToken);
@@ -75,12 +77,12 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
       if (!email || !password) {
         throw new Error('請輸入電子郵件和密碼');
       }
-      
+
       if (password.length < 6) {
         throw new Error('密碼長度至少需要6個字元');
       }
-      
-      const userCredential = await auth().createUserWithEmailAndPassword(email, password);
+
+      const userCredential = await auth.createUserWithEmailAndPassword(email, password);
       const idToken = await userCredential.user.getIdToken();
       setToken(idToken);
       await AsyncStorage.setItem('userToken', idToken);
@@ -106,14 +108,14 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
       const userInfo = await GoogleSignin.signIn();
       console.log('userInfo', userInfo);
 
-      const {accessToken} = await GoogleSignin.getTokens();
-      
+      const { accessToken } = await GoogleSignin.getTokens();
+
       if (!accessToken) {
         throw new Error('無法獲取 Google access token');
       }
 
-      const googleCredential = auth.GoogleAuthProvider.credential(userInfo.data?.idToken || null);
-      const userCredential = await auth().signInWithCredential(googleCredential);
+      const googleCredential = firebase.auth.GoogleAuthProvider.credential(userInfo.data?.idToken || null);
+      const userCredential = await auth.signInWithCredential(googleCredential);
       const firebaseToken = await userCredential.user.getIdToken();
       setToken(firebaseToken);
       await AsyncStorage.setItem('userToken', firebaseToken);
@@ -125,7 +127,7 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
 
   const signOut = async () => {
     try {
-      await auth().signOut();
+      await auth.signOut();
       await GoogleSignin.signOut();
       await AsyncStorage.removeItem('userToken');
       setToken(null);
@@ -142,18 +144,18 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
 
       await GoogleSignin.hasPlayServices();
       const { data: userInfo } = await GoogleSignin.signIn();
-      
+
       if (userInfo?.user?.email !== user.email) {
         throw new Error('請使用相同的電子郵件地址');
       }
 
-      const {accessToken} = await GoogleSignin.getTokens();
-      
+      const { accessToken } = await GoogleSignin.getTokens();
+
       if (!accessToken) {
         throw new Error('無法獲取 Google access token');
       }
 
-      const googleCredential = auth.GoogleAuthProvider.credential(
+      const googleCredential = firebase.auth.GoogleAuthProvider.credential(
         userInfo.idToken,
         accessToken,
       );
@@ -180,7 +182,7 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
     try {
       if (!user) throw new Error('用戶未登入');
       await user.reauthenticateWithCredential(
-        auth.EmailAuthProvider.credential(user.email!, currentPassword)
+        firebase.auth.EmailAuthProvider.credential(user.email!, currentPassword)
       );
       await user.updatePassword(newPassword);
     } catch (error: any) {

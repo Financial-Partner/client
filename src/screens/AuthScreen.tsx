@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Pressable,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import {useAuth} from '../contexts/AuthContext';
 import {colors} from '../theme/colors';
@@ -23,10 +24,11 @@ const AuthScreen = () => {
     try {
       setLoading(true);
       setError('');
+      
       if (isLogin) {
-        await signIn(email, password);
+        await signIn(email.trim(), password);
       } else {
-        await signUp(email, password);
+        await signUp(email.trim(), password);
       }
     } catch (error: any) {
       setError(error.message);
@@ -45,6 +47,7 @@ const AuthScreen = () => {
         value={email}
         onChangeText={setEmail}
         autoCapitalize="none"
+        keyboardType="email-address"
       />
       
       <TextInput
@@ -69,6 +72,8 @@ const AuthScreen = () => {
           </Text>
         )}
       </Pressable>
+
+      <Text style={styles.dividerText}>或</Text>
 
       <Pressable
         style={styles.socialButton}
@@ -134,8 +139,18 @@ const styles = StyleSheet.create({
     color: colors.text,
     textAlign: 'center',
   },
+  dividerText: {
+    color: colors.text,
+    textAlign: 'center',
+    marginBottom: 10,
+  },
   switchButton: {
-    padding: 10,
+    backgroundColor: '#fff',
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#ddd',
   },
   switchText: {
     color: colors.text,

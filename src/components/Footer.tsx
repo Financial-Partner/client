@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, StyleSheet, Pressable, Platform} from 'react-native';
+import {View, StyleSheet, Pressable, Platform, Image, Text} from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import type {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
 
@@ -12,16 +12,36 @@ type TabParamList = {
 
 type NavigationProp = BottomTabNavigationProp<TabParamList>;
 
+const tabs = [
+  {
+    name: 'Home' as const,
+    icon: require('../assets/icons/home.png'),
+    activeIcon: require('../assets/icons/home-active.png'),
+    label: '首頁',
+  },
+  {
+    name: 'Gacha' as const,
+    icon: require('../assets/icons/gacha.png'),
+    activeIcon: require('../assets/icons/gacha-active.png'),
+    label: '抽卡',
+  },
+  {
+    name: 'Invest' as const,
+    icon: require('../assets/icons/invest.png'),
+    activeIcon: require('../assets/icons/invest-active.png'),
+    label: '投資',
+  },
+  {
+    name: 'Analysis' as const,
+    icon: require('../assets/icons/analysis.png'),
+    activeIcon: require('../assets/icons/analysis-active.png'),
+    label: '分析',
+  },
+] as const;
+
 const Footer = () => {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute();
-
-  const tabs = [
-    {name: 'Home' as const, icon: '🏠', label: '首頁'},
-    {name: 'Gacha' as const, icon: '🎲', label: '抽卡'},
-    {name: 'Invest' as const, icon: '📈', label: '投資'},
-    {name: 'Analysis' as const, icon: '📊', label: '分析'},
-  ] as const;
 
   return (
     <View style={styles.container}>
@@ -31,21 +51,13 @@ const Footer = () => {
           style={({pressed}) => [
             styles.tab,
             pressed && styles.tabPressed,
-            route.name === tab.name && styles.tabActive,
           ]}
           onPress={() => navigation.navigate(tab.name)}>
-          <Text style={[
-            styles.icon,
-            route.name === tab.name && styles.iconActive
-          ]}>
-            {tab.icon}
-          </Text>
-          <Text style={[
-            styles.label,
-            route.name === tab.name && styles.labelActive
-          ]}>
-            {tab.label}
-          </Text>
+          <Image
+            source={route.name === tab.name ? tab.activeIcon : tab.icon}
+            style={styles.icon}
+            resizeMode="contain"
+          />
         </Pressable>
       ))}
     </View>
@@ -59,33 +71,20 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#eee',
     paddingBottom: Platform.OS === 'ios' ? 20 : 10,
+    paddingTop: 10,
   },
   tab: {
     flex: 1,
-    paddingVertical: 8,
+    height: 44,
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 4,
   },
   tabPressed: {
     opacity: 0.7,
   },
-  tabActive: {
-    backgroundColor: '#f8f8f8',
-  },
   icon: {
-    fontSize: 24,
-    color: '#666',
-  },
-  iconActive: {
-    color: '#000',
-  },
-  label: {
-    fontSize: 12,
-    color: '#666',
-  },
-  labelActive: {
-    color: '#000',
-    fontWeight: '600',
+    width: 28,
+    height: 28,
   },
 });
 

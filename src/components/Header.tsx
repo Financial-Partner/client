@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, StyleSheet, Pressable, StatusBar, Platform} from 'react-native';
+import {View, Text, StyleSheet, Pressable, StatusBar, Platform, Image} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import type {StackNavigationProp} from '@react-navigation/stack';
 
@@ -22,7 +22,10 @@ const Header = () => {
           pressed && styles.buttonPressed
         ]}
         onPress={() => navigation.navigate('Settings')}>
-        <Text style={styles.icon}>⚙️</Text>
+        <Image 
+          source={require('../assets/icons/settings.png')}
+          style={styles.icon}
+        />
       </Pressable>
       
       <View style={styles.rightContainer}>
@@ -34,11 +37,18 @@ const Header = () => {
           onPress={() => {
             navigation.navigate('Bag');
           }}>
-          <Text style={styles.icon}>🎒</Text>
+          <Image 
+            source={require('../assets/icons/bag.png')}
+            style={styles.icon}
+          />
         </Pressable>
         
         <View style={styles.moneyContainer}>
-          <Text style={styles.moneyText}>💰 1,000,000</Text>
+					<Image 
+						source={require('../assets/icons/diamond.png')}
+						style={styles.icon}
+					/>
+          <Text style={styles.moneyText}>1,000,000</Text>
         </View>
       </View>
     </View>
@@ -76,17 +86,22 @@ const styles = StyleSheet.create({
     backgroundColor: '#f0f0f0',
   },
   moneyContainer: {
-    backgroundColor: '#f8f8f8',
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#8E8989',
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 16,
+    gap: 4,
+  },
+  icon: {
+    width: 20,
+    height: 20,
+    resizeMode: 'contain',
   },
   moneyText: {
     fontSize: 16,
     fontWeight: '600',
-  },
-  icon: {
-    fontSize: 20,
   },
 });
 

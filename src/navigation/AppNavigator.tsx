@@ -16,6 +16,7 @@ const AppNavigator = () => {
       <Tab.Navigator
         screenOptions={{
           headerShown: false,
+          tabBarShowLabel: false,
           tabBarStyle: {
             backgroundColor: '#fff',
             borderTopWidth: 1,
@@ -26,32 +27,28 @@ const AppNavigator = () => {
           name="Home" 
           component={HomeScreen}
           options={{
-            tabBarLabel: '首頁',
-            tabBarIcon: ({color}) => <Text style={{color}}>🏠</Text>,
+            tabBarIcon: ({color}) => <Text style={{color, fontSize: 24}}>🏠</Text>,
           }}
         />
         <Tab.Screen 
           name="Gacha" 
           component={GachaScreen}
           options={{
-            tabBarLabel: '抽卡',
-            tabBarIcon: ({color}) => <Text style={{color}}>🎲</Text>,
+            tabBarIcon: ({color}) => <Text style={{color, fontSize: 24}}>🎲</Text>,
           }}
         />
         <Tab.Screen 
           name="Invest" 
           component={InvestScreen}
           options={{
-            tabBarLabel: '投資',
-            tabBarIcon: ({color}) => <Text style={{color}}>📈</Text>,
+            tabBarIcon: ({color}) => <Text style={{color, fontSize: 24}}>📈</Text>,
           }}
         />
         <Tab.Screen 
           name="Analysis" 
           component={AnalysisScreen}
           options={{
-            tabBarLabel: '分析',
-            tabBarIcon: ({color}) => <Text style={{color}}>📊</Text>,
+            tabBarIcon: ({color}) => <Text style={{color, fontSize: 24}}>📊</Text>,
           }}
         />
       </Tab.Navigator>

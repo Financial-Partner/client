@@ -3,6 +3,7 @@ import {View, Text, StyleSheet, StatusBar, Platform, Pressable} from 'react-nati
 import {useNavigation} from '@react-navigation/native';
 import type {StackNavigationProp} from '@react-navigation/stack';
 import {colors} from '../theme/colors';
+import {useAuth} from '../contexts/AuthContext';
 
 type RootStackParamList = {
   MainTabs: undefined;
@@ -13,6 +14,15 @@ type NavigationProp = StackNavigationProp<RootStackParamList>;
 
 const SettingsScreen = () => {
   const navigation = useNavigation<NavigationProp>();
+  const {signOut} = useAuth();
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      console.error('登出錯誤:', error);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -30,7 +40,14 @@ const SettingsScreen = () => {
         <View style={styles.placeholder} />
       </View>
       <View style={styles.content}>
-        <Text style={styles.text}>設定內容</Text>
+        <Pressable
+          style={({pressed}) => [
+            styles.signOutButton,
+            pressed && styles.buttonPressed,
+          ]}
+          onPress={handleSignOut}>
+          <Text style={styles.signOutText}>登出</Text>
+        </Pressable>
       </View>
     </View>
   );
@@ -72,12 +89,18 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    justifyContent: 'center',
+    padding: 16,
+  },
+  signOutButton: {
+    backgroundColor: '#FF6B6B',
+    padding: 16,
+    borderRadius: 8,
     alignItems: 'center',
   },
-  text: {
-    color: colors.text,
+  signOutText: {
+    color: '#FFFFFF',
     fontSize: 16,
+    fontWeight: '600',
   },
 });
 

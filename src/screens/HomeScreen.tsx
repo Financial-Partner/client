@@ -5,7 +5,7 @@ import Layout from '../components/Layout';
 const HomeScreen = () => {
   return (
     <Layout>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+      <StatusBar barStyle="dark-content" />
       <View style={styles.content}>
         <Text>首頁畫面</Text>
       </View>

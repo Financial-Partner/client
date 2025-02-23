@@ -2,6 +2,7 @@ import React from 'react';
 import {View, Text, StyleSheet, Pressable, StatusBar, Platform, Image} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import type {StackNavigationProp} from '@react-navigation/stack';
+import {colors} from '../theme/colors';
 
 type RootStackParamList = {
   MainTabs: undefined;
@@ -61,9 +62,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 12,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    backgroundColor: colors.background,
     paddingTop: Platform.select({
       android: StatusBar.currentHeight,
       ios: 44, // iOS 的安全區域高度
@@ -83,12 +82,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   buttonPressed: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: colors.pressedBackground,
   },
   moneyContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#8E8989',
+    backgroundColor: colors.moneyBackground,
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 16,
@@ -102,6 +101,7 @@ const styles = StyleSheet.create({
   moneyText: {
     fontSize: 16,
     fontWeight: '600',
+    color: colors.diamond,
   },
 });
 

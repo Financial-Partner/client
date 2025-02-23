@@ -2,6 +2,7 @@ import React from 'react';
 import {View, StyleSheet, Pressable, Platform, Image, Text} from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import type {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
+import {colors} from '../theme/colors';
 
 type TabParamList = {
   Home: undefined;
@@ -67,9 +68,7 @@ const Footer = () => {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    backgroundColor: '#fff',
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
+    backgroundColor: colors.background,
     paddingBottom: Platform.OS === 'ios' ? 20 : 10,
     paddingTop: 10,
   },
@@ -80,7 +79,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   tabPressed: {
-    opacity: 0.7,
+    backgroundColor: colors.pressedBackground,
   },
   icon: {
     width: 28,

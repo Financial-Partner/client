@@ -1,7 +1,8 @@
 import React from 'react';
-import {View, Text, StyleSheet, StatusBar, Pressable, Platform} from 'react-native';
+import {View, Text, StyleSheet, StatusBar, Platform, Pressable} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import type {StackNavigationProp} from '@react-navigation/stack';
+import {colors} from '../theme/colors';
 
 type RootStackParamList = {
   MainTabs: undefined;
@@ -15,20 +16,21 @@ const SettingsScreen = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+      <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
       <View style={styles.header}>
-        <Text style={styles.title}>設定</Text>
-        <Pressable 
+        <Pressable
           style={({pressed}) => [
             styles.closeButton,
-            pressed && styles.buttonPressed
+            pressed && styles.buttonPressed,
           ]}
           onPress={() => navigation.goBack()}>
-          <Text style={styles.closeText}>✕</Text>
+          <Text style={styles.closeText}>關閉</Text>
         </Pressable>
+        <Text style={styles.title}>設定</Text>
+        <View style={styles.placeholder} />
       </View>
       <View style={styles.content}>
-        <Text>設定內容</Text>
+        <Text style={styles.text}>設定內容</Text>
       </View>
     </View>
   );
@@ -37,18 +39,16 @@ const SettingsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.background,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
     paddingTop: Platform.select({
       android: StatusBar.currentHeight,
-      ios: 44, // iOS 的安全區域高度
+      ios: 44,
     }),
   },
   closeButton: {
@@ -56,20 +56,28 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   buttonPressed: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: colors.pressedBackground,
   },
   closeText: {
     fontSize: 16,
+    color: colors.text,
   },
   title: {
     fontSize: 18,
     fontWeight: '600',
-    marginLeft: 12,
+    color: colors.text,
+  },
+  placeholder: {
+    width: 40,
   },
   content: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  text: {
+    color: colors.text,
+    fontSize: 16,
   },
 });
 

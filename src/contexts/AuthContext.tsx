@@ -157,7 +157,8 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
         accessToken,
       );
 
-      await user.linkWithCredential(googleCredential);
+      const result = await user.linkWithCredential(googleCredential);
+      setUser(result.user);
     } catch (error: any) {
       console.error('Google 帳號連結錯誤:', error);
       switch (error.code) {

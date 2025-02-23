@@ -45,6 +45,8 @@ const SettingsScreen = () => {
     provider => provider.providerId === 'google.com',
   );
 
+  const showLinkButton = isEmailProvider && !hasGoogleProvider;
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
@@ -67,7 +69,7 @@ const SettingsScreen = () => {
           <Text style={styles.email}>{user?.email}</Text>
         </View>
 
-        {isEmailProvider && !hasGoogleProvider && (
+        {showLinkButton && (
           <View style={styles.linkSection}>
             <Text style={styles.sectionTitle}>連結其他登入方式</Text>
             <Pressable

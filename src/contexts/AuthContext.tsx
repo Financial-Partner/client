@@ -13,6 +13,7 @@ type AuthContextType = {
   signOut: () => Promise<void>;
   googleSignIn: () => Promise<void>;
   linkGoogleAccount: () => Promise<void>;
+  updatePassword: (currentPassword: string, newPassword: string) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -175,6 +176,18 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
     }
   };
 
+  const updatePassword = async (currentPassword: string, newPassword: string) => {
+    try {
+      if (!user) throw new Error('用戶未登入');
+      await user.reauthenticateWithCredential(
+        auth.EmailAuthProvider.credential(user.email!, currentPassword)
+      );
+      await user.updatePassword(newPassword);
+    } catch (error: any) {
+      throw error;
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -186,6 +199,7 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
         signOut,
         googleSignIn,
         linkGoogleAccount,
+        updatePassword,
       }}>
       {children}
     </AuthContext.Provider>

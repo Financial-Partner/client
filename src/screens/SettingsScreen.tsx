@@ -4,6 +4,7 @@ import {useNavigation} from '@react-navigation/native';
 import type {StackNavigationProp} from '@react-navigation/stack';
 import {colors} from '../theme/colors';
 import {useAuth} from '../contexts/AuthContext';
+import UpdatePasswordModal from '../components/UpdatePasswordModal';
 
 type RootStackParamList = {
   MainTabs: undefined;
@@ -14,8 +15,9 @@ type NavigationProp = StackNavigationProp<RootStackParamList>;
 
 const SettingsScreen = () => {
   const navigation = useNavigation<NavigationProp>();
-  const {user, signOut, linkGoogleAccount} = useAuth();
+  const {user, signOut, linkGoogleAccount, updatePassword} = useAuth();
   const [linking, setLinking] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
 
   const handleSignOut = async () => {
     try {
@@ -37,15 +39,27 @@ const SettingsScreen = () => {
     }
   };
 
-  const isEmailProvider = user?.providerData.some(
-    provider => provider.providerId === 'password',
+  const handleUpdatePassword = async (
+    currentPassword: string,
+    newPassword: string,
+  ) => {
+    try {
+      await updatePassword(currentPassword, newPassword);
+      Alert.alert('成功', '密碼已更新');
+    } catch (error: any) {
+      throw error;
+    }
+  };
+
+  const isPasswordLogin = user?.providerData.some(
+    provider => provider.providerId === 'password'
   );
 
   const hasGoogleProvider = user?.providerData.some(
     provider => provider.providerId === 'google.com',
   );
 
-  const showLinkButton = isEmailProvider && !hasGoogleProvider;
+  const showLinkButton = isPasswordLogin && !hasGoogleProvider;
 
   return (
     <View style={styles.container}>
@@ -68,6 +82,17 @@ const SettingsScreen = () => {
           <Text style={styles.label}>電子郵件</Text>
           <Text style={styles.email}>{user?.email}</Text>
         </View>
+
+        {isPasswordLogin && (
+          <Pressable
+            style={({pressed}) => [
+              styles.settingButton,
+              pressed && styles.buttonPressed,
+            ]}
+            onPress={() => setShowPasswordModal(true)}>
+            <Text style={styles.settingText}>修改密碼</Text>
+          </Pressable>
+        )}
 
         {showLinkButton && (
           <View style={styles.linkSection}>
@@ -100,6 +125,12 @@ const SettingsScreen = () => {
           <Text style={styles.signOutText}>登出</Text>
         </Pressable>
       </View>
+
+      <UpdatePasswordModal
+        visible={showPasswordModal}
+        onClose={() => setShowPasswordModal(false)}
+        onSubmit={handleUpdatePassword}
+      />
     </View>
   );
 };
@@ -194,6 +225,18 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginTop: 8,
     textAlign: 'center',
+  },
+  settingButton: {
+    backgroundColor: '#4285F4',
+    padding: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  settingText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 

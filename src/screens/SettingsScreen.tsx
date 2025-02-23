@@ -1,5 +1,5 @@
-import React from 'react';
-import {View, Text, StyleSheet, StatusBar, Platform, Pressable} from 'react-native';
+import React, {useState} from 'react';
+import {View, Text, StyleSheet, StatusBar, Platform, Pressable, Alert, ActivityIndicator} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import type {StackNavigationProp} from '@react-navigation/stack';
 import {colors} from '../theme/colors';
@@ -14,7 +14,8 @@ type NavigationProp = StackNavigationProp<RootStackParamList>;
 
 const SettingsScreen = () => {
   const navigation = useNavigation<NavigationProp>();
-  const {signOut} = useAuth();
+  const {user, signOut, linkGoogleAccount} = useAuth();
+  const [linking, setLinking] = useState(false);
 
   const handleSignOut = async () => {
     try {
@@ -23,6 +24,26 @@ const SettingsScreen = () => {
       console.error('登出錯誤:', error);
     }
   };
+
+  const handleLinkGoogle = async () => {
+    try {
+      setLinking(true);
+      await linkGoogleAccount();
+      Alert.alert('成功', 'Google 帳號已成功連結');
+    } catch (error: any) {
+      Alert.alert('錯誤', error.message);
+    } finally {
+      setLinking(false);
+    }
+  };
+
+  const isEmailProvider = user?.providerData.some(
+    provider => provider.providerId === 'password',
+  );
+
+  const hasGoogleProvider = user?.providerData.some(
+    provider => provider.providerId === 'google.com',
+  );
 
   return (
     <View style={styles.container}>
@@ -39,7 +60,35 @@ const SettingsScreen = () => {
         <Text style={styles.title}>設定</Text>
         <View style={styles.placeholder} />
       </View>
+      
       <View style={styles.content}>
+        <View style={styles.infoSection}>
+          <Text style={styles.label}>電子郵件</Text>
+          <Text style={styles.email}>{user?.email}</Text>
+        </View>
+
+        {isEmailProvider && !hasGoogleProvider && (
+          <View style={styles.linkSection}>
+            <Text style={styles.sectionTitle}>連結其他登入方式</Text>
+            <Pressable
+              style={({pressed}) => [
+                styles.linkButton,
+                pressed && styles.buttonPressed,
+              ]}
+              onPress={handleLinkGoogle}
+              disabled={linking}>
+              {linking ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.linkText}>連結 Google 帳號</Text>
+              )}
+            </Pressable>
+            <Text style={styles.linkHint}>
+              * 請使用相同的電子郵件地址 ({user?.email})
+            </Text>
+          </View>
+        )}
+
         <Pressable
           style={({pressed}) => [
             styles.signOutButton,
@@ -101,6 +150,48 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
+  },
+  infoSection: {
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 20,
+  },
+  label: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    marginBottom: 4,
+  },
+  email: {
+    fontSize: 16,
+    color: colors.text,
+  },
+  linkSection: {
+    marginBottom: 20,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.text,
+    marginBottom: 12,
+  },
+  linkButton: {
+    backgroundColor: '#4285F4',
+    padding: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  linkText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  linkHint: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    marginTop: 8,
+    textAlign: 'center',
   },
 });
 

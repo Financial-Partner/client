@@ -9,9 +9,10 @@ type AuthContextType = {
   loading: boolean;
   token: string | null;
   signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   googleSignIn: () => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
+  linkGoogleAccount: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -132,6 +133,47 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
     }
   };
 
+  const linkGoogleAccount = async () => {
+    try {
+      if (!user?.email) {
+        throw new Error('找不到當前用戶信箱');
+      }
+
+      await GoogleSignin.hasPlayServices();
+      const { data: userInfo } = await GoogleSignin.signIn();
+      
+      if (userInfo?.user?.email !== user.email) {
+        throw new Error('請使用相同的電子郵件地址');
+      }
+
+      const {accessToken} = await GoogleSignin.getTokens();
+      
+      if (!accessToken) {
+        throw new Error('無法獲取 Google access token');
+      }
+
+      const googleCredential = auth.GoogleAuthProvider.credential(
+        userInfo.idToken,
+        accessToken,
+      );
+
+      await user.linkWithCredential(googleCredential);
+    } catch (error: any) {
+      console.error('Google 帳號連結錯誤:', error);
+      switch (error.code) {
+        case 'auth/provider-already-linked':
+          throw new Error('此 Google 帳號已經連結');
+        case 'auth/credential-already-in-use':
+          throw new Error('此 Google 帳號已被其他帳號使用');
+        default:
+          if (error.message) {
+            throw error;
+          }
+          throw new Error('連結失敗，請稍後再試');
+      }
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -139,9 +181,10 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
         loading,
         token,
         signIn,
+        signUp,
         signOut,
         googleSignIn,
-        signUp
+        linkGoogleAccount,
       }}>
       {children}
     </AuthContext.Provider>

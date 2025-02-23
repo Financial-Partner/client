@@ -1,10 +1,15 @@
-import React, {useState} from 'react';
-import {View, Text, StyleSheet, StatusBar, Platform, Pressable, Alert, ActivityIndicator} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import type {StackNavigationProp} from '@react-navigation/stack';
-import {colors} from '../theme/colors';
-import {useAuth} from '../contexts/AuthContext';
-import UpdatePasswordModal from '../components/UpdatePasswordModal';
+import React, { useState } from 'react';
+import { View, StyleSheet, StatusBar, Alert } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import type { StackNavigationProp } from '@react-navigation/stack';
+import { colors } from '../theme/colors';
+import { useAuth } from '../contexts/AuthContext';
+import SettingsHeader from '../components/settings/SettingsHeader';
+import AccountInfo from '../components/settings/AccountInfo';
+import PasswordSection from '../components/settings/PasswordSection';
+import LinkGoogleAccount from '../components/settings/LinkGoogleAccount';
+import SignOutButton from '../components/settings/SignOutButton';
+import UpdatePasswordModal from '../components/settings/UpdatePasswordModal';
 
 type RootStackParamList = {
   MainTabs: undefined;
@@ -13,11 +18,11 @@ type RootStackParamList = {
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 
-const SettingsScreen = () => {
+const SettingsScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
-  const {user, signOut, linkGoogleAccount, updatePassword} = useAuth();
-  const [linking, setLinking] = useState(false);
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const { user, signOut, linkGoogleAccount, updatePassword } = useAuth();
+  const [linking, setLinking] = useState<boolean>(false);
+  const [showPasswordModal, setShowPasswordModal] = useState<boolean>(false);
 
   const handleSignOut = async () => {
     try {
@@ -39,10 +44,7 @@ const SettingsScreen = () => {
     }
   };
 
-  const handleUpdatePassword = async (
-    currentPassword: string,
-    newPassword: string,
-  ) => {
+  const handleUpdatePassword = async (currentPassword: string, newPassword: string) => {
     try {
       await updatePassword(currentPassword, newPassword);
       Alert.alert('成功', '密碼已更新');
@@ -52,11 +54,11 @@ const SettingsScreen = () => {
   };
 
   const isPasswordLogin = user?.providerData.some(
-    provider => provider.providerId === 'password'
+    (provider) => provider.providerId === 'password'
   );
 
   const hasGoogleProvider = user?.providerData.some(
-    provider => provider.providerId === 'google.com',
+    (provider) => provider.providerId === 'google.com'
   );
 
   const showLinkButton = isPasswordLogin && !hasGoogleProvider;
@@ -64,68 +66,21 @@ const SettingsScreen = () => {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
-      <View style={styles.header}>
-        <Pressable
-          style={({pressed}) => [
-            styles.closeButton,
-            pressed && styles.buttonPressed,
-          ]}
-          onPress={() => navigation.goBack()}>
-          <Text style={styles.closeText}>關閉</Text>
-        </Pressable>
-        <Text style={styles.title}>設定</Text>
-        <View style={styles.placeholder} />
-      </View>
-      
+      <SettingsHeader onClose={() => navigation.goBack()} />
       <View style={styles.content}>
-        <View style={styles.infoSection}>
-          <Text style={styles.label}>電子郵件</Text>
-          <Text style={styles.email}>{user?.email}</Text>
-        </View>
-
+        <AccountInfo email={user?.email} />
         {isPasswordLogin && (
-          <Pressable
-            style={({pressed}) => [
-              styles.settingButton,
-              pressed && styles.buttonPressed,
-            ]}
-            onPress={() => setShowPasswordModal(true)}>
-            <Text style={styles.settingText}>修改密碼</Text>
-          </Pressable>
+          <PasswordSection onPress={() => setShowPasswordModal(true)} />
         )}
-
         {showLinkButton && (
-          <View style={styles.linkSection}>
-            <Text style={styles.sectionTitle}>連結其他登入方式</Text>
-            <Pressable
-              style={({pressed}) => [
-                styles.linkButton,
-                pressed && styles.buttonPressed,
-              ]}
-              onPress={handleLinkGoogle}
-              disabled={linking}>
-              {linking ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text style={styles.linkText}>連結 Google 帳號</Text>
-              )}
-            </Pressable>
-            <Text style={styles.linkHint}>
-              * 請使用相同的電子郵件地址 ({user?.email})
-            </Text>
-          </View>
+          <LinkGoogleAccount
+            linking={linking}
+            onLink={handleLinkGoogle}
+            email={user?.email}
+          />
         )}
-
-        <Pressable
-          style={({pressed}) => [
-            styles.signOutButton,
-            pressed && styles.buttonPressed,
-          ]}
-          onPress={handleSignOut}>
-          <Text style={styles.signOutText}>登出</Text>
-        </Pressable>
+        <SignOutButton onPress={handleSignOut} />
       </View>
-
       <UpdatePasswordModal
         visible={showPasswordModal}
         onClose={() => setShowPasswordModal(false)}
@@ -140,104 +95,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-    paddingTop: Platform.select({
-      android: StatusBar.currentHeight,
-      ios: 44,
-    }),
-  },
-  closeButton: {
-    padding: 8,
-    borderRadius: 8,
-  },
-  buttonPressed: {
-    backgroundColor: colors.pressedBackground,
-  },
-  closeText: {
-    fontSize: 16,
-    color: colors.text,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.text,
-  },
-  placeholder: {
-    width: 40,
-  },
   content: {
     flex: 1,
     padding: 16,
   },
-  signOutButton: {
-    backgroundColor: '#FF6B6B',
-    padding: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  signOutText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  infoSection: {
-    backgroundColor: '#fff',
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginBottom: 4,
-  },
-  email: {
-    fontSize: 16,
-    color: colors.text,
-  },
-  linkSection: {
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: 12,
-  },
-  linkButton: {
-    backgroundColor: '#4285F4',
-    padding: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  linkText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  linkHint: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    marginTop: 8,
-    textAlign: 'center',
-  },
-  settingButton: {
-    backgroundColor: '#4285F4',
-    padding: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  settingText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
 });
 
-export default SettingsScreen; 
+export default SettingsScreen;

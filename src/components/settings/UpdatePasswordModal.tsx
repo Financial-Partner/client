@@ -10,7 +10,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import {colors} from '../theme/colors';
+import {colors} from '../../theme/colors';
 
 type Props = {
   visible: boolean;

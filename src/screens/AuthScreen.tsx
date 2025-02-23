@@ -1,93 +1,27 @@
-import React, {useState} from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  Pressable,
-  ActivityIndicator,
-  Alert,
-} from 'react-native';
-import {useAuth} from '../contexts/AuthContext';
-import {colors} from '../theme/colors';
+import React, { useState } from 'react';
+import { View, StyleSheet } from 'react-native';
+import { colors } from '../theme/colors';
+import AuthForm from '../components/auth/AuthForm';
+import SocialAuth from '../components/auth/SocialAuth';
+import SwitchAuthMode from '../components/auth/SwitchAuthMode';
+import { useAuth } from '../contexts/AuthContext';
 
 const AuthScreen = () => {
   const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  const {signIn, signUp, googleSignIn} = useAuth();
-
-  const handleSubmit = async () => {
-    try {
-      setLoading(true);
-      setError('');
-      
-      if (isLogin) {
-        await signIn(email.trim(), password);
-      } else {
-        await signUp(email.trim(), password);
-      }
-    } catch (error: any) {
-      setError(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { signIn, signUp, googleSignIn } = useAuth();
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{isLogin ? '登入' : '註冊'}</Text>
-      
-      <TextInput
-        style={styles.input}
-        placeholder="電子郵件"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-        keyboardType="email-address"
+      <AuthForm 
+        isLogin={isLogin} 
+        signIn={signIn} 
+        signUp={signUp} 
       />
-      
-      <TextInput
-        style={styles.input}
-        placeholder="密碼"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
+      <SocialAuth googleSignIn={googleSignIn} />
+      <SwitchAuthMode 
+        isLogin={isLogin} 
+        onToggle={() => setIsLogin(!isLogin)} 
       />
-
-      {error ? <Text style={styles.error}>{error}</Text> : null}
-
-      <Pressable
-        style={styles.submitButton}
-        onPress={handleSubmit}
-        disabled={loading}>
-        {loading ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.submitText}>
-            {isLogin ? '登入' : '註冊'}
-          </Text>
-        )}
-      </Pressable>
-
-      <Text style={styles.dividerText}>或</Text>
-
-      <Pressable
-        style={styles.socialButton}
-        onPress={googleSignIn}>
-        <Text style={styles.socialText}>使用 Google 登入</Text>
-      </Pressable>
-
-      <Pressable
-        style={styles.switchButton}
-        onPress={() => setIsLogin(!isLogin)}>
-        <Text style={styles.switchText}>
-          {isLogin ? '還沒有帳號？註冊' : '已有帳號？登入'}
-        </Text>
-      </Pressable>
     </View>
   );
 };
@@ -99,63 +33,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     justifyContent: 'center',
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    color: colors.text,
-    textAlign: 'center',
-  },
-  input: {
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 10,
-  },
-  error: {
-    color: 'red',
-    marginBottom: 10,
-  },
-  submitButton: {
-    backgroundColor: '#007AFF',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 10,
-  },
-  submitText: {
-    color: '#fff',
-    textAlign: 'center',
-    fontWeight: 'bold',
-  },
-  socialButton: {
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: '#ddd',
-  },
-  socialText: {
-    color: colors.text,
-    textAlign: 'center',
-  },
-  dividerText: {
-    color: colors.text,
-    textAlign: 'center',
-    marginBottom: 10,
-  },
-  switchButton: {
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: '#ddd',
-  },
-  switchText: {
-    color: colors.text,
-    textAlign: 'center',
-  },
 });
 
-export default AuthScreen; 
+export default AuthScreen;

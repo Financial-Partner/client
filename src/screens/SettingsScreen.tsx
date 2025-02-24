@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, StatusBar, Alert } from 'react-native';
+import { View, StyleSheet, StatusBar, Alert, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { colors } from '../theme/colors';
@@ -10,6 +10,7 @@ import PasswordSection from '../components/settings/PasswordSection';
 import LinkGoogleAccount from '../components/settings/LinkGoogleAccount';
 import SignOutButton from '../components/settings/SignOutButton';
 import UpdatePasswordModal from '../components/settings/UpdatePasswordModal';
+import Layout from '../components/Layout';
 
 type RootStackParamList = {
   MainTabs: undefined;
@@ -20,7 +21,7 @@ type NavigationProp = StackNavigationProp<RootStackParamList>;
 
 const SettingsScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
-  const { user, signOut, linkGoogleAccount, updatePassword } = useAuth();
+  const { user, signOut, linkGoogleAccount, updatePassword, skipAuth } = useAuth();
   const [linking, setLinking] = useState<boolean>(false);
   const [showPasswordModal, setShowPasswordModal] = useState<boolean>(false);
 
@@ -65,27 +66,40 @@ const SettingsScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
-      <SettingsHeader onClose={() => navigation.goBack()} />
-      <View style={styles.content}>
-        <AccountInfo email={user?.email} />
-        {isPasswordLogin && (
-          <PasswordSection onPress={() => setShowPasswordModal(true)} />
-        )}
-        {showLinkButton && (
-          <LinkGoogleAccount
-            linking={linking}
-            onLink={handleLinkGoogle}
-            email={user?.email}
+      {skipAuth ? (
+        <>
+          <SettingsHeader onClose={() => navigation.goBack()} />
+          <View style={styles.section}>
+            <Text style={styles.warningText}>
+              目前處於開發模式，已跳過身份驗證
+            </Text>
+          </View>
+        </>
+      ) : (
+        <>
+          <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
+          <SettingsHeader onClose={() => navigation.goBack()} />
+          <View style={styles.content}>
+            <AccountInfo email={user?.email} />
+            {isPasswordLogin && (
+              <PasswordSection onPress={() => setShowPasswordModal(true)} />
+            )}
+            {showLinkButton && (
+              <LinkGoogleAccount
+                linking={linking}
+                onLink={handleLinkGoogle}
+                email={user?.email}
+              />
+            )}
+            <SignOutButton onPress={handleSignOut} />
+          </View>
+          <UpdatePasswordModal
+            visible={showPasswordModal}
+            onClose={() => setShowPasswordModal(false)}
+            onSubmit={handleUpdatePassword}
           />
-        )}
-        <SignOutButton onPress={handleSignOut} />
-      </View>
-      <UpdatePasswordModal
-        visible={showPasswordModal}
-        onClose={() => setShowPasswordModal(false)}
-        onSubmit={handleUpdatePassword}
-      />
+        </>
+      )}
     </View>
   );
 };
@@ -98,6 +112,17 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     padding: 16,
+  },
+  section: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  warningText: {
+    color: '#ff6b6b',
+    fontSize: 16,
+    textAlign: 'center',
+    padding: 10,
   },
 });
 

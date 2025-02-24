@@ -8,6 +8,7 @@ type AuthContextType = {
   user: FirebaseAuthTypes.User | null;
   loading: boolean;
   token: string | null;
+  skipAuth: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -24,8 +25,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState<string | null>(null);
+  const skipAuth = Config.SKIP_AUTH === 'true';
 
   useEffect(() => {
+    if (skipAuth) {
+      setLoading(false);
+      setToken('dummy-token-for-development');
+      return;
+    }
+
     GoogleSignin.configure({
       webClientId: Config.GOOGLE_WEB_CLIENT_ID,
     });
@@ -44,7 +52,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [skipAuth]);
 
   const signIn = async (email: string, password: string) => {
     try {
@@ -190,19 +198,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const contextValue = {
+    user,
+    loading,
+    token,
+    skipAuth,
+    signIn: skipAuth ? async () => {} : signIn,
+    signUp: skipAuth ? async () => {} : signUp,
+    signOut: skipAuth ? async () => {} : signOut,
+    googleSignIn: skipAuth ? async () => {} : googleSignIn,
+    linkGoogleAccount: skipAuth ? async () => {} : linkGoogleAccount,
+    updatePassword: skipAuth ? async () => {} : updatePassword,
+  };
+
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        loading,
-        token,
-        signIn,
-        signUp,
-        signOut,
-        googleSignIn,
-        linkGoogleAccount,
-        updatePassword,
-      }}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );

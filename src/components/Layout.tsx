@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, StyleSheet} from 'react-native';
+import {View, StyleSheet, ScrollView} from 'react-native';
 import Header from './Header';
 import Footer from './Footer';
 import {colors} from '../theme/colors';
@@ -12,9 +12,9 @@ const Layout = ({children}: LayoutProps) => {
   return (
     <View style={styles.container}>
       <Header />
-      <View style={styles.content}>
+      <ScrollView style={styles.content}>
         {children}
-      </View>
+      </ScrollView>
       <Footer />
     </View>
   );
@@ -30,4 +30,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Layout; 
+export default Layout;

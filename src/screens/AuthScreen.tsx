@@ -12,15 +12,15 @@ const AuthScreen = () => {
 
   return (
     <View style={styles.container}>
-      <AuthForm 
-        isLogin={isLogin} 
-        signIn={signIn} 
-        signUp={signUp} 
+      <AuthForm
+        isLogin={isLogin}
+        signIn={signIn}
+        signUp={signUp}
       />
       <SocialAuth googleSignIn={googleSignIn} />
-      <SwitchAuthMode 
-        isLogin={isLogin} 
-        onToggle={() => setIsLogin(!isLogin)} 
+      <SwitchAuthMode
+        isLogin={isLogin}
+        onToggle={() => setIsLogin(!isLogin)}
       />
     </View>
   );

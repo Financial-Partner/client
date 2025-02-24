@@ -17,35 +17,35 @@ const Header = () => {
 
   return (
     <View style={styles.container}>
-      <Pressable 
+      <Pressable
         style={({pressed}) => [
           styles.settingsButton,
-          pressed && styles.buttonPressed
+          pressed && styles.buttonPressed,
         ]}
         onPress={() => navigation.navigate('Settings')}>
-        <Image 
+        <Image
           source={require('../assets/icons/settings.png')}
           style={styles.icon}
         />
       </Pressable>
-      
+
       <View style={styles.rightContainer}>
-        <Pressable 
+        <Pressable
           style={({pressed}) => [
             styles.bagButton,
-            pressed && styles.buttonPressed
+            pressed && styles.buttonPressed,
           ]}
           onPress={() => {
             navigation.navigate('Bag');
           }}>
-          <Image 
+          <Image
             source={require('../assets/icons/bag.png')}
             style={styles.icon}
           />
         </Pressable>
-        
+
         <View style={styles.moneyContainer}>
-					<Image 
+					<Image
 						source={require('../assets/icons/diamond.png')}
 						style={styles.icon}
 					/>
@@ -105,4 +105,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Header; 
+export default Header;

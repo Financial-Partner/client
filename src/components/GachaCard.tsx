@@ -1,7 +1,7 @@
 import {View, StyleSheet, Text} from 'react-native';
 import React from 'react';
 
-const Card = () => {
+const GachaCard = () => {
   return (
     <View style={styles.container}>
       <Text>Card</Text>
@@ -19,4 +19,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Card;
+export default GachaCard;

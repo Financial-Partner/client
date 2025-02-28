@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, StyleSheet, Pressable, Platform, Image, Text} from 'react-native';
+import {View, StyleSheet, Pressable, Platform, Image} from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import type {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
 import {colors} from '../theme/colors';
@@ -87,4 +87,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Footer; 
+export default Footer;

@@ -3,7 +3,7 @@ import {StyleSheet, Text, View} from 'react-native';
 import SelectDropdown from 'react-native-select-dropdown';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const Demo = () => {
+const DurationSelector = () => {
   const duration = [
     {title: '3日'},
     {title: '一週'},
@@ -46,7 +46,7 @@ const Demo = () => {
   );
 };
 
-export default Demo;
+export default DurationSelector;
 
 const styles = StyleSheet.create({
   dropdownButtonStyle: {

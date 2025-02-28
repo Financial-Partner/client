@@ -1,12 +1,14 @@
 import {View, Text, StyleSheet} from 'react-native';
 import React from 'react';
 
+interface CharacterData {
+    hasOwned: boolean;
+    isUsed: boolean;
+    imageUrl: string;
+}
+
 type CharacterProps = {
-    character: {
-        hasOwned: boolean,
-        isUsed: boolean,
-        imageUrl: string,
-    }
+    character: CharacterData;
 }
 
 const Character = ({character}: CharacterProps) => {

@@ -1,7 +1,7 @@
 import {View, Text, StyleSheet} from 'react-native';
 import React from 'react';
 
-type characterProps = {
+type CharacterProps = {
     character: {
         hasOwned: boolean,
         isUsed: boolean,
@@ -9,7 +9,7 @@ type characterProps = {
     }
 }
 
-const Character = ({character}: characterProps) => {
+const Character = ({character}: CharacterProps) => {
   return (
     <View style={[styles.characterImg, character.hasOwned && styles.show, character.isUsed && styles.highlight]}>
       <Text>

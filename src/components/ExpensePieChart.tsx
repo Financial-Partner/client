@@ -1,8 +1,8 @@
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
 // import {Text} from 'react-native';
-import PieChart from 'react-native-pie-chart';
-import Svg, {Circle, Rect} from 'react-native-svg';
+// import PieChart from 'react-native-pie-chart';
+// import Svg, {Circle, Rect} from 'react-native-svg';
 
 const ExpensePieChart = () => {
   const widthAndHeight = 250;

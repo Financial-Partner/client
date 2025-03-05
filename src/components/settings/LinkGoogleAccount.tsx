@@ -1,6 +1,12 @@
 import React from 'react';
-import { View, Text, Pressable, StyleSheet, ActivityIndicator } from 'react-native';
-import { colors } from '../../theme/colors';
+import {
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  ActivityIndicator,
+} from 'react-native';
+import {colors} from '../../theme/colors';
 
 type LinkGoogleAccountProps = {
   linking: boolean;
@@ -8,15 +14,21 @@ type LinkGoogleAccountProps = {
   email?: string | null;
 };
 
-const LinkGoogleAccount: React.FC<LinkGoogleAccountProps> = ({ linking, onLink, email }) => {
+const LinkGoogleAccount: React.FC<LinkGoogleAccountProps> = ({
+  linking,
+  onLink,
+  email,
+}) => {
   return (
     <View style={styles.linkSection}>
       <Text style={styles.sectionTitle}>連結其他登入方式</Text>
       <Pressable
-        style={({ pressed }) => [styles.linkButton, pressed && styles.buttonPressed]}
+        style={({pressed}) => [
+          styles.linkButton,
+          pressed && styles.buttonPressed,
+        ]}
         onPress={onLink}
-        disabled={linking}
-      >
+        disabled={linking}>
         {linking ? (
           <ActivityIndicator color="#fff" />
         ) : (

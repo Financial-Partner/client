@@ -1,18 +1,27 @@
 import React from 'react';
-import { View, Text, StyleSheet, Pressable, StatusBar, Platform } from 'react-native';
-import { colors } from '../../theme/colors';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  StatusBar,
+  Platform,
+} from 'react-native';
+import {colors} from '../../theme/colors';
 
 type SettingsHeaderProps = {
   onClose: () => void;
 };
 
-const SettingsHeader: React.FC<SettingsHeaderProps> = ({ onClose }) => {
+const SettingsHeader: React.FC<SettingsHeaderProps> = ({onClose}) => {
   return (
     <View style={styles.header}>
       <Pressable
-        style={({ pressed }) => [styles.closeButton, pressed && styles.buttonPressed]}
-        onPress={onClose}
-      >
+        style={({pressed}) => [
+          styles.closeButton,
+          pressed && styles.buttonPressed,
+        ]}
+        onPress={onClose}>
         <Text style={styles.closeText}>關閉</Text>
       </Pressable>
       <Text style={styles.title}>設定</Text>

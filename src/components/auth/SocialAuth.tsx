@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
-import { colors } from '../../theme/colors';
+import {View, Text, Pressable, StyleSheet} from 'react-native';
+import {colors} from '../../theme/colors';
 
-const SocialAuth = ({ googleSignIn }: { googleSignIn: () => Promise<void> }) => {
+const SocialAuth = ({googleSignIn}: {googleSignIn: () => Promise<void>}) => {
   return (
     <View>
       <Text style={styles.dividerText}>或</Text>

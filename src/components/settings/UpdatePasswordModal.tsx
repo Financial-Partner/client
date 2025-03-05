@@ -28,7 +28,7 @@ const UpdatePasswordModal = ({visible, onClose, onSubmit}: Props) => {
   const handleSubmit = async () => {
     try {
       setError('');
-      
+
       if (!currentPassword || !newPassword || !confirmPassword) {
         setError('請填寫所有欄位');
         return;
@@ -73,7 +73,7 @@ const UpdatePasswordModal = ({visible, onClose, onSubmit}: Props) => {
         style={styles.container}>
         <View style={styles.content}>
           <Text style={styles.title}>修改密碼</Text>
-          
+
           <TextInput
             style={styles.input}
             placeholder="目前密碼"
@@ -186,4 +186,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default UpdatePasswordModal; 
+export default UpdatePasswordModal;

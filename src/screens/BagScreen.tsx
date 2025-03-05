@@ -87,16 +87,13 @@ const BagScreen = () => {
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <View style={styles.content}>
         <View style={styles.characterImg}>
-          <Text>
-            main character
-          </Text>
+          <Text>main character</Text>
         </View>
-
 
         <FlatList
           data={characters}
-          renderItem={({ item, index }) => (
-              <Character key={index} character={item}/>
+          renderItem={({item, index}) => (
+            <Character key={index} character={item} />
           )}
           keyExtractor={(item, index) => index.toString()}
           numColumns={3}

@@ -1,8 +1,23 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
-import { colors } from '../../theme/colors';
+import React, {useState} from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  Pressable,
+  ActivityIndicator,
+} from 'react-native';
+import {colors} from '../../theme/colors';
 
-const AuthForm = ({ isLogin, signIn, signUp }: { isLogin: boolean, signIn: (email: string, password: string) => Promise<void>, signUp: (email: string, password: string) => Promise<void> }) => {
+const AuthForm = ({
+  isLogin,
+  signIn,
+  signUp,
+}: {
+  isLogin: boolean;
+  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string) => Promise<void>;
+}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -43,13 +58,14 @@ const AuthForm = ({ isLogin, signIn, signUp }: { isLogin: boolean, signIn: (emai
         secureTextEntry
       />
       {error ? <Text style={styles.error}>{error}</Text> : null}
-      <Pressable style={styles.submitButton} onPress={handleSubmit} disabled={loading}>
+      <Pressable
+        style={styles.submitButton}
+        onPress={handleSubmit}
+        disabled={loading}>
         {loading ? (
           <ActivityIndicator color="#fff" />
         ) : (
-          <Text style={styles.submitText}>
-            {isLogin ? '登入' : '註冊'}
-          </Text>
+          <Text style={styles.submitText}>{isLogin ? '登入' : '註冊'}</Text>
         )}
       </Pressable>
     </View>

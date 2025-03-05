@@ -11,4 +11,4 @@ export const colors = {
   borderColor: '#eee',
 } as const;
 
-export type ColorKeys = keyof typeof colors; 
+export type ColorKeys = keyof typeof colors;

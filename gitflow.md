@@ -21,6 +21,7 @@
 ### 1.1 檢查 Git 是否安裝
 
 確認 Git 已正確安裝：
+
 ```bash
 git --version
 ```
@@ -28,14 +29,17 @@ git --version
 ### 1.2 Clone 專案
 
 從 GitHub 將專案 clone 到本地：
+
 ```bash
 git clone git@github.com:Financial-Partner/client.git
 ```
+
 若遇到權限錯誤，請參考[SSH 金鑰設定](#ssh-金鑰設定)。
 
 ### 1.3 SSH 金鑰設定
 
 如果推送或 clone 時出現「Permission Denied」錯誤：
+
 - **生成 SSH 金鑰：**
   - **Windows/Mac：** 打開 Terminal 或 Git Bash，執行：
     ```bash
@@ -57,6 +61,7 @@ git config --global user.email "your_email@example.com"
 ## 2. 建立分支
 
 為了保持 main 分支的穩定性，請從 main 分支建立新分支進行開發：
+
 ```bash
 git checkout -b feat/your-feature-name
 ```
@@ -72,6 +77,7 @@ git checkout -b feat/your-feature-name
 ### 3.2 新增變更
 
 將修改的檔案加入暫存區：
+
 ```bash
 git add .
 ```
@@ -79,6 +85,7 @@ git add .
 ### 3.3 提交變更
 
 提交變更並附上清楚的說明：
+
 ```bash
 git commit -m "描述此次修改內容"
 ```
@@ -90,7 +97,6 @@ git commit -m "描述此次修改內容"
   git push -u origin feat/your-feature-name
   ```
   此命令會設定本地分支與遠端分支的追蹤關係。
-  
 - **後續推送：**
   直接使用：
   ```bash
@@ -112,10 +118,12 @@ git commit -m "描述此次修改內容"
 ## 5. 合併後更新 main 分支
 
 當 MR 合併到 main 後，請更新本地 main 分支：
+
 ```bash
 git checkout main
 git pull
 ```
+
 這樣可以確保你的 main 與遠端同步。
 
 ---

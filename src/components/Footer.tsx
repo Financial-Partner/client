@@ -4,6 +4,8 @@ import {useNavigation, useRoute} from '@react-navigation/native';
 import type {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
 import {colors} from '../theme/colors';
 
+// import GachaScreenIcon from '../svg/GachaScreenIcon';
+
 type TabParamList = {
   Home: undefined;
   Gacha: undefined;
@@ -56,6 +58,7 @@ const Footer = () => {
             style={styles.icon}
             resizeMode="contain"
           />
+          {/* <GachaScreenIcon /> */}
         </Pressable>
       ))}
     </View>

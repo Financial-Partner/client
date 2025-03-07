@@ -2,6 +2,9 @@ import React from 'react';
 import {View, Text, StyleSheet, StatusBar} from 'react-native';
 import Layout from '../components/Layout';
 import InvestmentChance from '../components/InvestmentChance';
+import Diamond from '../svg/Diamond';
+import UpArrow from '../svg/UpArrow';
+import DownArrow from '../svg/DownArrow';
 
 const InvestScreen = () => {
   const chances = [
@@ -41,6 +44,7 @@ const InvestScreen = () => {
       tags: ['高風險', '1年'],
     },
   ];
+  const isIncrease = false;
 
   return (
     <Layout>
@@ -49,11 +53,21 @@ const InvestScreen = () => {
         <View style={styles.summaryContainer}>
           <View style={styles.summary}>
             <Text style={styles.summaryTitle}>總投資</Text>
-            <Text style={styles.summaryContent}>💰 1,000,000</Text>
+            <View style={styles.summaryText}>
+              <Diamond height={14} width={14} style={styles.icon}/>
+              <Text style={styles.summaryContent}>1,000,000</Text>
+            </View>
           </View>
           <View style={styles.summary}>
             <Text style={styles.summaryTitle}>平均報酬率</Text>
-            <Text style={styles.summaryContent}>🔺 10.5%</Text>
+            <View style={styles.summaryText}>
+              {isIncrease ? (
+                <UpArrow width={18} height={18} style={styles.icon}/>
+              ) : (
+                <DownArrow width={18} height={18} style={styles.icon}/>
+              )}
+              <Text style={styles.summaryContent}>10.5%</Text>
+            </View>
           </View>
         </View>
 
@@ -99,6 +113,9 @@ const styles = StyleSheet.create({
   },
   summaryContent: {
     textAlign: 'right',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
   },
   chanceContainer: {
     flex: 1,
@@ -117,6 +134,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 10,
     marginRight: 'auto',
+  },
+  icon: {
+    marginRight: 5,
+  },
+  summaryText: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
   },
 });
 

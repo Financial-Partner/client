@@ -9,6 +9,8 @@ import {
 } from 'react-native';
 import Layout from '../components/Layout';
 import GachaCard from '../components/GachaCard';
+import Diamond from '../svg/Diamond';
+import ChangeIcon from '../svg/ChangeIcon';
 
 const GachaScreen = () => {
   const cards: number[] = Array.from({length: 9});
@@ -28,9 +30,13 @@ const GachaScreen = () => {
         <View style={styles.btnGroup}>
           <TouchableOpacity style={styles.button} onPress={() => {}}>
             <Text style={styles.buttonText}>領養</Text>
-            <Text style={styles.buttonText}>💰 1,000</Text>
+            <Diamond height={16} width={16} style={styles.diamond}/>
+            <Text style={styles.buttonText}>1,000</Text>
           </TouchableOpacity>
-          <Text>🔄 換一批 20</Text>
+
+          <TouchableOpacity>
+            <Text><ChangeIcon height={12} width={12}/> 換一批 20</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </Layout>
@@ -61,12 +67,15 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
-    marginRight: 10,
+    marginRight: 20,
   },
   btnGroup: {
     flexDirection: 'column',
     alignItems: 'flex-end',
     justifyContent: 'center',
+  },
+  diamond: {
+    marginRight: 10,
   },
 });
 

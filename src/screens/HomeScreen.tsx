@@ -12,6 +12,7 @@ import * as Progress from 'react-native-progress';
 
 import Layout from '../components/Layout';
 import Mission from '../components/Mission';
+import Dinosaur from '../svg/Dinosaur';
 
 type RootStackParamList = {
   Transaction: undefined;
@@ -51,9 +52,7 @@ const HomeScreen = () => {
     <Layout>
       <StatusBar barStyle="dark-content" />
       <View style={styles.content}>
-        <View style={styles.characterImg}>
-          <Text>main character</Text>
-        </View>
+        <Dinosaur height={200} width={200} style={styles.mainCharacter}/>
 
         <View style={styles.progressBar}>
           <Progress.Bar progress={currentAmount / targetAmount} width={200} />
@@ -88,16 +87,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-  },
-  characterImg: {
-    width: 300,
-    height: 350,
-    backgroundColor: 'lightblue',
-    marginBottom: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 20,
-    borderRadius: 20,
   },
   missionContainer: {
     flexDirection: 'column',
@@ -136,6 +125,12 @@ const styles = StyleSheet.create({
   },
   progressText: {
     marginLeft: 10,
+  },
+  mainCharacter: {
+    marginTop: 40,
+    marginBottom: 20,
+    marginLeft: 10,
+    marginRight: 'auto',
   },
 });
 

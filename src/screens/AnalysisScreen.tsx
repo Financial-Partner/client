@@ -45,7 +45,6 @@ const AnalysisScreen = () => {
         </View>
 
         <View style={styles.chart}>
-          <Text>Pie chart</Text>
           <ExpensePieChart />
         </View>
       </View>
@@ -56,8 +55,8 @@ const AnalysisScreen = () => {
 const styles = StyleSheet.create({
   content: {
     flex: 1,
-    // justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 20,
   },
   switchSelector: {
     width: '50%',
@@ -72,7 +71,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   chart: {
-    marginTop: 20,
+    marginTop: 10,
+    width: '90%',
   },
 });
 

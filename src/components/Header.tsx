@@ -11,6 +11,8 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import type {StackNavigationProp} from '@react-navigation/stack';
 import {colors} from '../theme/colors';
+import Diamond from '../svg/Diamond';
+import BagIcon from '../svg/BagIcon';
 
 type RootStackParamList = {
   MainTabs: undefined;
@@ -46,17 +48,15 @@ const Header = () => {
           onPress={() => {
             navigation.navigate('Bag');
           }}>
-          <Image
-            source={require('../assets/icons/bag.png')}
-            style={styles.icon}
-          />
+          <BagIcon height={24} width={24} />
+          {/* // <Image
+          //   source={require('../assets/icons/bag.png')}
+          //   style={styles.icon}
+          // /> */}
         </Pressable>
 
         <View style={styles.moneyContainer}>
-          <Image
-            source={require('../assets/icons/diamond.png')}
-            style={styles.icon}
-          />
+          <Diamond height={16}  width={16}/>
           <Text style={styles.moneyText}>1,000,000</Text>
         </View>
       </View>

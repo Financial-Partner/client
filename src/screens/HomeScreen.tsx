@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  StatusBar,
-  TouchableOpacity,
-} from 'react-native';
+import {View, Text, Pressable, StyleSheet, StatusBar, TouchableOpacity} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import type {StackNavigationProp} from '@react-navigation/stack';
 import * as Progress from 'react-native-progress';
@@ -15,7 +9,7 @@ import Mission from '../components/Mission';
 import {Dinosaur} from '../svg';
 
 type RootStackParamList = {
-  Transaction: undefined;
+  TransactionScreen: undefined;
 };
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
@@ -68,14 +62,16 @@ const HomeScreen = () => {
           ))}
         </View>
 
-        <TouchableOpacity
+        {/*<TouchableOpacity
           style={styles.button}
-          onPress={() => {
-            navigation.navigate('Transaction');
-          }}>
+          onPress={() => {navigation.navigate('NewTransaction');}}
+        >
           <Text style={styles.buttonText}>新增交易紀錄</Text>
           <Text style={styles.buttonText}>+</Text>
-        </TouchableOpacity>
+        </TouchableOpacity>*/}
+        <Pressable style={styles.button} onPress={() => navigation.navigate('TransactionScreen')}>
+          <Text style={styles.buttonText}>新增交易紀錄</Text>
+        </Pressable>
       </View>
     </Layout>
   );

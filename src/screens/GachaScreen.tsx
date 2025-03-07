@@ -1,17 +1,24 @@
 import React from 'react';
-import {StyleSheet, StatusBar, FlatList, TouchableOpacity, Text, View} from 'react-native';
+import {
+  StyleSheet,
+  StatusBar,
+  FlatList,
+  TouchableOpacity,
+  Text,
+  View,
+} from 'react-native';
 import Layout from '../components/Layout';
 import GachaCard from '../components/GachaCard';
 
 const GachaScreen = () => {
-  const cards:number[] = Array.from({ length: 9 });
+  const cards: number[] = Array.from({length: 9});
   return (
     <Layout>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <View style={styles.container}>
         <FlatList
           data={cards}
-          renderItem={({ item }) => <GachaCard key={item} />}
+          renderItem={({item}) => <GachaCard key={item} />}
           keyExtractor={(item, index) => index.toString()}
           numColumns={3}
           contentContainerStyle={styles.content}

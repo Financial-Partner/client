@@ -1,17 +1,19 @@
 import React from 'react';
-import { Pressable, Text, StyleSheet } from 'react-native';
-import { colors } from '../../theme/colors';
+import {Pressable, Text, StyleSheet} from 'react-native';
+import {colors} from '../../theme/colors';
 
 type PasswordSectionProps = {
   onPress: () => void;
 };
 
-const PasswordSection: React.FC<PasswordSectionProps> = ({ onPress }) => {
+const PasswordSection: React.FC<PasswordSectionProps> = ({onPress}) => {
   return (
     <Pressable
-      style={({ pressed }) => [styles.settingButton, pressed && styles.buttonPressed]}
-      onPress={onPress}
-    >
+      style={({pressed}) => [
+        styles.settingButton,
+        pressed && styles.buttonPressed,
+      ]}
+      onPress={onPress}>
       <Text style={styles.settingText}>修改密碼</Text>
     </Pressable>
   );

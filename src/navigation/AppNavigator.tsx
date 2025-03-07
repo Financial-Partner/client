@@ -18,7 +18,7 @@ const TabNavigator = () => {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarStyle: { display: 'none' },
+        tabBarStyle: {display: 'none'},
       }}>
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Gacha" component={GachaScreen} />
@@ -34,8 +34,8 @@ const AppNavigator = () => {
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name="MainTabs" component={TabNavigator} />
-      <Stack.Screen 
-        name="Settings" 
+      <Stack.Screen
+        name="Settings"
         component={SettingsScreen}
         options={{
           presentation: 'modal',
@@ -45,4 +45,4 @@ const AppNavigator = () => {
   );
 };
 
-export default AppNavigator; 
+export default AppNavigator;

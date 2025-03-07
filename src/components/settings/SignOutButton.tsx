@@ -1,17 +1,19 @@
 import React from 'react';
-import { Pressable, Text, StyleSheet } from 'react-native';
-import { colors } from '../../theme/colors';
+import {Pressable, Text, StyleSheet} from 'react-native';
+import {colors} from '../../theme/colors';
 
 type SignOutButtonProps = {
   onPress: () => void;
 };
 
-const SignOutButton: React.FC<SignOutButtonProps> = ({ onPress }) => {
+const SignOutButton: React.FC<SignOutButtonProps> = ({onPress}) => {
   return (
     <Pressable
-      style={({ pressed }) => [styles.signOutButton, pressed && styles.buttonPressed]}
-      onPress={onPress}
-    >
+      style={({pressed}) => [
+        styles.signOutButton,
+        pressed && styles.buttonPressed,
+      ]}
+      onPress={onPress}>
       <Text style={styles.signOutText}>登出</Text>
     </Pressable>
   );

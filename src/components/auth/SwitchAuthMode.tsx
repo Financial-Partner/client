@@ -1,8 +1,14 @@
 import React from 'react';
-import { Pressable, Text, StyleSheet } from 'react-native';
-import { colors } from '../../theme/colors';
+import {Pressable, Text, StyleSheet} from 'react-native';
+import {colors} from '../../theme/colors';
 
-const SwitchAuthMode = ({ isLogin, onToggle }: { isLogin: boolean, onToggle: () => void }) => {
+const SwitchAuthMode = ({
+  isLogin,
+  onToggle,
+}: {
+  isLogin: boolean;
+  onToggle: () => void;
+}) => {
   return (
     <Pressable style={styles.switchButton} onPress={onToggle}>
       <Text style={styles.switchText}>

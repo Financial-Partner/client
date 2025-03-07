@@ -10,6 +10,9 @@ import {
 } from 'react-native';
 import TransactionForm from '../components/TransactionForm';
 import Layout from '../components/Layout';
+import { Picker } from '@react-native-picker/picker';
+
+const categories = ['餐飲', '交通', '娛樂', '醫療', '教育', '房租', '水電', '其他'];
 
 const TransactionScreen: React.FC = () => {
   const [transactions, setTransactions] = useState<
@@ -189,6 +192,7 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     flex: 1,
+    padding: 16,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0,0,0,0.5)',
@@ -198,6 +202,30 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: '#dc3545',
     borderRadius: 5,
+  },
+  totalText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 8,
+    borderRadius: 6,
+    marginBottom: 12,
+    fontSize: 16,
+  },
+  picker: {
+    height: 40,
+    marginBottom: 16,
+  },
+  button: {
+    backgroundColor: '#007bff',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
   },
 });
 

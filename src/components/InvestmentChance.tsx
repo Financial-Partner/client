@@ -102,7 +102,8 @@ const styles = StyleSheet.create({
   statusContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    width: 80,
+    justifyContent: 'space-around',
   },
   statusText: {
     fontSize: 24,

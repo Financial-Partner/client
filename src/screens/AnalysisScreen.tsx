@@ -4,6 +4,7 @@ import Layout from '../components/Layout';
 import SwitchSelector from 'react-native-switch-selector';
 import DurationSelector from '../components/DurationSelector';
 import ExpensePieChart from '../components/ExpensePieChart';
+import { colors } from '../theme/colors';
 // import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 // import ExpensePieChart from '../components/ExpensePieChart';
@@ -26,14 +27,18 @@ const AnalysisScreen = () => {
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <View style={styles.content}>
         <SwitchSelector
-          options={options}
           initial={0}
+          textColor="#000000"
+          borderColor="black"
+          buttonColor="#BCD635"
+          selectedColor="white"
+          backgroundColor={colors.background}
+          hasPadding
+          borderRadius={10}
+          options={options}
           onPress={(value: number) => handleButtonPress(value)}
-          borderColor="#c9c9c9"
-          borderWidth={3}
           style={styles.switchSelector}
         />
-
         <View style={styles.durationSelector}>
           <Text>查詢範圍：</Text>
           <DurationSelector />

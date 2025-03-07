@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   summaryTitle: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 5,
   },
@@ -125,8 +125,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 20,
     marginBottom: 30,
-    paddingHorizontal: '10%',
-    paddingVertical: '5%',
+    padding: '5%',
     overflow: 'scroll',
   },
   chanceTitle: {

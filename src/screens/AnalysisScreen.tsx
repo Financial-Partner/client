@@ -4,7 +4,7 @@ import Layout from '../components/Layout';
 import SwitchSelector from 'react-native-switch-selector';
 import DurationSelector from '../components/DurationSelector';
 import ExpensePieChart from '../components/ExpensePieChart';
-import { colors } from '../theme/colors';
+import {colors} from '../theme/colors';
 // import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 // import ExpensePieChart from '../components/ExpensePieChart';
@@ -14,6 +14,7 @@ const AnalysisScreen = () => {
 
   const handleButtonPress = (buttonIndex: number) => {
     setSelectedButton(buttonIndex);
+    console.log('selectedButton:', selectedButton);
   };
 
   const options = [

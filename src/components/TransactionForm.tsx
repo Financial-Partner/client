@@ -1,48 +1,97 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Pressable, StyleSheet } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import React, {useState} from 'react';
+import {View, Text, Pressable, StyleSheet} from 'react-native';
 
-type TransactionFormProps = {
+const categories: string[] = [
+  '餐飲',
+  '交通',
+  '娛樂',
+  '醫療',
+  '教育',
+  '房租',
+  '水電',
+  '其他',
+];
+
+interface TransactionFormProps {
   onSubmit: (amount: number, category: string) => void;
-};
+}
 
-const categories = ['餐飲', '交通', '娛樂', '購物', '醫療', '教育', '房租', '水電', '其他'];
+const TransactionForm: React.FC<TransactionFormProps> = ({onSubmit}) => {
+  const [selectedCategory, setSelectedCategory] = useState<string>(
+    categories[0],
+  );
+  const [amount, setAmount] = useState<string>('');
 
-const TransactionForm = ({ onSubmit }: TransactionFormProps) => {
-  const [amount, setAmount] = useState('');
-  const [category, setCategory] = useState(categories[0]);
+  const handleNumberPress = (num: string) => {
+    setAmount(prev => prev + num);
+  };
 
-  const handleSave = () => {
+  const handleDelete = () => {
+    setAmount(prev => prev.slice(0, -1));
+  };
+
+  const handleConfirm = () => {
     const parsedAmount = parseFloat(amount);
     if (!isNaN(parsedAmount) && parsedAmount > 0) {
-      onSubmit(parsedAmount, category);
+      onSubmit(parsedAmount, selectedCategory);
       setAmount('');
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>金額：</Text>
-      <TextInput
-        style={styles.input}
-        keyboardType="numeric"
-        placeholder="輸入金額"
-        value={amount}
-        onChangeText={setAmount}
-      />
-
-      <Text style={styles.label}>類別：</Text>
-      <View style={styles.pickerContainer}>
-        <Picker selectedValue={category} onValueChange={(itemValue) => setCategory(itemValue)} style={styles.picker}>
-          {categories.map((cat) => (
-            <Picker.Item key={cat} label={cat} value={cat} />
-          ))}
-        </Picker>
+      <Text style={styles.title}>選擇類別</Text>
+      <View style={styles.categoryContainer}>
+        {categories.map(cat => (
+          <Pressable
+            key={cat}
+            style={[
+              styles.categoryButton,
+              selectedCategory === cat && styles.selectedCategory,
+            ]}
+            onPress={() => setSelectedCategory(cat)}>
+            <Text style={styles.categoryText}>{cat}</Text>
+          </Pressable>
+        ))}
       </View>
 
-      <Pressable style={styles.button} onPress={handleSave}>
-        <Text style={styles.buttonText}>儲存交易</Text>
-      </Pressable>
+      <Text style={styles.title}>輸入金額</Text>
+      <Text style={styles.amountText}>{amount || '0'}</Text>
+
+      <View style={styles.keypad}>
+        {[
+          '1',
+          '2',
+          '3',
+          'Del',
+          '4',
+          '5',
+          '6',
+          '',
+          '7',
+          '8',
+          '9',
+          '',
+          '',
+          '0',
+          '確認',
+        ].map((key, index) => (
+          <Pressable
+            key={index}
+            style={[
+              styles.key,
+              key === '確認' && styles.confirmKey,
+              key === 'Del' && styles.deleteKey,
+            ]}
+            onPress={() => {
+              if (key === '確認') {handleConfirm();}
+              else if (key === 'Del') {handleDelete();}
+              else {handleNumberPress(key.toString());}
+            }}>
+            <Text style={styles.keyText}>{key}</Text>
+          </Pressable>
+        ))}
+      </View>
     </View>
   );
 };
@@ -51,40 +100,62 @@ const styles = StyleSheet.create({
   container: {
     padding: 16,
     backgroundColor: '#fff',
-    borderRadius: 8,
-    width: '100%',
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 6,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 8,
-    borderRadius: 6,
-    marginBottom: 12,
-    fontSize: 16,
-  },
-  pickerContainer: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 6,
-    marginBottom: 12,
-    width: '100%',
-  },
-  picker: {
-    height: 40,
-  },
-  button: {
-    backgroundColor: '#007bff',
-    padding: 12,
-    borderRadius: 8,
+    borderRadius: 10,
     alignItems: 'center',
   },
-  buttonText: {
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  categoryContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  categoryButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    margin: 5,
+    borderRadius: 8,
+    backgroundColor: '#ccc',
+  },
+  selectedCategory: {
+    backgroundColor: '#007bff',
+  },
+  categoryText: {
     color: '#fff',
     fontSize: 16,
+  },
+  amountText: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  keypad: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+  },
+  key: {
+    width: 70,
+    height: 70,
+    margin: 5,
+    borderRadius: 8,
+    backgroundColor: '#ddd',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  confirmKey: {
+    backgroundColor: '#4169E1',
+  },
+  deleteKey: {
+    backgroundColor: '#ffe384',
+  },
+  keyText: {
+    fontSize: 20,
+    fontWeight: 'bold',
   },
 });
 

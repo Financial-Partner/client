@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {View, Text, StyleSheet, StatusBar, Pressable, Modal, FlatList} from 'react-native';
-import Layout from '../components/Layout';
 import TransactionForm from '../components/TransactionForm';
+import Layout from '../components/Layout';
 
 const TransactionScreen: React.FC = () => {
   const [transactions, setTransactions] = useState<
@@ -87,6 +87,7 @@ const TransactionScreen: React.FC = () => {
   );
 };
 
+// 樣式
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -212,12 +213,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
   },
-  totalText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 16,
-  },
-  
 });
 
 export default TransactionScreen;

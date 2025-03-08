@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createStackNavigator} from '@react-navigation/stack';
-import { NavigationContainer } from '@react-navigation/native';
 
 import HomeScreen from '../screens/HomeScreen';
 import GachaScreen from '../screens/GachaScreen';

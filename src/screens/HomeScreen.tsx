@@ -71,7 +71,9 @@ const HomeScreen = () => {
             style={[styles.mainCharacter, {width: 200, height: 200}]}
           />
         ) : (
-          <Dinosaur height={200} width={200} style={styles.mainCharacter} /> // fallback if no image
+          <View style={styles.characterImg}>
+          <Text>main character</Text>
+        </View> // fallback if no image
         )}
 
         <View style={styles.progressBar}>
@@ -104,6 +106,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
+  },
+  characterImg: {
+    width: 300,
+    height: 350,
+    backgroundColor: 'lightblue',
+    marginBottom: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 20,
+    borderRadius: 20,
   },
   missionContainer: {
     flexDirection: 'column',

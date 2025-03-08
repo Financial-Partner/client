@@ -11,6 +11,7 @@ import {
 import TransactionForm from '../components/TransactionForm';
 import Layout from '../components/Layout';
 import TransactionForm from '../components/TransactionForm';
+import Layout from '../components/Layout';
 
 const TransactionScreen: React.FC = () => {
   const [transactions, setTransactions] = useState<
@@ -96,6 +97,7 @@ const TransactionScreen: React.FC = () => {
   );
 };
 
+// 樣式
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -191,21 +193,17 @@ const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     padding: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: '#f5f5f5',
   },
+ 
+  
   closeButton: {
     marginTop: 10,
     padding: 10,
     backgroundColor: '#dc3545',
     borderRadius: 5,
   },
-  totalText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 16,
-  },
+
   
   input: {
     borderWidth: 1,
@@ -219,7 +217,7 @@ const styles = StyleSheet.create({
     height: 40,
     marginBottom: 16,
   },
-  button: {
+  button: { 
     backgroundColor: '#007bff',
     padding: 12,
     borderRadius: 8,

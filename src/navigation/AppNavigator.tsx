@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createStackNavigator} from '@react-navigation/stack';
-import { NavigationContainer } from '@react-navigation/native';
 
 import HomeScreen from '../screens/HomeScreen';
 import GachaScreen from '../screens/GachaScreen';
@@ -54,8 +53,16 @@ const AppNavigator = () => {
       screenOptions={{headerShown: false}}>
       <Stack.Screen name="SetUp" component={SetUp} />
       <Stack.Screen name="MainTabs" component={TabNavigator} />
-      <Stack.Screen name="Settings" component={SettingsScreen} options={{ presentation: 'modal',}}/>
-      <Stack.Screen name="Transaction" component={TransactionScreen} options={{ presentation: 'modal' }} />
+      <Stack.Screen
+        name="Settings"
+        component={SettingsScreen}
+        options={{presentation: 'modal'}}
+      />
+      <Stack.Screen
+        name="TransactionScreen"
+        component={TransactionScreen}
+        options={{presentation: 'modal'}}
+      />
     </Stack.Navigator>
   );
 };

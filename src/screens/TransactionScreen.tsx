@@ -1,18 +1,7 @@
-import React, {useState} from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  Modal,
-  FlatList,
-  StatusBar,
-} from 'react-native';
-import TransactionForm from '../components/TransactionForm';
+import React, { useState } from 'react';
+import {View, Text, StyleSheet, StatusBar, Pressable, Modal, FlatList} from 'react-native';
 import Layout from '../components/Layout';
-import { Picker } from '@react-native-picker/picker';
-
-const categories = ['餐飲', '交通', '娛樂', '醫療', '教育', '房租', '水電', '其他'];
+import TransactionForm from '../components/TransactionForm';
 
 const TransactionScreen: React.FC = () => {
   const [transactions, setTransactions] = useState<

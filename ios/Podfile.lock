@@ -2133,7 +2133,7 @@ SPEC CHECKSUMS:
   AppAuth: d4f13a8fe0baf391b2108511793e4b479691fb73
   boost: 7e761d76ca2ce687f7cc98e698152abd03a18f90
   DoubleConversion: cb417026b2400c8f53ae97020b2be961b59470cb
-  fast_float: 06eeec4fe712a76acc9376682e4808b05ce978b6
+  fast_float: 23278fd30b349f976d2014f4aec9e2d7bc1c3806
   FBAEMKit: e34530df538b8eb8aeb53c35867715ba6c63ef0c
   FBLazyVector: 6fe148afcef2e3213e484758e3459609d40d57f5
   FBSDKCoreKit: d3f479a69127acebb1c6aad91c1a33907bcf6c2f
@@ -2148,14 +2148,14 @@ SPEC CHECKSUMS:
   FirebaseCore: 99fe0c4b44a39f37d99e6404e02009d2db5d718d
   FirebaseCoreExtension: 3d3f2017a00d06e09ab4ebe065391b0bb642565e
   FirebaseCoreInternal: df24ce5af28864660ecbd13596fc8dd3a8c34629
-  fmt: a40bb5bd0294ea969aaaba240a927bd33d878cdd
-  glog: eb93e2f488219332457c3c4eafd2738ddc7e80b8
+  fmt: b85d977e8fe789fd71c77123f9f4920d88c4d170
+  glog: 4d0897e15160938a2f597257740aff78251ee509
   GoogleSignIn: d4281ab6cf21542b1cfaff85c191f230b399d2db
   GoogleUtilities: 26a3abef001b6533cf678d3eb38fd3f614b7872d
   GTMAppAuth: f69bd07d68cd3b766125f7e072c45d7340dea0de
   GTMSessionFetcher: 5aea5ba6bd522a239e236100971f10cb71b96ab6
-  hermes-engine: b417d2b2aee3b89b58e63e23a51e02be91dc876d
-  RCT-Folly: 36fe2295e44b10d831836cc0d1daec5f8abcf809
+  hermes-engine: b3bd049767e1993c0e344ea63c8bc048ba7cfa22
+  RCT-Folly: 031db300533e2dfa954cdc5a859b792d5c14ed7b
   RCTDeprecation: b2eecf2d60216df56bc5e6be5f063826d3c1ee35
   RCTRequired: 78522de7dc73b81f3ed7890d145fa341f5bb32ea
   RCTTypeSafety: c135dd2bf50402d87fd12884cbad5d5e64850edd
@@ -2230,4 +2230,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: ce80398f425d422d755e8f87940bdb21c2b44ae6
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2

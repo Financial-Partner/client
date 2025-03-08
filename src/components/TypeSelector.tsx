@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 
 type RadioButtonProps = {
@@ -17,23 +17,18 @@ const RadioButton = ({label, selected, onPress}: RadioButtonProps) => {
   );
 };
 
-type DurationSelectorProps = {
-  duration: String;
-  setDuration: (mode: String) => void;
-};
-
-const DurationSelector = ({duration, setDuration}: DurationSelectorProps) => {
-  // const durations = ['一個月', '半年', '一年', '自訂'];
-  const durations = ['一個月', '半年', '一年'];
+const TypeSelector = () => {
+  const [selectedType, setSelectedType] = useState<String>('收入');
+  const types = ['收入', '支出', '結餘'];
 
   return (
-    <View style={styles.durationContainer}>
-      {durations.map((option, index) => (
+    <View style={styles.typeSelector}>
+      {types.map((option, index) => (
         <RadioButton
           key={index}
           label={option}
-          selected={duration === option}
-          onPress={() => setDuration(option)}
+          selected={selectedType === option}
+          onPress={() => setSelectedType(option)}
         />
       ))}
     </View>
@@ -41,14 +36,6 @@ const DurationSelector = ({duration, setDuration}: DurationSelectorProps) => {
 };
 
 const styles = StyleSheet.create({
-  durationSelector: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '95%',
-    marginTop: 10,
-    marginBottom: 10,
-  },
   label: {
     fontSize: 16,
     paddingVertical: 3,
@@ -63,19 +50,19 @@ const styles = StyleSheet.create({
   },
   selectedButton: {
     backgroundColor: '#BCD635',
+    borderRadius: 5,
   },
-  durationContainer: {
+  typeSelector: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignContent: 'center',
-    width: '95%',
+    width: '50%',
     marginTop: 10,
-    borderTopColor: '#555',
-    borderTopWidth: 1,
-    borderBottomColor: '#555',
-    borderBottomWidth: 1,
     padding: 0,
+    borderColor: '#555',
+    borderWidth: 1,
+    borderRadius: 5,
   },
 });
 
-export default DurationSelector;
+export default TypeSelector;

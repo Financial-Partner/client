@@ -109,11 +109,11 @@ const styles = StyleSheet.create({
   labelType: {
     marginRight: 10,
     color: 'black',
-    fontWeight: 'bold',
+    // fontWeight: 'bold',
   },
   amount: {
     color: 'black',
-    fontWeight: 'bold',
+    // fontWeight: 'bold',
     marginRight: 10,
   },
   labelsGrid: {

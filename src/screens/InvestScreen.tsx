@@ -54,7 +54,7 @@ const InvestScreen = () => {
           <View style={styles.summary}>
             <Text style={styles.summaryTitle}>總投資</Text>
             <View style={styles.summaryText}>
-              <Diamond height={14} width={14} style={styles.icon}/>
+              <Diamond height={14} width={14} style={styles.icon} />
               <Text style={styles.summaryContent}>1,000,000</Text>
             </View>
           </View>
@@ -62,9 +62,9 @@ const InvestScreen = () => {
             <Text style={styles.summaryTitle}>平均報酬率</Text>
             <View style={styles.summaryText}>
               {isIncrease ? (
-                <UpArrow width={18} height={18} style={styles.icon}/>
+                <UpArrow width={18} height={18} style={styles.icon} />
               ) : (
-                <DownArrow width={18} height={18} style={styles.icon}/>
+                <DownArrow width={18} height={18} style={styles.icon} />
               )}
               <Text style={styles.summaryContent}>10.5%</Text>
             </View>

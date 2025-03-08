@@ -29,9 +29,9 @@ const InvestmentChance = ({chance}: chanceProps) => {
 
         <View style={styles.statusContainer}>
           {chance.isIncrease ? (
-            <UpArrow width={26} height={26} style={styles.icon}/>
+            <UpArrow width={26} height={26} style={styles.icon} />
           ) : (
-            <DownArrow width={26} height={26} style={styles.icon}/>
+            <DownArrow width={26} height={26} style={styles.icon} />
           )}
           <Text style={styles.statusText}>{chance.status}%</Text>
         </View>

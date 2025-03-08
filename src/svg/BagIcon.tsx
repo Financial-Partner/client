@@ -1,6 +1,5 @@
 import * as React from 'react';
-import Svg, { Path, SvgProps } from 'react-native-svg';
-
+import Svg, {Path, SvgProps} from 'react-native-svg';
 
 const BagIcon = (props: SvgProps) => (
   <Svg
@@ -11,8 +10,7 @@ const BagIcon = (props: SvgProps) => (
     id="bag"
     data-name="Flat Color"
     className="icon flat-color"
-    {...props}
-  >
+    {...props}>
     <Path
       id="primary"
       d="M19.07,8.85a2,2,0,0,0-2-1.85H6.93a2,2,0,0,0-2,1.85l-.84,11a2,2,0,0,0,.52,1.51A2,2,0,0,0,6.08,22H17.92a2,2,0,0,0,2-2.15Z"

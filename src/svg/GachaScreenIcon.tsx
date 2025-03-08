@@ -1,22 +1,15 @@
 import * as React from 'react';
-import Svg, { Rect, Defs, Pattern, Use, Image, SvgProps } from 'react-native-svg';
+import Svg, {Rect, Defs, Pattern, Use, Image, SvgProps} from 'react-native-svg';
 
 const GachaScreenIcon = (props: SvgProps) => (
-  <Svg
-    width={20}
-    height={20}
-    viewBox="0 0 24 24"
-    fill="none"
-    {...props}
-  >
+  <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" {...props}>
     <Rect x={0.5} y={0.5} width={28} height={28} fill="url(#pattern0_58_81)" />
     <Defs>
       <Pattern
         id="pattern0_58_81"
         patternContentUnits="objectBoundingBox"
         width={1}
-        height={1}
-      >
+        height={1}>
         <Use xlinkHref="#image0_58_81" transform="scale(0.0111111)" />
       </Pattern>
       <Image

@@ -52,7 +52,7 @@ const HomeScreen = () => {
     <Layout>
       <StatusBar barStyle="dark-content" />
       <View style={styles.content}>
-        <Dinosaur height={200} width={200} style={styles.mainCharacter}/>
+        <Dinosaur height={200} width={200} style={styles.mainCharacter} />
 
         <View style={styles.progressBar}>
           <Progress.Bar progress={currentAmount / targetAmount} width={200} />

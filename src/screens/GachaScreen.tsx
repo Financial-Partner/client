@@ -30,12 +30,14 @@ const GachaScreen = () => {
         <View style={styles.btnGroup}>
           <TouchableOpacity style={styles.button} onPress={() => {}}>
             <Text style={styles.buttonText}>領養</Text>
-            <Diamond height={16} width={16} style={styles.diamond}/>
+            <Diamond height={16} width={16} style={styles.diamond} />
             <Text style={styles.buttonText}>1,000</Text>
           </TouchableOpacity>
 
           <TouchableOpacity>
-            <Text><ChangeIcon height={12} width={12}/> 換一批 20</Text>
+            <Text>
+              <ChangeIcon height={12} width={12} /> 換一批 20
+            </Text>
           </TouchableOpacity>
         </View>
       </View>

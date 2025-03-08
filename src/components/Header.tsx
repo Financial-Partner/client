@@ -56,7 +56,7 @@ const Header = () => {
         </Pressable>
 
         <View style={styles.moneyContainer}>
-          <Diamond height={16}  width={16}/>
+          <Diamond height={16} width={16} />
           <Text style={styles.moneyText}>1,000,000</Text>
         </View>
       </View>

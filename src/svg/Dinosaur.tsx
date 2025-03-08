@@ -1,22 +1,15 @@
 import * as React from 'react';
-import Svg, { Rect, Defs, Pattern, Use, Image, SvgProps } from 'react-native-svg';
+import Svg, {Rect, Defs, Pattern, Use, Image, SvgProps} from 'react-native-svg';
 
 const Dinosaur = (props: SvgProps) => (
-  <Svg
-    width={154}
-    height={187}
-    viewBox="0 0 154 187"
-    fill="none"
-    {...props}
-  >
+  <Svg width={154} height={187} viewBox="0 0 154 187" fill="none" {...props}>
     <Rect width={154} height={187} fill="url(#pattern0_27_116)" />
     <Defs>
       <Pattern
         id="pattern0_27_116"
         patternContentUnits="objectBoundingBox"
         width={1}
-        height={1}
-      >
+        height={1}>
         <Use
           xlinkHref="#image0_27_116"
           transform="matrix(0.00190327 0 0 0.0015674 -0.000559785 0)"

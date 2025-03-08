@@ -25,7 +25,10 @@ const DurationSelector = () => {
             <Text style={styles.dropdownButtonTxtStyle}>
               {(selectedItem && selectedItem.title) || '查詢範圍'}
             </Text>
-            <Icon name={isOpen ? 'chevron-up' : 'chevron-down'} style={styles.dropdownButtonArrowStyle} />
+            <Icon
+              name={isOpen ? 'chevron-up' : 'chevron-down'}
+              style={styles.dropdownButtonArrowStyle}
+            />
           </View>
         );
       }}

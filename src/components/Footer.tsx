@@ -46,13 +46,10 @@ const Footer = () => {
 
   return (
     <View style={styles.container}>
-      {tabs.map((tab) => (
+      {tabs.map(tab => (
         <Pressable
           key={tab.name}
-          style={({pressed}) => [
-            styles.tab,
-            pressed && styles.tabPressed,
-          ]}
+          style={({pressed}) => [styles.tab, pressed && styles.tabPressed]}
           onPress={() => navigation.navigate(tab.name)}>
           <Image
             source={route.name === tab.name ? tab.activeIcon : tab.icon}

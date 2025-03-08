@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, Pressable, StyleSheet, StatusBar, TouchableOpacity} from 'react-native';
+import {View, Text, Pressable, StyleSheet, StatusBar} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import type {StackNavigationProp} from '@react-navigation/stack';
 import * as Progress from 'react-native-progress';
@@ -12,7 +12,6 @@ type RootStackParamList = {
 };
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
-
 
 const HomeScreen = () => {
   const missions = [
@@ -36,7 +35,9 @@ const HomeScreen = () => {
 
         <View style={styles.progressBar}>
           <Progress.Bar progress={currentAmount / targetAmount} width={200} />
-          <Text style={styles.progressText}>${currentAmount}/${targetAmount}</Text>
+          <Text style={styles.progressText}>
+            ${currentAmount}/${targetAmount}
+          </Text>
         </View>
 
         <View style={styles.missionContainer}>
@@ -48,8 +49,9 @@ const HomeScreen = () => {
 
         {/*<TouchableOpacity
           style={styles.button}
-          onPress={() => {navigation.navigate('NewTransaction');}}
-        >
+          onPress={() => {
+            navigation.navigate('Transaction');
+          }}>
           <Text style={styles.buttonText}>新增交易紀錄</Text>
           <Text style={styles.buttonText}>+</Text>
         </TouchableOpacity>*/}

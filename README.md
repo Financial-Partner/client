@@ -28,6 +28,7 @@ npm install
 ```
 
 3. 環境變數設置：
+
    - 將 `.env.example` 重新命名為 `.env`
    - 填入適當的環境變數
 
@@ -38,16 +39,19 @@ npm install
 ## 執行專案
 
 1. 啟動 Metro 開發伺服器：
+
 ```bash
 yarn start
 ```
 
 2. 在新的視窗中執行 Android 應用程式：
+
 ```bash
 yarn android
 ```
 
 3. 在新的視窗中執行 iOS 應用程式：
+
 ```bash
 yarn ios
 ```
@@ -55,6 +59,7 @@ yarn ios
 ## 開發注意事項
 
 在 iOS 環境，若初次啟動，或是有安裝任何新的 dependency，建議確認是否需要在 iOS 安裝新的依賴：
+
 ```bash
 cd ios
 bundle exec pod install
@@ -65,10 +70,12 @@ bundle exec pod install
 ## 常見問題排解
 
 如果遇到問題，請檢查：
+
 1. `.env` 檔案中的所有變數是否已正確設置
 2. `google-services.json`, `GoogleService-info.plist` 檔案是否存在且內容正確
 3. `npx react-native doctor` 確認已準備好環境
 
 更多疑難排解資訊，請參考：
+
 - [React Native 疑難排解指南](https://reactnative.dev/docs/troubleshooting)
 - [Firebase Authentication 文件](https://firebase.google.com/docs/auth)

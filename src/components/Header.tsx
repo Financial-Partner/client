@@ -1,5 +1,13 @@
 import React from 'react';
-import {View, Text, StyleSheet, Pressable, StatusBar, Platform, Image} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  StatusBar,
+  Platform,
+  Image,
+} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import type {StackNavigationProp} from '@react-navigation/stack';
 import {colors} from '../theme/colors';
@@ -45,10 +53,10 @@ const Header = () => {
         </Pressable>
 
         <View style={styles.moneyContainer}>
-					<Image
-						source={require('../assets/icons/diamond.png')}
-						style={styles.icon}
-					/>
+          <Image
+            source={require('../assets/icons/diamond.png')}
+            style={styles.icon}
+          />
           <Text style={styles.moneyText}>1,000,000</Text>
         </View>
       </View>

@@ -10,13 +10,13 @@ const GachaCard = () => {
 };
 
 const styles = StyleSheet.create({
-    container: {
-        width: 100,
-        height: 150,
-        backgroundColor: 'pink',
-        borderRadius: 10,
-        margin: 8,
-    },
+  container: {
+    width: 100,
+    height: 150,
+    backgroundColor: 'pink',
+    borderRadius: 10,
+    margin: 8,
+  },
 });
 
 export default GachaCard;

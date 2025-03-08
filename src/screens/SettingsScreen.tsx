@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, StatusBar, Alert, Text } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import type { StackNavigationProp } from '@react-navigation/stack';
-import { colors } from '../theme/colors';
-import { useAuth } from '../contexts/AuthContext';
+import React, {useState} from 'react';
+import {View, StyleSheet, StatusBar, Alert, Text} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
+import type {StackNavigationProp} from '@react-navigation/stack';
+import {colors} from '../theme/colors';
+import {useAuth} from '../contexts/AuthContext';
 import SettingsHeader from '../components/settings/SettingsHeader';
 import AccountInfo from '../components/settings/AccountInfo';
 import PasswordSection from '../components/settings/PasswordSection';
@@ -21,7 +21,8 @@ type NavigationProp = StackNavigationProp<RootStackParamList>;
 
 const SettingsScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
-  const { user, signOut, linkGoogleAccount, updatePassword, skipAuth } = useAuth();
+  const {user, signOut, linkGoogleAccount, updatePassword, skipAuth} =
+    useAuth();
   const [linking, setLinking] = useState<boolean>(false);
   const [showPasswordModal, setShowPasswordModal] = useState<boolean>(false);
 
@@ -45,7 +46,10 @@ const SettingsScreen: React.FC = () => {
     }
   };
 
-  const handleUpdatePassword = async (currentPassword: string, newPassword: string) => {
+  const handleUpdatePassword = async (
+    currentPassword: string,
+    newPassword: string,
+  ) => {
     try {
       await updatePassword(currentPassword, newPassword);
       Alert.alert('成功', '密碼已更新');
@@ -55,11 +59,11 @@ const SettingsScreen: React.FC = () => {
   };
 
   const isPasswordLogin = user?.providerData.some(
-    (provider) => provider.providerId === 'password'
+    provider => provider.providerId === 'password',
   );
 
   const hasGoogleProvider = user?.providerData.some(
-    (provider) => provider.providerId === 'google.com'
+    provider => provider.providerId === 'google.com',
   );
 
   const showLinkButton = isPasswordLogin && !hasGoogleProvider;
@@ -77,7 +81,10 @@ const SettingsScreen: React.FC = () => {
         </>
       ) : (
         <>
-          <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
+          <StatusBar
+            barStyle="dark-content"
+            backgroundColor={colors.background}
+          />
           <SettingsHeader onClose={() => navigation.goBack()} />
           <View style={styles.content}>
             <AccountInfo email={user?.email} />

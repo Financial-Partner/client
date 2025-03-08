@@ -11,15 +11,15 @@ import ExpensePieChart from '../components/ExpensePieChart';
 const AnalysisScreen = () => {
   const [selectedButton, setSelectedButton] = useState<number>(2);
 
-  const handleButtonPress = (buttonIndex:number) => {
+  const handleButtonPress = (buttonIndex: number) => {
     setSelectedButton(buttonIndex);
   };
 
   const options = [
-    { label: '收入', value: '1' },
-    { label: '支出', value: '2' },
-    { label: '結餘', value: '3' },
-];
+    {label: '收入', value: '1'},
+    {label: '支出', value: '2'},
+    {label: '結餘', value: '3'},
+  ];
 
   return (
     <Layout>
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 10,
-    marginBottom:10,
+    marginBottom: 10,
   },
   chart: {
     marginTop: 20,

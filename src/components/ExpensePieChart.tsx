@@ -7,11 +7,11 @@ import {StyleSheet, View} from 'react-native';
 const ExpensePieChart = () => {
   const widthAndHeight = 250;
   const series = [
-    { value: 430, color: '#fbd203' },
-    { value: 321, color: '#ffb300' },
-    { value: 185, color: '#ff9100' },
-    { value: 123, color: '#ff6c00' },
-    { value: 80, color: '#ff3c00' },
+    {value: 430, color: '#fbd203'},
+    {value: 321, color: '#ffb300'},
+    {value: 185, color: '#ff9100'},
+    {value: 123, color: '#ff6c00'},
+    {value: 80, color: '#ff3c00'},
   ];
 
   return (
@@ -47,6 +47,5 @@ const styles = StyleSheet.create({
     borderRadius: 125, // Half of the width/height to make it a circle
   },
 });
-
 
 export default ExpensePieChart;

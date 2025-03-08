@@ -19,7 +19,9 @@ const InvestmentChance = ({chance}: chanceProps) => {
       <View style={styles.chanceContent}>
         <View style={styles.chanceHeader}>
           <Text style={styles.chanceTitle}>{chance.title}</Text>
-          <Text style={styles.chanceDescription}>最少投資 {chance.min_amount}</Text>
+          <Text style={styles.chanceDescription}>
+            最少投資 {chance.min_amount}
+          </Text>
         </View>
 
         <View style={styles.statusContainer}>

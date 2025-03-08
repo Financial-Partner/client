@@ -19,7 +19,7 @@ const TabNavigator = () => {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarStyle: { display: 'none' },
+        tabBarStyle: {display: 'none'},
       }}>
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Gacha" component={GachaScreen} />
@@ -40,4 +40,4 @@ const AppNavigator = () => {
   );
 };
 
-export default AppNavigator; 
+export default AppNavigator;

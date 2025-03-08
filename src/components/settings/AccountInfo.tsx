@@ -1,12 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { colors } from '../../theme/colors';
+import {View, Text, StyleSheet} from 'react-native';
+import {colors} from '../../theme/colors';
 
 type AccountInfoProps = {
   email?: string | null;
 };
 
-const AccountInfo: React.FC<AccountInfoProps> = ({ email }) => {
+const AccountInfo: React.FC<AccountInfoProps> = ({email}) => {
   return (
     <View style={styles.infoSection}>
       <Text style={styles.label}>電子郵件</Text>

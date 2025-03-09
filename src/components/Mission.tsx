@@ -1,7 +1,7 @@
 import {StyleSheet, View, Text} from 'react-native';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 
-import Diamond from '../svg/Diamond';
+import {Diamond} from '../svg';
 
 type MissionProps = {
   mission: {

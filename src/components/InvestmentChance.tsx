@@ -1,8 +1,7 @@
 import {View, Text, StyleSheet, Button, TextInput} from 'react-native';
 import React, {useState} from 'react';
 
-import DownArrow from '../svg/DownArrow';
-import UpArrow from '../svg/UpArrow';
+import {DownArrow, UpArrow} from '../svg';
 
 type chanceProps = {
   chance: {

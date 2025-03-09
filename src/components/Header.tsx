@@ -11,8 +11,7 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import type {StackNavigationProp} from '@react-navigation/stack';
 import {colors} from '../theme/colors';
-import Diamond from '../svg/Diamond';
-import BagIcon from '../svg/BagIcon';
+import {Diamond, BagIcon} from '../svg';
 
 type RootStackParamList = {
   MainTabs: undefined;

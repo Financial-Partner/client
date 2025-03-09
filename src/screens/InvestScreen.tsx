@@ -2,9 +2,7 @@ import React from 'react';
 import {View, Text, StyleSheet, StatusBar} from 'react-native';
 import Layout from '../components/Layout';
 import InvestmentChance from '../components/InvestmentChance';
-import Diamond from '../svg/Diamond';
-import UpArrow from '../svg/UpArrow';
-import DownArrow from '../svg/DownArrow';
+import {Diamond, UpArrow, DownArrow} from '../svg';
 
 const InvestScreen = () => {
   const chances = [

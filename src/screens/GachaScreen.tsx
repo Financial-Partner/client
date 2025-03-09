@@ -9,8 +9,7 @@ import {
 } from 'react-native';
 import Layout from '../components/Layout';
 import GachaCard from '../components/GachaCard';
-import Diamond from '../svg/Diamond';
-import ChangeIcon from '../svg/ChangeIcon';
+import {Diamond, ChangeIcon} from '../svg';
 
 const GachaScreen = () => {
   const cards: number[] = Array.from({length: 9});

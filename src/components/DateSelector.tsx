@@ -1,8 +1,7 @@
 import React, {useState} from 'react';
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 
-import LeftTriangle from '../svg/LeftTriangle';
-import RightTriangle from '../svg/RightTriangle';
+import {LeftTriangle, RightTriangle} from '../svg';
 
 type dateProp = {
   duration: String;

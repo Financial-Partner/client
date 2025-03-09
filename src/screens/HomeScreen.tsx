@@ -12,7 +12,7 @@ import * as Progress from 'react-native-progress';
 
 import Layout from '../components/Layout';
 import Mission from '../components/Mission';
-import Dinosaur from '../svg/Dinosaur';
+import {Dinosaur} from '../svg';
 
 type RootStackParamList = {
   Transaction: undefined;

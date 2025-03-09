@@ -10,7 +10,6 @@ import PasswordSection from '../components/settings/PasswordSection';
 import LinkGoogleAccount from '../components/settings/LinkGoogleAccount';
 import SignOutButton from '../components/settings/SignOutButton';
 import UpdatePasswordModal from '../components/settings/UpdatePasswordModal';
-// import Layout from '../components/Layout';
 
 type RootStackParamList = {
   MainTabs: undefined;

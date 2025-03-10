@@ -2,19 +2,19 @@ import React, {useState} from 'react';
 import {View, StyleSheet, StatusBar} from 'react-native';
 import Layout from '../components/Layout';
 import ExpensePieChart from '../components/ExpensePieChart';
-import DurationSelector from '../components/DurationSelector';
-import TypeSelector from '../components/TypeSelector';
-import DateSelector from '../components/DateSelector';
+import DurationSelector from '../components/input/DurationSelector';
+import TypeSelector from '../components/input/TypeSelector';
+import {Duration} from '../components/input/DurationSelector';
 
 const AnalysisScreen = () => {
-  const [duration, setDuration] = useState<String>('一個月');
+  const [duration, setDuration] = useState<Duration>(Duration.OneMonth);
+
   return (
     <Layout>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <View style={styles.content}>
         <TypeSelector />
         <DurationSelector duration={duration} setDuration={setDuration} />
-        <DateSelector duration={duration} />
 
         <View style={styles.chart}>
           <ExpensePieChart />

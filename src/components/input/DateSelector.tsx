@@ -18,7 +18,9 @@ const DateSelector = ({setDate, date}: dateSelectorProps) => {
 
   const handleDateChange = (newDate: String) => {
     const parsedDate = parseDateString(newDate);
-    setDate(parsedDate);
+    if (parsedDate.getTime() !== date.getTime()) {
+      setDate(parsedDate);
+    }
   };
 
   return (

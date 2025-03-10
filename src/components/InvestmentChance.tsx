@@ -1,6 +1,8 @@
 import {View, Text, StyleSheet, Button, TextInput} from 'react-native';
 import React, {useState} from 'react';
 
+import {DownArrow, UpArrow} from '../svg';
+
 type chanceProps = {
   chance: {
     title: string;
@@ -26,9 +28,9 @@ const InvestmentChance = ({chance}: chanceProps) => {
 
         <View style={styles.statusContainer}>
           {chance.isIncrease ? (
-            <Text style={styles.statusText}>🔺</Text>
+            <UpArrow width={26} height={26} style={styles.icon} />
           ) : (
-            <Text style={styles.statusText}>🔻</Text>
+            <DownArrow width={26} height={26} style={styles.icon} />
           )}
           <Text style={styles.statusText}>{chance.status}%</Text>
         </View>
@@ -99,6 +101,8 @@ const styles = StyleSheet.create({
   statusContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    width: 80,
+    justifyContent: 'space-around',
   },
   statusText: {
     fontSize: 24,
@@ -130,6 +134,9 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 5,
     paddingHorizontal: 8,
+    marginRight: 5,
+  },
+  icon: {
     marginRight: 5,
   },
 });

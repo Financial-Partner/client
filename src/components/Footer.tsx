@@ -56,6 +56,7 @@ const Footer = () => {
             style={styles.icon}
             resizeMode="contain"
           />
+          {/* <GachaScreenIcon /> */}
         </Pressable>
       ))}
     </View>

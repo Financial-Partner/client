@@ -1,6 +1,8 @@
 import {StyleSheet, View, Text} from 'react-native';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 
+import {Diamond} from '../svg';
+
 type MissionProps = {
   mission: {
     title: string;
@@ -26,7 +28,10 @@ const Mission = ({mission}: MissionProps) => {
         </View>
         <Text style={styles.missionTitle}>{mission.title}</Text>
       </View>
-      <Text>💰 {mission.amount}</Text>
+      <View style={styles.missionReward}>
+        <Diamond width={20} height={20} />
+        <Text>{mission.amount}</Text>
+      </View>
     </View>
   );
 };
@@ -42,6 +47,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginBottom: 10,
     width: '100%',
+    borderRadius: 10,
   },
   missionTitle: {
     fontSize: 14,
@@ -50,12 +56,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   checkbox: {
-    marginRight: 5,
+    marginRight: 10,
   },
   missionLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
+  },
+  missionReward: {
+    width: 70,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
 });
 

@@ -68,7 +68,9 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
   };
 
   const retryTokenExchange = async (): Promise<boolean> => {
-    if (!user) {return false;}
+    if (!user) {
+      return false;
+    }
 
     try {
       const firebaseToken = await user.getIdToken(true);
@@ -231,7 +233,12 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
     try {
       if (serverToken) {
         try {
-          await authService.logout();
+          const refreshToken = await AsyncStorage.getItem('refreshToken');
+          if (refreshToken) {
+            await authService.logout(refreshToken);
+          } else {
+            console.warn('找不到 refresh_token 進行登出');
+          }
         } catch (apiError) {
           console.error('API 登出失敗:', apiError);
         }

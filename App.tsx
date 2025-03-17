@@ -6,6 +6,7 @@ import AuthScreen from './src/screens/AuthScreen';
 import {AuthProvider, useAuth} from './src/contexts/AuthContext';
 import LoadingScreen from './src/screens/LoadingScreen';
 import {initializeApp, getApps} from '@react-native-firebase/app';
+import {SWRProvider} from './src/api/swrConfig';
 import Config from 'react-native-config';
 
 const firebaseConfig = {
@@ -45,9 +46,11 @@ const AppContent = () => {
 
 function App(): React.JSX.Element {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <SWRProvider>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </SWRProvider>
   );
 }
 

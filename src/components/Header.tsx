@@ -12,6 +12,7 @@ import {useNavigation} from '@react-navigation/native';
 import type {StackNavigationProp} from '@react-navigation/stack';
 import {colors} from '../theme/colors';
 import {Diamond, BagIcon} from '../svg';
+import {useUserProfile} from '../api/userService';
 
 type RootStackParamList = {
   MainTabs: undefined;
@@ -21,8 +22,14 @@ type RootStackParamList = {
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 
+const formatNumber = (num: number): string => {
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
+
 const Header = () => {
   const navigation = useNavigation<NavigationProp>();
+  const {user, isLoading} = useUserProfile();
+  const diamonds = user?.wallet?.diamonds || 0;
 
   return (
     <View style={styles.container}>
@@ -48,15 +55,15 @@ const Header = () => {
             navigation.navigate('Bag');
           }}>
           <BagIcon height={24} width={24} />
-          {/* // <Image
-          //   source={require('../assets/icons/bag.png')}
-          //   style={styles.icon}
-          // /> */}
         </Pressable>
 
         <View style={styles.moneyContainer}>
           <Diamond height={16} width={16} />
-          <Text style={styles.moneyText}>1,000,000</Text>
+          {isLoading ? (
+            <Text style={styles.moneyText}>Loading...</Text>
+          ) : (
+            <Text style={styles.moneyText}>{formatNumber(diamonds)}</Text>
+          )}
         </View>
       </View>
     </View>

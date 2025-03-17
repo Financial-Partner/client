@@ -42,6 +42,31 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
   );
   const skipAuth = Config.SKIP_AUTH === 'true';
 
+  const refreshAccessToken = async () => {
+    try {
+      const refreshToken = await AsyncStorage.getItem('refreshToken');
+      if (!refreshToken) {
+        return false;
+      }
+
+      setTokenExchangeError(null);
+      const response = await authService.refreshToken(refreshToken);
+
+      await AsyncStorage.setItem('userToken', response.access_token);
+      await AsyncStorage.setItem('refreshToken', response.refresh_token);
+
+      setServerToken(response.access_token);
+      return true;
+    } catch (error: any) {
+      console.error('刷新 token 失敗:', error);
+      setTokenExchangeError('刷新 token 失敗，請重新登入');
+      setServerToken(null);
+      await AsyncStorage.removeItem('userToken');
+      await AsyncStorage.removeItem('refreshToken');
+      return false;
+    }
+  };
+
   const exchangeFirebaseToken = async (firebaseToken: string) => {
     try {
       setTokenExchangeError(null);
@@ -85,40 +110,54 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
   };
 
   useEffect(() => {
-    if (skipAuth) {
-      setLoading(false);
-      setToken('dummy-token-for-development');
-      setServerToken('dummy-server-token-for-development');
-      return;
-    }
-
-    GoogleSignin.configure({
-      webClientId: Config.GOOGLE_WEB_CLIENT_ID,
-    });
-
-    const unsubscribe = auth.onAuthStateChanged(async userState => {
-      setUser(userState);
-      if (userState) {
-        const idToken = await userState.getIdToken();
-        setToken(idToken);
-
-        try {
-          await exchangeFirebaseToken(idToken);
-        } catch (error) {
-          console.error('自動 token 交換失敗:', error);
-        }
-      } else {
-        setToken(null);
-        setServerToken(null);
-        setTokenExchangeError(null);
-        await AsyncStorage.removeItem('userToken');
-        await AsyncStorage.removeItem('refreshToken');
+    const initAuth = async () => {
+      if (skipAuth) {
+        setLoading(false);
+        setToken('dummy-token-for-development');
+        setServerToken('dummy-server-token-for-development');
+        return;
       }
-      setLoading(false);
-    });
 
-    return () => unsubscribe();
-  }, [skipAuth]);
+      const storedToken = await AsyncStorage.getItem('userToken');
+      if (storedToken) {
+        setServerToken(storedToken);
+        await refreshAccessToken();
+      }
+
+      GoogleSignin.configure({
+        webClientId: Config.GOOGLE_WEB_CLIENT_ID,
+      });
+
+      const unsubscribe = auth.onAuthStateChanged(async userState => {
+        setUser(userState);
+
+        if (userState) {
+          const idToken = await userState.getIdToken();
+          setToken(idToken);
+
+          if (!serverToken) {
+            try {
+              await exchangeFirebaseToken(idToken);
+            } catch (error) {
+              console.error('Firebase token 交換失敗:', error);
+            }
+          }
+        } else {
+          setToken(null);
+          setServerToken(null);
+          setTokenExchangeError(null);
+          await AsyncStorage.removeItem('userToken');
+          await AsyncStorage.removeItem('refreshToken');
+        }
+
+        setLoading(false);
+      });
+
+      return unsubscribe;
+    };
+
+    initAuth();
+  }, [skipAuth, serverToken]);
 
   const signIn = async (email: string, password: string) => {
     try {

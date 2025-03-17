@@ -14,6 +14,7 @@ type AuthContextType = {
   loading: boolean;
   token: string | null;
   serverToken: string | null;
+  tokenExchangeError: string | null;
   skipAuth: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
@@ -24,6 +25,7 @@ type AuthContextType = {
     currentPassword: string,
     newPassword: string,
   ) => Promise<void>;
+  retryTokenExchange: () => Promise<boolean>;
 };
 
 const auth = getAuth();
@@ -35,10 +37,14 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState<string | null>(null);
   const [serverToken, setServerToken] = useState<string | null>(null);
+  const [tokenExchangeError, setTokenExchangeError] = useState<string | null>(
+    null,
+  );
   const skipAuth = Config.SKIP_AUTH === 'true';
 
   const exchangeFirebaseToken = async (firebaseToken: string) => {
     try {
+      setTokenExchangeError(null);
       const response = await authService.exchangeToken(firebaseToken);
 
       await AsyncStorage.setItem('userToken', response.access_token);
@@ -47,9 +53,32 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
       setServerToken(response.access_token);
 
       return response;
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message || error.message || '與服務器連接失敗';
+      setTokenExchangeError(errorMessage);
       console.error('Token 交換失敗:', error);
+
+      setServerToken(null);
+      await AsyncStorage.removeItem('userToken');
+      await AsyncStorage.removeItem('refreshToken');
+
       throw error;
+    }
+  };
+
+  const retryTokenExchange = async (): Promise<boolean> => {
+    if (!user) {return false;}
+
+    try {
+      const firebaseToken = await user.getIdToken(true);
+      setToken(firebaseToken);
+
+      await exchangeFirebaseToken(firebaseToken);
+      return true;
+    } catch (error) {
+      console.error('重試 token 交換失敗:', error);
+      return false;
     }
   };
 
@@ -75,11 +104,11 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
           await exchangeFirebaseToken(idToken);
         } catch (error) {
           console.error('自動 token 交換失敗:', error);
-          await AsyncStorage.setItem('userToken', idToken);
         }
       } else {
         setToken(null);
         setServerToken(null);
+        setTokenExchangeError(null);
         await AsyncStorage.removeItem('userToken');
         await AsyncStorage.removeItem('refreshToken');
       }
@@ -103,24 +132,25 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
       const firebaseToken = await userCredential.user.getIdToken();
       setToken(firebaseToken);
 
-      try {
-        await exchangeFirebaseToken(firebaseToken);
-      } catch (tokenError) {
-        console.error('Token 交換失敗:', tokenError);
-        await AsyncStorage.setItem('userToken', firebaseToken);
-      }
+      await exchangeFirebaseToken(firebaseToken);
     } catch (error: any) {
-      switch (error.code) {
-        case 'auth/invalid-email':
-          throw new Error('無效的電子郵件格式');
-        case 'auth/user-not-found':
-          throw new Error('找不到此用戶');
-        case 'auth/wrong-password':
-          throw new Error('密碼錯誤');
-        case 'auth/too-many-requests':
-          throw new Error('登入嘗試次數過多，請稍後再試');
-        default:
-          throw new Error('登入失敗，請稍後再試');
+      setServerToken(null);
+
+      if (error.code) {
+        switch (error.code) {
+          case 'auth/invalid-email':
+            throw new Error('無效的電子郵件格式');
+          case 'auth/user-not-found':
+            throw new Error('找不到此用戶');
+          case 'auth/wrong-password':
+            throw new Error('密碼錯誤');
+          case 'auth/too-many-requests':
+            throw new Error('登入嘗試次數過多，請稍後再試');
+          default:
+            throw new Error('登入失敗，請稍後再試');
+        }
+      } else {
+        throw error;
       }
     }
   };
@@ -143,24 +173,25 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
       const firebaseToken = await userCredential.user.getIdToken();
       setToken(firebaseToken);
 
-      try {
-        await exchangeFirebaseToken(firebaseToken);
-      } catch (tokenError) {
-        console.error('Token 交換失敗:', tokenError);
-        await AsyncStorage.setItem('userToken', firebaseToken);
-      }
+      await exchangeFirebaseToken(firebaseToken);
     } catch (error: any) {
-      switch (error.code) {
-        case 'auth/email-already-in-use':
-          throw new Error('此電子郵件已被使用');
-        case 'auth/invalid-email':
-          throw new Error('無效的電子郵件格式');
-        case 'auth/operation-not-allowed':
-          throw new Error('此登入方式尚未啟用');
-        case 'auth/weak-password':
-          throw new Error('密碼強度不足');
-        default:
-          throw new Error('註冊失敗，請稍後再試');
+      setServerToken(null);
+
+      if (error.code) {
+        switch (error.code) {
+          case 'auth/email-already-in-use':
+            throw new Error('此電子郵件已被使用');
+          case 'auth/invalid-email':
+            throw new Error('無效的電子郵件格式');
+          case 'auth/operation-not-allowed':
+            throw new Error('此登入方式尚未啟用');
+          case 'auth/weak-password':
+            throw new Error('密碼強度不足');
+          default:
+            throw new Error('註冊失敗，請稍後再試');
+        }
+      } else {
+        throw error;
       }
     }
   };
@@ -187,13 +218,10 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
       const firebaseToken = await userCredential.user.getIdToken();
       setToken(firebaseToken);
 
-      try {
-        await exchangeFirebaseToken(firebaseToken);
-      } catch (tokenError) {
-        console.error('Token 交換失敗:', tokenError);
-        await AsyncStorage.setItem('userToken', firebaseToken);
-      }
-    } catch (error) {
+      await exchangeFirebaseToken(firebaseToken);
+    } catch (error: any) {
+      setServerToken(null);
+
       console.error('Google 登入錯誤:', error);
       throw error;
     }
@@ -222,6 +250,7 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
 
       setToken(null);
       setServerToken(null);
+      setTokenExchangeError(null);
     } catch (error) {
       throw error;
     }
@@ -274,24 +303,24 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
       const firebaseToken = await result.user.getIdToken(true);
       setToken(firebaseToken);
 
-      try {
-        await exchangeFirebaseToken(firebaseToken);
-      } catch (tokenError) {
-        console.error('Token 交換失敗:', tokenError);
-        await AsyncStorage.setItem('userToken', firebaseToken);
-      }
+      await exchangeFirebaseToken(firebaseToken);
     } catch (error: any) {
       console.error('Google 帳號連結錯誤:', error);
-      switch (error.code) {
-        case 'auth/provider-already-linked':
-          throw new Error('此 Google 帳號已經連結');
-        case 'auth/credential-already-in-use':
-          throw new Error('此 Google 帳號已被其他帳號使用');
-        default:
-          if (error.message) {
-            throw error;
-          }
-          throw new Error('連結失敗，請稍後再試');
+
+      if (error.code) {
+        switch (error.code) {
+          case 'auth/provider-already-linked':
+            throw new Error('此 Google 帳號已經連結');
+          case 'auth/credential-already-in-use':
+            throw new Error('此 Google 帳號已被其他帳號使用');
+          default:
+            if (error.message) {
+              throw error;
+            }
+            throw new Error('連結失敗，請稍後再試');
+        }
+      } else {
+        throw error;
       }
     }
   };
@@ -315,12 +344,7 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
       const firebaseToken = await user.getIdToken(true);
       setToken(firebaseToken);
 
-      try {
-        await exchangeFirebaseToken(firebaseToken);
-      } catch (tokenError) {
-        console.error('Token 交換失敗:', tokenError);
-        await AsyncStorage.setItem('userToken', firebaseToken);
-      }
+      await exchangeFirebaseToken(firebaseToken);
     } catch (error: any) {
       throw error;
     }
@@ -331,6 +355,7 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
     loading,
     token,
     serverToken,
+    tokenExchangeError,
     skipAuth,
     signIn: skipAuth ? async () => {} : signIn,
     signUp: skipAuth ? async () => {} : signUp,
@@ -338,6 +363,7 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
     googleSignIn: skipAuth ? async () => {} : googleSignIn,
     linkGoogleAccount: skipAuth ? async () => {} : linkGoogleAccount,
     updatePassword: skipAuth ? async () => {} : updatePassword,
+    retryTokenExchange,
   };
 
   return (

@@ -25,7 +25,7 @@ if (!getApps().length) {
 const Stack = createStackNavigator();
 
 const AppContent = () => {
-  const {loading, token} = useAuth();
+  const {loading, serverToken} = useAuth();
 
   if (loading) {
     return <LoadingScreen />;
@@ -34,7 +34,7 @@ const AppContent = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{headerShown: false}}>
-        {token ? (
+        {serverToken ? (
           <Stack.Screen name="App" component={AppNavigator} />
         ) : (
           <Stack.Screen name="Auth" component={AuthScreen} />

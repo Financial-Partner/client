@@ -1,6 +1,5 @@
+import apiClient from './client';
 import {API_ENDPOINTS} from './endpoints';
-
-import {apiClient, useApiMutation} from '.';
 import useSWR from 'swr';
 
 interface UserProfileResponse {
@@ -37,11 +36,10 @@ export const useUserProfile = () => {
 
 export const useUserProfileManager = () => {
   const {user, isLoading, isError, mutate} = useUserProfile();
-  const {put} = useApiMutation();
 
   const updateProfile = async (userData: any) => {
     try {
-      const updatedUser = await put(API_ENDPOINTS.USER_UPDATE, userData);
+      const updatedUser = await userService.updateUserProfile(userData);
       mutate(updatedUser, false);
       return updatedUser;
     } catch (error) {

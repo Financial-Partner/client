@@ -1,6 +1,7 @@
 import apiClient from './client';
 import {API_ENDPOINTS} from './endpoints';
 import useSWR from 'swr';
+import {useAuth} from '../contexts/AuthContext';
 
 interface UserProfileResponse {
   wallet: {
@@ -22,8 +23,9 @@ export const userService = {
 };
 
 export const useUserProfile = () => {
+  const {serverToken} = useAuth();
   const {data, error, isLoading, mutate} = useSWR<UserProfileResponse>(
-    API_ENDPOINTS.USER_ME,
+    serverToken ? API_ENDPOINTS.USER_ME : null,
   );
 
   return {

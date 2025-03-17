@@ -30,6 +30,65 @@ type AuthContextType = {
 
 const auth = getAuth();
 
+const createDummyUser = (token: string, refreshToken: string): FirebaseAuthTypes.User => {
+  const dummyUser = {
+    uid: 'dummy-user-id',
+    email: 'dummy@example.com',
+    emailVerified: true,
+    isAnonymous: false,
+    displayName: null,
+    phoneNumber: null,
+    photoURL: null,
+    metadata: {
+      creationTime: new Date().toISOString(),
+      lastSignInTime: new Date().toISOString(),
+    },
+    providerData: [],
+    refreshToken: '',
+    tenantId: null,
+    delete: async () => {},
+    getIdToken: async () => token,
+    getIdTokenResult: async () => ({
+      token,
+      claims: {},
+      authTime: new Date().toISOString(),
+      issuedAtTime: new Date().toISOString(),
+      expirationTime: new Date(Date.now() + 3600000).toISOString(),
+      signInProvider: null,
+      signInSecondFactor: null,
+    }),
+    reload: async () => {},
+    toJSON: () => ({}),
+    multiFactor: {
+      enrolledFactors: [],
+      session: null,
+    },
+    stsTokenManager: {
+      accessToken: token,
+      refreshToken,
+      expirationTime: Date.now() + 3600000,
+    },
+    providerId: 'password',
+    updateEmail: async () => {},
+    updatePassword: async () => {},
+    updatePhoneNumber: async () => {},
+    updateProfile: async () => {},
+    linkWithCredential: async () => ({} as any),
+    linkWithPhoneNumber: async () => ({} as any),
+    reauthenticateWithCredential: async () => {},
+    reauthenticateWithPhoneNumber: async () => {},
+    unlink: async () => ({} as any),
+    linkWithPopup: async () => ({} as any),
+    linkWithRedirect: async () => ({} as any),
+    reauthenticateWithPopup: async () => ({} as any),
+    reauthenticateWithRedirect: async () => ({} as any),
+    getProviderData: () => [],
+    getProviderId: () => 'password',
+  } as unknown as FirebaseAuthTypes.User;
+
+  return dummyUser;
+};
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({children}: {children: React.ReactNode}) => {
@@ -112,10 +171,30 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
   useEffect(() => {
     const initAuth = async () => {
       if (skipAuth) {
+        const DUMMY_TOKEN = 'dummy-token-for-development';
+        const DUMMY_REFRESH_TOKEN = 'dummy-refresh-token-for-development';
+
+        await AsyncStorage.setItem('userToken', DUMMY_TOKEN);
+        await AsyncStorage.setItem('refreshToken', DUMMY_REFRESH_TOKEN);
+        await AsyncStorage.setItem('isDummyToken', 'true');
+
+        setToken(DUMMY_TOKEN);
+        setServerToken(DUMMY_TOKEN);
+        setUser(createDummyUser(DUMMY_TOKEN, DUMMY_REFRESH_TOKEN));
         setLoading(false);
-        setToken('dummy-token-for-development');
-        setServerToken('dummy-server-token-for-development');
         return;
+      } else {
+        const isDummyToken = await AsyncStorage.getItem('isDummyToken');
+        if (isDummyToken === 'true') {
+          console.log(
+            '檢測到環境變數變更：從 dummy 模式切換到正常模式，清除舊的 token',
+          );
+          await AsyncStorage.removeItem('userToken');
+          await AsyncStorage.removeItem('refreshToken');
+          await AsyncStorage.removeItem('isDummyToken');
+          setToken(null);
+          setServerToken(null);
+        }
       }
 
       const storedToken = await AsyncStorage.getItem('userToken');

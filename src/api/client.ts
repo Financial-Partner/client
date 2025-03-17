@@ -4,6 +4,7 @@ import Config from 'react-native-config';
 import {API_ENDPOINTS} from './endpoints';
 
 const API_BASE_URL = Config.API_BASE_URL || 'http://localhost:8080/api';
+const SKIP_AUTH = Config.SKIP_AUTH === 'true';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -35,6 +36,10 @@ apiClient.interceptors.response.use(
     return response;
   },
   async (error: AxiosError) => {
+    if (SKIP_AUTH) {
+      return Promise.reject(error);
+    }
+
     const originalRequest = error.config as AxiosRequestConfig & {
       _retry?: boolean;
     };
@@ -71,6 +76,7 @@ apiClient.interceptors.response.use(
       } catch (refreshError) {
         await AsyncStorage.removeItem('userToken');
         await AsyncStorage.removeItem('refreshToken');
+        await AsyncStorage.removeItem('isDummyToken');
 
         console.error('Token refresh failed, user needs to login again');
 

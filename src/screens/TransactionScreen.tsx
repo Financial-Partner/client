@@ -103,7 +103,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#f5f5f5',
   },
   module: {
     padding: 16,
@@ -111,13 +110,13 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   grayBackground: {
-    backgroundColor: 'rgba(211, 211, 211, 0.4)', // light gray
+    backgroundColor: 'rgba(200, 160, 230, 0.8)', // light purple
   },
   blueBackground: {
-    backgroundColor: 'rgba(173, 216, 230, 0.4)', // light blue
+    backgroundColor: 'rgba(173, 216, 230, 0.8)', // light blue
   },
   whiteBackground: {
-    backgroundColor: 'rgba(255, 255, 255, 0.4)', // white
+    backgroundColor: 'rgba(255, 255, 255, 0.8)', // white
   },
   label: {
     fontSize: 18,

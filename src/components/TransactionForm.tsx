@@ -59,38 +59,28 @@ const TransactionForm: React.FC<TransactionFormProps> = ({onSubmit}) => {
       <Text style={styles.amountText}>{amount || '0'}</Text>
 
       <View style={styles.keypad}>
-        {[
-          '1',
-          '2',
-          '3',
-          'Del',
-          '4',
-          '5',
-          '6',
-          '',
-          '7',
-          '8',
-          '9',
-          '',
-          '',
-          '0',
-          '確認',
-        ].map((key, index) => (
-          <Pressable
-            key={index}
-            style={[
-              styles.key,
-              key === '確認' && styles.confirmKey,
-              key === 'Del' && styles.deleteKey,
-            ]}
-            onPress={() => {
-              if (key === '確認') {handleConfirm();}
-              else if (key === 'Del') {handleDelete();}
-              else {handleNumberPress(key.toString());}
-            }}>
-            <Text style={styles.keyText}>{key}</Text>
-          </Pressable>
-        ))}
+        {['1', '2', '3', 'Del', '4', '5', '6', '0', '7', '8', '9', '確認'].map(
+          (key, index) => (
+            <Pressable
+              key={index}
+              style={[
+                styles.key,
+                key === '確認' && styles.confirmKey,
+                key === 'Del' && styles.deleteKey,
+              ]}
+              onPress={() => {
+                if (key === '確認') {
+                  handleConfirm();
+                } else if (key === 'Del') {
+                  handleDelete();
+                } else {
+                  handleNumberPress(key.toString());
+                }
+              }}>
+              <Text style={styles.keyText}>{key}</Text>
+            </Pressable>
+          ),
+        )}
       </View>
     </View>
   );

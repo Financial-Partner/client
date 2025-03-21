@@ -16,28 +16,28 @@ const TransactionScreen: React.FC = () => {
     {category: string; amount: number}[]
   >([]);
   const [isModalVisible, setModalVisible] = useState(false);
-  const [budget, setBudget] = useState<number>(10000); // 預設預算
-  const totalExpense = transactions.reduce((sum, t) => sum + t.amount, 0); // 本月支出
-  const totalIncome = 15000; // 假設本月收入固定
-  const remainingBudget = budget - totalExpense; // 剩餘額度
+  const [budget, setBudget] = useState<number>(10000); // setting Budget
+  const totalExpense = transactions.reduce((sum, t) => sum + t.amount, 0); // total Expense
+  const totalIncome = 15000; // total Revenue (assume to be fixed)
+  const remainingBudget = budget - totalExpense; // Remain balance
 
   const handleAddTransaction = (amount: number, category: string) => {
-    setTransactions([{category, amount}, ...transactions]); //最新輸入顯示在最上方
+    setTransactions([{category, amount}, ...transactions]); //sort by newest
     setModalVisible(false);
   };
 
   return (
-    <Layout>
+    <Layout scrollable={false}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <View style={styles.container}>
-        {/* 第一個模塊：本月支出 & 收入 */}
+        {/* First block：Expense & Revenue */}
         <View style={[styles.module, styles.grayBackground]}>
           <Text style={styles.label}>本月支出</Text>
           <Text style={styles.amount}>-${totalExpense}</Text>
           <Text style={styles.subText}>本月收入：${totalIncome}</Text>
         </View>
 
-        {/* 第二個模塊：本月預算 & 剩餘額度 */}
+        {/* Second block：Budget & remain balance */}
         <View style={[styles.module, styles.blueBackground]}>
           <View style={styles.row}>
             <Text style={styles.label}>本月預算</Text>
@@ -53,7 +53,7 @@ const TransactionScreen: React.FC = () => {
           <Text style={styles.subText}>剩餘額度：${remainingBudget}</Text>
         </View>
 
-        {/* 第三個模塊：帳單明細 */}
+        {/* Third block：details */}
         <View style={[styles.module, styles.whiteBackground]}>
           <Text style={styles.label}>帳單明細</Text>
           <FlatList
@@ -71,14 +71,12 @@ const TransactionScreen: React.FC = () => {
           />
         </View>
 
-        {/* + 按鈕，開啟交易輸入表單 */}
         <Pressable
           style={styles.addButton}
           onPress={() => setModalVisible(true)}>
           <Text style={styles.addButtonText}>+</Text>
         </Pressable>
 
-        {/* Modal 彈出輸入交易表單 */}
         <Modal
           visible={isModalVisible}
           animationType="slide"
@@ -97,7 +95,6 @@ const TransactionScreen: React.FC = () => {
   );
 };
 
-// 樣式
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -114,13 +111,13 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   grayBackground: {
-    backgroundColor: 'rgba(211, 211, 211, 0.4)', // 淺灰色 40% 透明度
+    backgroundColor: 'rgba(211, 211, 211, 0.4)', // light gray
   },
   blueBackground: {
-    backgroundColor: 'rgba(173, 216, 230, 0.4)', // 淺藍色 40% 透明度
+    backgroundColor: 'rgba(173, 216, 230, 0.4)', // light blue
   },
   whiteBackground: {
-    backgroundColor: 'rgba(255, 255, 255, 0.4)', // 白色 40% 透明度
+    backgroundColor: 'rgba(255, 255, 255, 0.4)', // white
   },
   label: {
     fontSize: 18,

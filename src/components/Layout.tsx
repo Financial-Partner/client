@@ -6,15 +6,15 @@ import {colors} from '../theme/colors';
 
 type LayoutProps = {
   children: React.ReactNode;
+  scrollable?: boolean;
 };
 
-const Layout = ({children}: LayoutProps) => {
+const Layout = ({children, scrollable = true}: LayoutProps) => {
+  const ContentContainer = scrollable ? ScrollView : View;
   return (
     <View style={styles.container}>
       <Header />
-      <ScrollView style={styles.content} nestedScrollEnabled={true}>
-        {children}
-      </ScrollView>
+      <ContentContainer style={styles.content}>{children}</ContentContainer>
       <Footer />
     </View>
   );

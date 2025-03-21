@@ -16,10 +16,10 @@ type NavigationProp = StackNavigationProp<RootStackParamList>;
 
 const HomeScreen = () => {
   const missions = [
-    { title: '輸入交易紀錄', amount: 1000, isCompleted: false },
-    { title: '添加額外收入', amount: 500, isCompleted: false },
-    { title: '設定預算', amount: 2000, isCompleted: true },
-    { title: '設定目標存款', amount: 3000, isCompleted: false },
+    {title: '輸入交易紀錄', amount: 1000, isCompleted: false},
+    {title: '添加額外收入', amount: 500, isCompleted: false},
+    {title: '設定預算', amount: 2000, isCompleted: true},
+    {title: '設定目標存款', amount: 3000, isCompleted: false},
   ];
   const targetAmount = 10000;
   const currentAmount = 5000;
@@ -46,14 +46,9 @@ const HomeScreen = () => {
           ))}
         </View>
 
-        {/*<TouchableOpacity
+        <Pressable
           style={styles.button}
-          onPress={() => {navigation.navigate('NewTransaction');}}
-        >
-          <Text style={styles.buttonText}>新增交易紀錄</Text>
-          <Text style={styles.buttonText}>+</Text>
-        </TouchableOpacity>*/}
-        <Pressable style={styles.button} onPress={() => navigation.navigate('TransactionScreen')}>
+          onPress={() => navigation.navigate('TransactionScreen')}>
           <Text style={styles.buttonText}>新增交易紀錄</Text>
         </Pressable>
       </View>

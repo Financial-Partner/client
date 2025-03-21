@@ -87,7 +87,6 @@ const TransactionScreen: React.FC = () => {
   );
 };
 
-// 樣式
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,

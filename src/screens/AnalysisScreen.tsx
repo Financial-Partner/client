@@ -4,6 +4,7 @@ import Layout from '../components/Layout';
 import ExpensePieChart from '../components/ExpensePieChart';
 import DurationSelector from '../components/input/DurationSelector';
 import TypeSelector from '../components/input/TypeSelector';
+import ChatBox from '../components/ChatBox';
 import {Duration} from '../components/input/DurationSelector';
 
 const AnalysisScreen = () => {
@@ -20,6 +21,9 @@ const AnalysisScreen = () => {
           <ExpensePieChart />
         </View>
       </View>
+
+      {/* Chat Box */}
+      <ChatBox />
     </Layout>
   );
 };

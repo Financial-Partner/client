@@ -12,7 +12,9 @@ const Layout = ({children}: LayoutProps) => {
   return (
     <View style={styles.container}>
       <Header />
-      <ScrollView style={styles.content}>{children}</ScrollView>
+      <ScrollView style={styles.content} nestedScrollEnabled={true}>
+        {children}
+      </ScrollView>
       <Footer />
     </View>
   );

@@ -25,7 +25,7 @@ const TabNavigator = () => {
       <Tab.Screen name="Invest" component={InvestScreen} />
       <Tab.Screen name="Analysis" component={AnalysisScreen} />
       <Tab.Screen name="Bag" component={BagScreen} />
-      <Tab.Screen name="Transaction" component={TransactionScreen} />
+      <Tab.Screen name="TransactionScreen" component={TransactionScreen} />
     </Tab.Navigator>
   );
 };
@@ -37,9 +37,12 @@ const AppNavigator = () => {
       <Stack.Screen
         name="Settings"
         component={SettingsScreen}
-        options={{
-          presentation: 'modal',
-        }}
+        options={{presentation: 'modal'}}
+      />
+      <Stack.Screen
+        name="TransactionScreen"
+        component={TransactionScreen}
+        options={{presentation: 'modal'}}
       />
     </Stack.Navigator>
   );

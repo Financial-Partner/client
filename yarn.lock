@@ -5723,7 +5723,7 @@ merge2@^1.3.0, merge2@^1.4.1:
 
 metro-babel-transformer@0.81.1:
   version "0.81.1"
-  resolved "https://registry.npmjs.org/metro-babel-transformer/-/metro-babel-transformer-0.81.1.tgz"
+  resolved "https://registry.yarnpkg.com/metro-babel-transformer/-/metro-babel-transformer-0.81.1.tgz#1fb74c8e136c4aadd0a410ff81579ae3e31dc1bd"
   integrity sha512-JECKDrQaUnDmj0x/Q/c8c5YwsatVx38Lu+BfCwX9fR8bWipAzkvJocBpq5rOAJRDXRgDcPv2VO4Q4nFYrpYNQg==
   dependencies:
     "@babel/core" "^7.25.2"
@@ -5733,14 +5733,14 @@ metro-babel-transformer@0.81.1:
 
 metro-cache-key@0.81.1:
   version "0.81.1"
-  resolved "https://registry.npmjs.org/metro-cache-key/-/metro-cache-key-0.81.1.tgz"
+  resolved "https://registry.yarnpkg.com/metro-cache-key/-/metro-cache-key-0.81.1.tgz#6bc3dd54f36355c9ac333e4b4242902be21d8f4b"
   integrity sha512-5fDaHR1yTvpaQuwMAeEoZGsVyvjrkw9IFAS7WixSPvaNY5YfleqoJICPc6hbXFJjvwCCpwmIYFkjqzR/qJ6yqA==
   dependencies:
     flow-enums-runtime "^0.0.6"
 
 metro-cache@0.81.1:
   version "0.81.1"
-  resolved "https://registry.npmjs.org/metro-cache/-/metro-cache-0.81.1.tgz"
+  resolved "https://registry.yarnpkg.com/metro-cache/-/metro-cache-0.81.1.tgz#052bb51a4c5863dca6b544b5b5a7dad936e53e8b"
   integrity sha512-Uqcmn6sZ+Y0VJHM88VrG5xCvSeU7RnuvmjPmSOpEcyJJBe02QkfHL05MX2ZyGDTyZdbKCzaX0IijrTe4hN3F0Q==
   dependencies:
     exponential-backoff "^3.1.1"
@@ -5772,7 +5772,7 @@ metro-core@0.81.1, metro-core@^0.81.0:
 
 metro-file-map@0.81.1:
   version "0.81.1"
-  resolved "https://registry.npmjs.org/metro-file-map/-/metro-file-map-0.81.1.tgz"
+  resolved "https://registry.yarnpkg.com/metro-file-map/-/metro-file-map-0.81.1.tgz#65be578045e14543d702585233fd42905cf6f0c6"
   integrity sha512-aY72H2ujmRfFxcsbyh83JgqFF+uQ4HFN1VhV2FmcfQG4s1bGKf2Vbkk+vtZ1+EswcBwDZFbkpvAjN49oqwGzAA==
   dependencies:
     debug "^2.2.0"
@@ -5787,7 +5787,7 @@ metro-file-map@0.81.1:
 
 metro-minify-terser@0.81.1:
   version "0.81.1"
-  resolved "https://registry.npmjs.org/metro-minify-terser/-/metro-minify-terser-0.81.1.tgz"
+  resolved "https://registry.yarnpkg.com/metro-minify-terser/-/metro-minify-terser-0.81.1.tgz#693ea83713a7625065fa1bb9dae18db3dbfddab8"
   integrity sha512-p/Qz3NNh1nebSqMlxlUALAnESo6heQrnvgHtAuxufRPtKvghnVDq9hGGex8H7z7YYLsqe42PWdt4JxTA3mgkvg==
   dependencies:
     flow-enums-runtime "^0.0.6"
@@ -5795,7 +5795,7 @@ metro-minify-terser@0.81.1:
 
 metro-resolver@0.81.1:
   version "0.81.1"
-  resolved "https://registry.npmjs.org/metro-resolver/-/metro-resolver-0.81.1.tgz"
+  resolved "https://registry.yarnpkg.com/metro-resolver/-/metro-resolver-0.81.1.tgz#f76bfb7925951cd5ac38e34a4ec9b83cfc77ff93"
   integrity sha512-E61t6fxRoYRkl6Zo3iUfCKW4DYfum/bLjcejXBMt1y3I7LFkK84TCR/Rs9OAwsMCY/7GOPB4+CREYZOtCC7CNA==
   dependencies:
     flow-enums-runtime "^0.0.6"
@@ -5826,7 +5826,7 @@ metro-source-map@0.81.1, metro-source-map@^0.81.0:
 
 metro-symbolicate@0.81.1:
   version "0.81.1"
-  resolved "https://registry.npmjs.org/metro-symbolicate/-/metro-symbolicate-0.81.1.tgz"
+  resolved "https://registry.yarnpkg.com/metro-symbolicate/-/metro-symbolicate-0.81.1.tgz#f3e16182e51093ddf12bfda9c2bdd4c5512bc7f5"
   integrity sha512-Lgk0qjEigtFtsM7C0miXITbcV47E1ZYIfB+m/hCraihiwRWkNUQEPCWvqZmwXKSwVE5mXA0EzQtghAvQSjZDxw==
   dependencies:
     flow-enums-runtime "^0.0.6"
@@ -5838,7 +5838,7 @@ metro-symbolicate@0.81.1:
 
 metro-transform-plugins@0.81.1:
   version "0.81.1"
-  resolved "https://registry.npmjs.org/metro-transform-plugins/-/metro-transform-plugins-0.81.1.tgz"
+  resolved "https://registry.yarnpkg.com/metro-transform-plugins/-/metro-transform-plugins-0.81.1.tgz#2a3fe93b65d0536f7fef0a388cddbab1e1511a06"
   integrity sha512-7L1lI44/CyjIoBaORhY9fVkoNe8hrzgxjSCQ/lQlcfrV31cZb7u0RGOQrKmUX7Bw4FpejrB70ArQ7Mse9mk7+Q==
   dependencies:
     "@babel/core" "^7.25.2"
@@ -5850,7 +5850,7 @@ metro-transform-plugins@0.81.1:
 
 metro-transform-worker@0.81.1:
   version "0.81.1"
-  resolved "https://registry.npmjs.org/metro-transform-worker/-/metro-transform-worker-0.81.1.tgz"
+  resolved "https://registry.yarnpkg.com/metro-transform-worker/-/metro-transform-worker-0.81.1.tgz#806cc3e5ff0338162eeba3c4d62abc0f587efb83"
   integrity sha512-M+2hVT3rEy5K7PBmGDgQNq3Zx53TjScOcO/CieyLnCRFtBGWZiSJ2+bLAXXOKyKa/y3bI3i0owxtyxuPGDwbZg==
   dependencies:
     "@babel/core" "^7.25.2"
@@ -6097,7 +6097,7 @@ nullthrows@^1.1.1:
 
 ob1@0.81.1:
   version "0.81.1"
-  resolved "https://registry.npmjs.org/ob1/-/ob1-0.81.1.tgz"
+  resolved "https://registry.yarnpkg.com/ob1/-/ob1-0.81.1.tgz#83cdbb68bc2baa6b2e1a29672daa10ac2341ccc3"
   integrity sha512-1PEbvI+AFvOcgdNcO79FtDI1TUO8S3lhiKOyAiyWQF3sFDDKS+aw2/BZvGlArFnSmqckwOOB9chQuIX0/OahoQ==
   dependencies:
     flow-enums-runtime "^0.0.6"

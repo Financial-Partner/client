@@ -18,32 +18,65 @@ import {colors} from '../theme/colors';
 const SetUp = () => {
   const [step, setStep] = useState(1);
   const [goal, setGoal] = useState('');
-  const [selectedPet, setSelectedPet] = useState<any>(null);
+  const [selectedDino, setSelectedDino] = useState<any>(null);
   const navigation = useNavigation();
   const {user} = useAuth();
 
   // Mock data for pet images
-  const pets = [
+  const dinosaurs = [
     {
       id: 1,
-      name: '寵物 1',
-      image: {
-        uri: 'https://www.comfortzone.com/-/media/project/oneweb/comfortzone/images/blog/how-can-i-soothe-and-calm-my-cat.jpeg?h=717&iar=0&w=1000&hash=4B47BC0AD485430E429977C30A7A37DF',
-      },
+      name: '寵物一',
+      imageKey: 'blue_1',
+      image: require('../assets/characters/blue_1.png'),
     },
     {
       id: 2,
-      name: '寵物 2',
-      image: {
-        uri: 'https://www.comfortzone.com/-/media/project/oneweb/comfortzone/images/blog/how-can-i-soothe-and-calm-my-cat.jpeg?h=717&iar=0&w=1000&hash=4B47BC0AD485430E429977C30A7A37DF',
-      },
+      name: '寵物二',
+      imageKey: 'blue_2',
+      image: require('../assets/characters/blue_2.png'),
     },
     {
       id: 3,
-      name: '寵物 3',
-      image: {
-        uri: 'https://www.comfortzone.com/-/media/project/oneweb/comfortzone/images/blog/how-can-i-soothe-and-calm-my-cat.jpeg?h=717&iar=0&w=1000&hash=4B47BC0AD485430E429977C30A7A37DF',
-      },
+      name: '寵物三',
+      imageKey: 'green_1',
+      image: require('../assets/characters/green_1.png'),
+    },
+    {
+      id: 4,
+      name: '寵物四',
+      imageKey: 'green_2',
+      image: require('../assets/characters/green_2.png'),
+    },
+    {
+      id: 5,
+      name: '寵物五',
+      imageKey: 'green_3',
+      image: require('../assets/characters/green_3.png'),
+    },
+    {
+      id: 6,
+      name: '寵物六',
+      imageKey: 'main_character',
+      image: require('../assets/characters/main_character.png'),
+    },
+    {
+      id: 7,
+      name: '寵物七',
+      imageKey: 'pink_1',
+      image: require('../assets/characters/pink_1.png'),
+    },
+    {
+      id: 8,
+      name: '寵物八',
+      imageKey: 'yellow_1',
+      image: require('../assets/characters/yellow_1.png'),
+    },
+    {
+      id: 9,
+      name: '寵物九',
+      imageKey: 'yellow_2',
+      image: require('../assets/characters/yellow_2.png'),
     },
   ];
 
@@ -53,9 +86,10 @@ const SetUp = () => {
         setStep(2);
       }
     } else if (step === 2) {
-      if (selectedPet && user?.uid) {
+      if (selectedDino && user?.uid) {
         const key = `setupDone-${user.uid}`;
         await AsyncStorage.setItem(key, 'true');
+        await AsyncStorage.setItem(`dino-${user.uid}`, selectedDino.imageKey);
         navigation.reset({index: 0, routes: [{name: 'MainTabs'}]});
       }
     }
@@ -89,17 +123,17 @@ const SetUp = () => {
           ) : (
             <View style={styles.stepContent}>
               <Text style={styles.title}>選擇一個萌寵</Text>
-              <View style={styles.petsContainer}>
-                {pets.map(pet => (
+              <View style={styles.dinosContainer}>
+                {dinosaurs.map(dino => (
                   <TouchableOpacity
-                    key={pet.id}
+                    key={dino.id}
                     style={[
-                      styles.petItem,
-                      selectedPet?.id === pet.id && styles.selectedPetItem,
+                      styles.dinoItem,
+                      selectedDino?.id === dino.id && styles.selectedDinoItem,
                     ]}
-                    onPress={() => setSelectedPet(pet)}>
-                    <Image source={pet.image} style={styles.petImage} />
-                    <Text style={styles.petName}>{pet.name}</Text>
+                    onPress={() => setSelectedDino(dino)}>
+                    <Image source={dino.image} style={styles.dinoImage} />
+                    <Text style={styles.dinoName}>{dino.name}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
@@ -158,27 +192,27 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     color: '#000',
   },
-  petsContainer: {
+  dinosContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     flexWrap: 'wrap',
     width: '100%',
   },
-  petItem: {
+  dinoItem: {
     alignItems: 'center',
     padding: 10,
     borderRadius: 5,
   },
-  selectedPetItem: {
+  selectedDinoItem: {
     borderWidth: 2,
     borderColor: '#007BFF',
   },
-  petImage: {
+  dinoImage: {
     width: 100,
     height: 100,
     marginBottom: 10,
   },
-  petName: {
+  dinoName: {
     textAlign: 'center',
     color: '#fff',
   },

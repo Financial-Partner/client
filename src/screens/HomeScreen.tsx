@@ -1,20 +1,43 @@
-import React from 'react';
-import {View, Text, Pressable, StyleSheet, StatusBar, TouchableOpacity} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  StatusBar,
+  Image,
+} from 'react-native'; // TouchableOpacity
 import {useNavigation} from '@react-navigation/native';
 import type {StackNavigationProp} from '@react-navigation/stack';
 import * as Progress from 'react-native-progress';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Layout from '../components/Layout';
 import Mission from '../components/Mission';
+import {useAuth} from '../contexts/AuthContext';
 import {Dinosaur} from '../svg';
 
 type RootStackParamList = {
   TransactionScreen: undefined;
 };
 
+const dinoImages: {[key: string]: any} = {
+  blue_1: require('../assets/characters/blue_1.png'),
+  blue_2: require('../assets/characters/blue_2.png'),
+  green_1: require('../assets/characters/green_1.png'),
+  green_2: require('../assets/characters/green_2.png'),
+  green_3: require('../assets/characters/green_3.png'),
+  main_character: require('../assets/characters/main_character.png'),
+  pink_1: require('../assets/characters/pink_1.png'),
+  yellow_1: require('../assets/characters/yellow_1.png'),
+  yellow_2: require('../assets/characters/yellow_2.png'),
+};
+
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 
 const HomeScreen = () => {
+  const {user} = useAuth();
+  const [dinoImage, setDinoImage] = useState(null);
   const missions = [
     {title: '輸入交易紀錄', amount: 1000, isCompleted: false},
     {title: '添加額外收入', amount: 500, isCompleted: false},
@@ -26,11 +49,30 @@ const HomeScreen = () => {
 
   const navigation = useNavigation<NavigationProp>();
 
+  useEffect(() => {
+    const loadDino = async () => {
+      if (!user?.uid) {return;}
+      const key = `dino-${user.uid}`;
+      const imageKey = await AsyncStorage.getItem(key);
+      if (imageKey && dinoImages[imageKey]) {
+        setDinoImage(dinoImages[imageKey]);
+      }
+    };
+    loadDino();
+  }, [user]);
+
   return (
     <Layout>
       <StatusBar barStyle="dark-content" />
       <View style={styles.content}>
-        <Dinosaur height={200} width={200} style={styles.mainCharacter} />
+        {dinoImage ? (
+          <Image
+            source={dinoImage}
+            style={[styles.mainCharacter, {width: 200, height: 200}]}
+          />
+        ) : (
+          <Dinosaur height={200} width={200} style={styles.mainCharacter} /> // fallback if no image
+        )}
 
         <View style={styles.progressBar}>
           <Progress.Bar progress={currentAmount / targetAmount} width={200} />

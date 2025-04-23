@@ -1,6 +1,8 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createStackNavigator} from '@react-navigation/stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useAuth} from '../contexts/AuthContext';
 
 import HomeScreen from '../screens/HomeScreen';
 import GachaScreen from '../screens/GachaScreen';
@@ -9,6 +11,7 @@ import AnalysisScreen from '../screens/AnalysisScreen';
 import BagScreen from '../screens/BagScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import TransactionScreen from '../screens/TransactionScreen';
+import SetUp from '../screens/SetUp';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -31,17 +34,30 @@ const TabNavigator = () => {
 };
 
 const AppNavigator = () => {
+  const {user} = useAuth();
+  const [initialRoute, setInitialRoute] = useState<string | null>(null);
+
+  useEffect(() => {
+    const checkSetup = async () => {
+      if (!user?.uid) {return;}
+      const key = `setupDone-${user.uid}`;
+      const setupDone = await AsyncStorage.getItem(key);
+      setInitialRoute(setupDone === 'true' ? 'MainTabs' : 'SetUp');
+    };
+    checkSetup();
+  }, [user]);
+
+  if (!initialRoute) {return null;}
+
   return (
-    <Stack.Navigator screenOptions={{headerShown: false}}>
+    <Stack.Navigator
+      initialRouteName={initialRoute}
+      screenOptions={{headerShown: false}}>
+      <Stack.Screen name="SetUp" component={SetUp} />
       <Stack.Screen name="MainTabs" component={TabNavigator} />
       <Stack.Screen
         name="Settings"
         component={SettingsScreen}
-        options={{presentation: 'modal'}}
-      />
-      <Stack.Screen
-        name="TransactionScreen"
-        component={TransactionScreen}
         options={{presentation: 'modal'}}
       />
     </Stack.Navigator>

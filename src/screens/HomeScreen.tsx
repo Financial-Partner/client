@@ -6,6 +6,7 @@ import {
   StyleSheet,
   StatusBar,
   Image,
+  Platform,
 } from 'react-native'; // TouchableOpacity
 import {useNavigation} from '@react-navigation/native';
 import type {StackNavigationProp} from '@react-navigation/stack';
@@ -51,7 +52,9 @@ const HomeScreen = () => {
 
   useEffect(() => {
     const loadDino = async () => {
-      if (!user?.uid) {return;}
+      if (!user?.uid) {
+        return;
+      }
       const key = `dino-${user.uid}`;
       const imageKey = await AsyncStorage.getItem(key);
       if (imageKey && dinoImages[imageKey]) {
@@ -65,14 +68,19 @@ const HomeScreen = () => {
     <Layout>
       <StatusBar barStyle="dark-content" />
       <View style={styles.content}>
-        {dinoImage ? (
-          <Image
-            source={dinoImage}
-            style={[styles.mainCharacter, {width: 200, height: 200}]}
-          />
-        ) : (
-          <Dinosaur height={200} width={200} style={styles.mainCharacter} /> // fallback if no image
-        )}
+        <View style={styles.characterContainer}>
+          <View style={styles.speechBubble}>
+            <Text style={styles.speechText}>一起往目標前進吧！</Text>
+          </View>
+          {dinoImage ? (
+            <Image
+              source={dinoImage}
+              style={[styles.mainCharacter, {width: 200, height: 200}]}
+            />
+          ) : (
+            <Dinosaur height={200} width={200} style={styles.mainCharacter} />
+          )}
+        </View>
 
         <View style={styles.progressBar}>
           <Progress.Bar progress={currentAmount / targetAmount} width={200} />
@@ -104,6 +112,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
+  },
+  characterContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: 20,
+    paddingHorizontal: 10,
   },
   missionContainer: {
     flexDirection: 'column',
@@ -146,8 +161,35 @@ const styles = StyleSheet.create({
   mainCharacter: {
     marginTop: 40,
     marginBottom: 20,
+    alignSelf: 'flex-start',
+    resizeMode: 'contain',
+    width: 150,
+    height: 150,
+  },
+  speechBubble: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 10,
     marginLeft: 10,
-    marginRight: 'auto',
+    flex: 1,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: {
+          width: 0,
+          height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+      },
+      android: {
+        elevation: 0,
+      },
+    }),
+  },
+  speechText: {
+    fontSize: 16,
+    color: '#333',
   },
 });
 

@@ -9,20 +9,67 @@ import {
   StatusBar,
 } from 'react-native';
 import TransactionForm from '../components/TransactionForm';
+import {TransactionType} from '../components/TransactionForm';
 import Layout from '../components/Layout';
 
+type Transaction = {
+  amount: number;
+  category: string;
+  date: string;
+  description: string;
+  transaction_type: 'Expense' | 'Income';
+};
+
 const TransactionScreen: React.FC = () => {
-  const [transactions, setTransactions] = useState<
-    {category: string; amount: number}[]
-  >([]);
+  // const [transactions, setTransactions] = useState<
+  //   {category: string; amount: number}[]
+  // >([]);
   const [isModalVisible, setModalVisible] = useState(false);
   const [budget, setBudget] = useState<number>(10000); // setting Budget
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const totalExpense = transactions.reduce((sum, t) => sum + t.amount, 0); // total Expense
   const totalIncome = 15000; // total Revenue (assume to be fixed)
   const remainingBudget = budget - totalExpense; // Remain balance
 
-  const handleAddTransaction = (amount: number, category: string) => {
-    setTransactions([{category, amount}, ...transactions]); //sort by newest
+  async () => {
+    try {
+      const res = await fetch('http://10.0.2.2:8080/api/transactions', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'dummy-token-for-development', // Add your token here
+        },
+      });
+      const data = await res.json();
+      setTransactions(data);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const formatDate = (d: Date) => {
+    const year = d.getFullYear();
+    const month = (d.getMonth() + 1).toString().padStart(2, '0'); // Ensure 2 digits
+    const day = d.getDate().toString().padStart(2, '0'); // Ensure 2 digits
+    return `${year}/${month}/${day}`;
+  };
+
+  const handleAddTransaction = (
+    amount: number,
+    category: string,
+    transaction_type: TransactionType,
+    date: Date,
+  ) => {
+    setTransactions([
+      {
+        amount,
+        category,
+        date: formatDate(date),
+        description: 'test',
+        transaction_type: transaction_type,
+      },
+      ...transactions,
+    ]); //sort by newest
     setModalVisible(false);
   };
 
@@ -61,8 +108,12 @@ const TransactionScreen: React.FC = () => {
             keyExtractor={(item, index) => index.toString()}
             renderItem={({item}) => (
               <View style={styles.transactionRow}>
+                <Text style={styles.transactionDate}>{item.date}</Text>
                 <Text style={styles.transactionCategory}>{item.category}</Text>
-                <Text style={styles.transactionAmount}>{item.amount}</Text>
+                <Text style={styles.transactionAmount}>
+                  {item.transaction_type === 'Expense' ? '-' : '+'}
+                  {item.amount}
+                </Text>
               </View>
             )}
             ListEmptyComponent={
@@ -121,6 +172,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 18,
     fontWeight: 'bold',
+    marginBottom: 10,
   },
   amount: {
     fontSize: 32,
@@ -155,13 +207,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingVertical: 4,
+    fontSize: 16,
+  },
+  transactionDate: {
+    width: 220,
+    textAlign: 'left',
   },
   transactionCategory: {
-    fontSize: 16,
+    width: 80,
     textAlign: 'left',
   },
   transactionAmount: {
-    fontSize: 16,
     textAlign: 'right',
   },
   emptyText: {

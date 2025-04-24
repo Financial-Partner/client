@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, Pressable, StyleSheet, StatusBar, TouchableOpacity} from 'react-native';
+import {View, Text, Pressable, StyleSheet, StatusBar} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import type {StackNavigationProp} from '@react-navigation/stack';
 import * as Progress from 'react-native-progress';

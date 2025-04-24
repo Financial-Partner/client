@@ -1,5 +1,12 @@
 import React, {useState} from 'react';
-import {View, Text, Pressable, StyleSheet} from 'react-native';
+import {
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
+import DateSelectorModal from './input/DateSelectorModal';
 
 const categories: string[] = [
   '餐飲',
@@ -12,15 +19,29 @@ const categories: string[] = [
   '其他',
 ];
 
+export enum TransactionType {
+  Expense = 'Expense',
+  Income = 'Income',
+}
+
 interface TransactionFormProps {
-  onSubmit: (amount: number, category: string) => void;
+  onSubmit: (
+    amount: number,
+    category: string,
+    transaction_type: TransactionType,
+    date: Date,
+  ) => void;
 }
 
 const TransactionForm: React.FC<TransactionFormProps> = ({onSubmit}) => {
   const [selectedCategory, setSelectedCategory] = useState<string>(
     categories[0],
   );
+  const [selectedTransactionType, setSelectedTransactionType] =
+    useState<TransactionType>(TransactionType.Expense);
   const [amount, setAmount] = useState<string>('');
+  const [date, setDate] = useState<Date>(new Date());
+  const [open, setOpen] = useState<boolean>(false);
 
   const handleNumberPress = (num: string) => {
     setAmount(prev => prev + num);
@@ -30,17 +51,64 @@ const TransactionForm: React.FC<TransactionFormProps> = ({onSubmit}) => {
     setAmount(prev => prev.slice(0, -1));
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     const parsedAmount = parseFloat(amount);
     if (!isNaN(parsedAmount) && parsedAmount > 0) {
-      onSubmit(parsedAmount, selectedCategory);
+      onSubmit(parsedAmount, selectedCategory, selectedTransactionType, date);
       setAmount('');
+      setSelectedCategory(categories[0]);
+      setSelectedTransactionType(TransactionType.Expense);
+      setDate(new Date());
+      setOpen(false);
     }
+    //   try {
+    //     // Add query parameters to the URL
+    //     // const queryParams = new URLSearchParams({
+    //     //   amount: parsedAmount.toString(),
+    //     //   category: selectedCategory,
+    //     // });
+
+    //     const res = await fetch('http://10.0.2.2:8080/api/transactions', {
+    //       method: 'GET',
+    //       headers: {
+    //         'Content-Type': 'application/json',
+    //         'Authorization': 'dummy-token-for-development', // Add your token here
+    //       },
+    //     });
+
+    //     const data = await res.json();
+    //     console.log('Response from backend:', data);
+    //   } catch (error) {
+    //     console.error('Error:', error);
+    //   }
+  };
+
+  const formatDate = (d: Date) => {
+    return `${d.getFullYear()}/${(d.getMonth() + 1)
+      .toString()
+      .padStart(2, '0')}/${d.getDate().toString().padStart(2, '0')}`;
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>選擇類別</Text>
+      <View style={styles.categoryContainer}>
+        {Object.values(TransactionType).map(type => (
+          <Pressable
+            key={type}
+            style={[
+              styles.categoryButton,
+              selectedTransactionType === type && styles.selectedCategory,
+            ]}
+            onPress={() => setSelectedTransactionType(type as TransactionType)}>
+            <Text style={styles.categoryText}>
+              {type === TransactionType.Expense ? '支出' : '收入'}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+
+      <Text style={styles.title}>選擇種類</Text>
       <View style={styles.categoryContainer}>
         {categories.map(cat => (
           <Pressable
@@ -54,6 +122,14 @@ const TransactionForm: React.FC<TransactionFormProps> = ({onSubmit}) => {
           </Pressable>
         ))}
       </View>
+
+      <Text style={styles.title}>選擇交易日期</Text>
+      <TouchableOpacity onPress={() => setOpen(true)}>
+        <Text style={styles.dateInput}>{formatDate(date)}</Text>
+      </TouchableOpacity>
+      {open && (
+        <DateSelectorModal setDate={setDate} date={date} setOpen={setOpen} />
+      )}
 
       <Text style={styles.title}>輸入金額</Text>
       <Text style={styles.amountText}>{amount || '0'}</Text>
@@ -116,7 +192,7 @@ const styles = StyleSheet.create({
   },
   categoryText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 12,
   },
   amountText: {
     fontSize: 32,
@@ -146,6 +222,14 @@ const styles = StyleSheet.create({
   keyText: {
     fontSize: 20,
     fontWeight: 'bold',
+  },
+  dateInput: {
+    fontSize: 18,
+    marginBottom: 20,
+    backgroundColor: '#f0f0f0',
+    padding: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
   },
 });
 

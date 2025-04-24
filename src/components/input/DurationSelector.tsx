@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
-import {View, StyleSheet, Modal, Text, TouchableOpacity} from 'react-native';
+import {View, StyleSheet} from 'react-native';
 
 import RadioButton from './RadioButton';
-import DateSelector from './DateSelector';
+import DateSelectorModal from './DateSelectorModal';
 import DateController from '../DateController';
 
 export enum Duration {
@@ -53,18 +53,8 @@ const DurationSelector = ({duration, setDuration}: DurationSelectorProps) => {
         selectedDate={date}
         setSelectedDate={setDate}
       />
-
       {open && (
-        <Modal animationType="slide" transparent={true} visible={open}>
-          <View style={styles.centerView}>
-            <View style={styles.modalView}>
-              <DateSelector setDate={setDate} date={date} />
-              <TouchableOpacity onPress={() => setOpen(false)}>
-                <Text>Close</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
+        <DateSelectorModal setDate={setDate} date={date} setOpen={setOpen} />
       )}
     </View>
   );
@@ -85,28 +75,6 @@ const styles = StyleSheet.create({
     borderBottomColor: '#555',
     borderBottomWidth: 1,
     padding: 0,
-  },
-  centerView: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 22,
-  },
-  modalView: {
-    margin: 20,
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 35,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-    width: '90%',
   },
 });
 

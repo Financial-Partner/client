@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {View, Text, Pressable, StyleSheet} from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 const categories: string[] = [
   '餐飲',
@@ -38,6 +39,9 @@ const TransactionForm: React.FC<TransactionFormProps> = ({onSubmit}) => {
     }
   };
 
+  const [date, setDate] = useState(new Date());
+  const [showPicker, setShowPicker] = useState(false);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>選擇類別</Text>
@@ -53,6 +57,27 @@ const TransactionForm: React.FC<TransactionFormProps> = ({onSubmit}) => {
             <Text style={styles.categoryText}>{cat}</Text>
           </Pressable>
         ))}
+      </View>
+
+      <View>
+        <Pressable
+          onPress={() => setShowPicker(true)}
+          style={styles.dateButton}>
+          <Text style={styles.dateText}>
+            {date.toISOString().split('T')[0]}
+          </Text>
+        </Pressable>
+        {showPicker && (
+          <DateTimePicker
+            value={date}
+            mode="date"
+            display="default"
+            onChange={(_, selectedDate) => {
+              setShowPicker(false);
+              if (selectedDate) {setDate(selectedDate);}
+            }}
+          />
+        )}
       </View>
 
       <Text style={styles.title}>輸入金額</Text>
@@ -111,10 +136,21 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: '#ccc',
   },
+  dateButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    margin: 5,
+    borderRadius: 8,
+    backgroundColor: '#ccc',
+  },
   selectedCategory: {
     backgroundColor: '#007bff',
   },
   categoryText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  dateText: {
     color: '#fff',
     fontSize: 16,
   },

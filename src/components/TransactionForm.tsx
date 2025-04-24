@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {View, Text, Pressable, StyleSheet} from 'react-native';
+import {View, Text, Pressable, StyleSheet, Platform} from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 const categories: string[] = [
@@ -42,6 +42,19 @@ const TransactionForm: React.FC<TransactionFormProps> = ({onSubmit}) => {
   const [date, setDate] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
 
+  const handleDateChange = (event: any, selectedDate?: Date) => {
+    if (Platform.OS === 'android') {
+      setShowPicker(false);
+    }
+    if (selectedDate) {
+      setDate(selectedDate);
+    }
+  };
+
+  const toggleDatePicker = () => {
+    setShowPicker(!showPicker);
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>選擇類別</Text>
@@ -59,26 +72,17 @@ const TransactionForm: React.FC<TransactionFormProps> = ({onSubmit}) => {
         ))}
       </View>
 
-      <View>
-        <Pressable
-          onPress={() => setShowPicker(true)}
-          style={styles.dateButton}>
-          <Text style={styles.dateText}>
-            {date.toISOString().split('T')[0]}
-          </Text>
-        </Pressable>
-        {showPicker && (
-          <DateTimePicker
-            value={date}
-            mode="date"
-            display="default"
-            onChange={(_, selectedDate) => {
-              setShowPicker(false);
-              if (selectedDate) {setDate(selectedDate);}
-            }}
-          />
-        )}
-      </View>
+      <Pressable onPress={toggleDatePicker} style={styles.dateButton}>
+        <Text style={styles.dateText}>{date.toLocaleDateString()}</Text>
+      </Pressable>
+      {showPicker && (
+        <DateTimePicker
+          value={date}
+          mode="date"
+          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          onChange={handleDateChange}
+        />
+      )}
 
       <Text style={styles.title}>輸入金額</Text>
       <Text style={styles.amountText}>{amount || '0'}</Text>

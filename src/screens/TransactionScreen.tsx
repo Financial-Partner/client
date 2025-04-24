@@ -80,14 +80,19 @@ const TransactionScreen: React.FC = () => {
         <Modal
           visible={isModalVisible}
           animationType="slide"
-          transparent={true}>
+          transparent={true}
+          statusBarTranslucent={true}>
           <View style={styles.modalContainer}>
-            <TransactionForm onSubmit={handleAddTransaction} />
-            <Pressable
-              style={styles.closeButton}
-              onPress={() => setModalVisible(false)}>
-              <Text style={styles.buttonText}>X</Text>
-            </Pressable>
+            <View style={styles.modalContent}>
+              <View style={styles.modalHeader}>
+                <Pressable
+                  style={styles.closeButton}
+                  onPress={() => setModalVisible(false)}>
+                  <Text style={styles.closeButtonText}>×</Text>
+                </Pressable>
+              </View>
+              <TransactionForm onSubmit={handleAddTransaction} />
+            </View>
           </View>
         </Modal>
       </View>
@@ -189,15 +194,32 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContent: {
+    width: '90%',
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    overflow: 'hidden',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
   },
   closeButton: {
-    marginTop: 10,
-    padding: 10,
-    backgroundColor: '#dc3545',
-    borderRadius: 5,
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  closeButtonText: {
+    fontSize: 24,
+    color: '#666',
   },
 });
 

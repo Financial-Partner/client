@@ -1,7 +1,5 @@
 import apiClient from './client';
 import {API_ENDPOINTS} from './endpoints';
-// import useSWR from 'swr';
-// import {useAuth} from '../contexts/AuthContext';
 
 export interface Transaction {
   amount: number;

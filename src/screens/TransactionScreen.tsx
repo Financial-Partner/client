@@ -30,7 +30,7 @@ const TransactionScreen: React.FC = () => {
       .padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`;
   };
 
-  const handleAddTransaction = (
+  const handleAddTransaction = async (
     amount: number,
     category: string,
     transaction_type: 'Income' | 'Expense',
@@ -49,7 +49,11 @@ const TransactionScreen: React.FC = () => {
 
     setTransactions(updatedTransactions); //sort by newest
     setModalVisible(false);
-    transactionService.createTransaction(newTransaction);
+    try {
+      await transactionService.createTransaction(newTransaction);
+    } catch (error) {
+      console.error('Error creating transaction:', error);
+    }
   };
 
   useEffect(() => {

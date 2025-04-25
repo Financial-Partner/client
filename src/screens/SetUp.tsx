@@ -5,81 +5,96 @@ import {
   StyleSheet,
   TouchableOpacity,
   StatusBar,
+  Image,
 } from 'react-native';
-import * as Progress from 'react-native-progress';
 import {useNavigation} from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useAuth} from '../contexts/AuthContext';
 import Layout from '../components/Layout';
 import {colors} from '../theme/colors';
-import GoalSetting from '../components/setup/GoalSetting';
-import PetSelection from '../components/setup/PetSelection';
+import {useUserProfileManager} from '../api/userService';
 
-type SetupStep = 'goal' | 'pet';
+// Define character keys and their corresponding image sources
+const CHARACTER_IMAGES = {
+  blue_1: require('../assets/characters/blue_1.png'),
+  blue_2: require('../assets/characters/blue_2.png'),
+  green_1: require('../assets/characters/green_1.png'),
+  green_2: require('../assets/characters/green_2.png'),
+  green_3: require('../assets/characters/green_3.png'),
+  pink_1: require('../assets/characters/pink_1.png'),
+  yellow_1: require('../assets/characters/yellow_1.png'),
+  yellow_2: require('../assets/characters/yellow_2.png'),
+} as const;
+
+type CharacterKey = keyof typeof CHARACTER_IMAGES;
+
+const getApiPath = (key: CharacterKey) => `/characters/${key}.png`;
 
 const SetUp = () => {
-  const [currentStep, setCurrentStep] = useState<SetupStep>('goal');
-  const [goal, setGoal] = useState('');
-  const [selectedDino, setSelectedDino] = useState<any>(null);
+  const [selectedCharacter, setSelectedCharacter] =
+    useState<CharacterKey | null>(null);
   const navigation = useNavigation();
-  const {user} = useAuth();
+  const {setCharacter} = useUserProfileManager();
 
-  const handleNext = async () => {
-    if (currentStep === 'goal') {
-      if (goal.trim().length > 0) {
-        setCurrentStep('pet');
-      }
-    } else if (currentStep === 'pet') {
-      if (selectedDino && user?.uid) {
-        const key = `setupDone-${user.uid}`;
-        await AsyncStorage.setItem(key, 'true');
-        await AsyncStorage.setItem(`dino-${user.uid}`, selectedDino.imageKey);
-        navigation.reset({
-          index: 0,
-          routes: [{name: 'MainTabs' as never}],
-        });
-      }
-    }
+  const handleSelect = (key: CharacterKey) => {
+    setSelectedCharacter(key);
   };
 
-  const handleBack = () => {
-    if (currentStep === 'pet') {
-      setCurrentStep('goal');
+  const handleComplete = async () => {
+    if (!selectedCharacter) {
+      return;
+    }
+
+    try {
+      const imageUrl = getApiPath(selectedCharacter);
+      console.log('Sending character data:', {
+        character_id: selectedCharacter,
+        image_url: imageUrl,
+      });
+
+      const result = await setCharacter({
+        character_id: selectedCharacter,
+        image_url: imageUrl,
+      });
+      console.log('Character set successfully:', result);
+
+      navigation.reset({
+        index: 0,
+        routes: [{name: 'MainTabs' as never}],
+      });
+    } catch (error: any) {
+      console.error('Failed to set character:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+      console.error('Error headers:', error.response?.headers);
     }
   };
-
-  const progressValue = currentStep === 'goal' ? 0.5 : 1.0;
 
   return (
     <Layout>
-      <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
+      <StatusBar barStyle="dark-content" />
       <View style={styles.container}>
-        <View style={styles.content}>
-          {currentStep === 'goal' ? (
-            <GoalSetting goal={goal} onGoalChange={setGoal} />
-          ) : (
-            <PetSelection
-              selectedDino={selectedDino}
-              onDinoSelect={setSelectedDino}
-            />
-          )}
-        </View>
-
-        <View style={styles.bottomContainer}>
-          <Progress.Bar progress={progressValue} width={null} />
-          <View style={styles.navButtonsContainer}>
-            {currentStep === 'pet' && (
-              <TouchableOpacity onPress={handleBack} style={styles.navButton}>
-                <Text style={styles.navButtonText}>上一步</Text>
-              </TouchableOpacity>
-            )}
-            <TouchableOpacity onPress={handleNext} style={styles.navButton}>
-              <Text style={styles.navButtonText}>
-                {currentStep === 'goal' ? '下一步' : '完成！'}
-              </Text>
+        <Text style={styles.title}>選擇你的角色</Text>
+        <View style={styles.characterGrid}>
+          {Object.entries(CHARACTER_IMAGES).map(([key, imageSource]) => (
+            <TouchableOpacity
+              key={key}
+              style={[
+                styles.characterButton,
+                selectedCharacter === key && styles.selectedCharacter,
+              ]}
+              onPress={() => handleSelect(key as CharacterKey)}>
+              <Image source={imageSource} style={styles.characterImage} />
             </TouchableOpacity>
-          </View>
+          ))}
         </View>
+        <TouchableOpacity
+          style={[
+            styles.completeButton,
+            !selectedCharacter && styles.disabledButton,
+          ]}
+          onPress={handleComplete}
+          disabled={!selectedCharacter}>
+          <Text style={styles.completeButtonText}>完成</Text>
+        </TouchableOpacity>
       </View>
     </Layout>
   );
@@ -89,33 +104,50 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    justifyContent: 'space-between',
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
   },
-  bottomContainer: {
-    marginTop: 10,
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
   },
-  navButtonsContainer: {
+  characterGrid: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 10,
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 10,
   },
-  navButton: {
-    backgroundColor: '#007BFF',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    flex: 1,
-    marginHorizontal: 5,
-    alignItems: 'center',
+  characterButton: {
+    width: 100,
+    height: 100,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: colors.primary,
+    overflow: 'hidden',
   },
-  navButtonText: {
-    color: '#fff',
-    fontSize: 16,
+  selectedCharacter: {
+    borderColor: colors.accent,
+    borderWidth: 3,
+  },
+  characterImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'contain',
+  },
+  completeButton: {
+    backgroundColor: colors.primary,
+    paddingHorizontal: 40,
+    paddingVertical: 15,
+    borderRadius: 25,
+    marginTop: 30,
+  },
+  disabledButton: {
+    backgroundColor: colors.disabled,
+  },
+  completeButtonText: {
+    color: colors.white,
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
 

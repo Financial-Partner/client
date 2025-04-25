@@ -22,7 +22,13 @@ apiClient.interceptors.request.use(
       !config.url?.includes(API_ENDPOINTS.AUTH_LOGIN) &&
       !config.url?.includes(API_ENDPOINTS.AUTH_REGISTER)
     ) {
-      config.headers.Authorization = `Bearer ${token}`;
+      if (token.split('.').length === 3) {
+        config.headers.Authorization = `Bearer ${token}`;
+      } else {
+        console.error('Invalid token format');
+        await AsyncStorage.removeItem('userToken');
+        await AsyncStorage.removeItem('refreshToken');
+      }
     }
     return config;
   },

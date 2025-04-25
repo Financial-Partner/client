@@ -1,53 +1,32 @@
-import React, {useEffect, useState} from 'react';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import React, {useState, useEffect} from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useAuth} from '../contexts/AuthContext';
-
-import HomeScreen from '../screens/HomeScreen';
-import GachaScreen from '../screens/GachaScreen';
-import InvestScreen from '../screens/InvestScreen';
-import AnalysisScreen from '../screens/AnalysisScreen';
-import BagScreen from '../screens/BagScreen';
-import SettingsScreen from '../screens/SettingsScreen';
-import TransactionScreen from '../screens/TransactionScreen';
+import {useUserProfile} from '../api/userService';
 import SetUp from '../screens/SetUp';
+import TabNavigator from './TabNavigator';
+import SettingsScreen from '../screens/SettingsScreen';
 
-const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
-
-const TabNavigator = () => {
-  return (
-    <Tab.Navigator
-      screenOptions={{
-        headerShown: false,
-        tabBarStyle: {display: 'none'},
-      }}>
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Gacha" component={GachaScreen} />
-      <Tab.Screen name="Invest" component={InvestScreen} />
-      <Tab.Screen name="Analysis" component={AnalysisScreen} />
-      <Tab.Screen name="Bag" component={BagScreen} />
-      <Tab.Screen name="TransactionScreen" component={TransactionScreen} />
-    </Tab.Navigator>
-  );
-};
 
 const AppNavigator = () => {
   const {user} = useAuth();
+  const {user: userProfile, isLoading: isUserLoading} = useUserProfile();
   const [initialRoute, setInitialRoute] = useState<string | null>(null);
 
   useEffect(() => {
     const checkSetup = async () => {
-      if (!user?.uid) {return;}
-      const key = `setupDone-${user.uid}`;
-      const setupDone = await AsyncStorage.getItem(key);
-      setInitialRoute(setupDone === 'true' ? 'MainTabs' : 'SetUp');
+      if (!user?.uid || isUserLoading) {return;}
+
+      if (!userProfile?.character?.id) {
+        setInitialRoute('SetUp');
+      } else {
+        setInitialRoute('MainTabs');
+      }
     };
     checkSetup();
-  }, [user]);
+  }, [user, userProfile, isUserLoading]);
 
-  if (!initialRoute) {return null;}
+  if (!initialRoute || isUserLoading) {return null;}
 
   return (
     <Stack.Navigator

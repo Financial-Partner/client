@@ -4,10 +4,22 @@ import useSWR from 'swr';
 import {useAuth} from '../contexts/AuthContext';
 
 interface UserProfileResponse {
+  id: string;
+  email: string;
+  name: string;
+  character: {
+    id: string;
+    image_url: string;
+  };
   wallet: {
     diamonds: number;
     saving: number;
   };
+}
+
+interface SetCharacterRequest {
+  character_id: string;
+  image_url: string;
 }
 
 export const userService = {
@@ -18,6 +30,13 @@ export const userService = {
 
   updateUserProfile: async (userData: any) => {
     const response = await apiClient.put(API_ENDPOINTS.USER_UPDATE, userData);
+    return response.data;
+  },
+
+  setCharacter: async (
+    data: SetCharacterRequest,
+  ): Promise<UserProfileResponse> => {
+    const response = await apiClient.put(API_ENDPOINTS.USER_CHARACTER, data);
     return response.data;
   },
 };
@@ -49,10 +68,21 @@ export const useUserProfileManager = () => {
     }
   };
 
+  const setCharacter = async (data: SetCharacterRequest) => {
+    try {
+      const updatedUser = await userService.setCharacter(data);
+      mutate(updatedUser, false);
+      return updatedUser;
+    } catch (error) {
+      throw error;
+    }
+  };
+
   return {
     user,
     isLoading,
     isError,
     updateProfile,
+    setCharacter,
   };
 };

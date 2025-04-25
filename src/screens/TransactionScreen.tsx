@@ -11,6 +11,8 @@ import {
 import TransactionForm from '../components/TransactionForm';
 import Layout from '../components/Layout';
 import {transactionService, Transaction} from '../api/transactionService';
+import {missionService} from '../api/missionService';
+import {userService} from '../api/userService';
 
 const TransactionScreen: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -52,6 +54,32 @@ const TransactionScreen: React.FC = () => {
     setModalVisible(false);
     try {
       await transactionService.createTransaction(newTransaction);
+
+      // Update mission status and add diamonds
+      const missions = await missionService.getMissions();
+      const transactionMission = missions.find(m => m.id === 'transaction');
+      const incomeMission = missions.find(m => m.id === 'income');
+
+      // Check if this is the first transaction
+      if (
+        transactionMission &&
+        !transactionMission.isCompleted &&
+        transactions.length === 0
+      ) {
+        await missionService.updateMissionStatus('transaction', true);
+        await userService.updateDiamonds(transactionMission.amount);
+      }
+
+      // Check if this is an income transaction
+      if (
+        incomeMission &&
+        !incomeMission.isCompleted &&
+        transaction_type === 'INCOME' &&
+        amount >= 500
+      ) {
+        await missionService.updateMissionStatus('income', true);
+        await userService.updateDiamonds(incomeMission.amount);
+      }
     } catch (error) {
       console.error('Error creating transaction:', error);
     }

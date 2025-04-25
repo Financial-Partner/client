@@ -51,6 +51,27 @@ export const userService = {
       throw error;
     }
   },
+
+  updateDiamonds: async (amount: number): Promise<UserProfileResponse> => {
+    try {
+      const profile = await userService.getUserProfile();
+      const updatedProfile = {
+        ...profile,
+        wallet: {
+          ...profile.wallet,
+          diamonds: (profile.wallet?.diamonds || 0) + amount,
+        },
+      };
+      await AsyncStorage.setItem(
+        WALLET_STORAGE_KEY,
+        JSON.stringify(updatedProfile.wallet),
+      );
+      return updatedProfile;
+    } catch (error) {
+      console.error('Error updating diamonds:', error);
+      throw error;
+    }
+  },
 };
 
 export const useUserProfile = () => {

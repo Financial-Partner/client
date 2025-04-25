@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   View,
   Text,
@@ -9,7 +9,7 @@ import {
   Platform,
   ImageSourcePropType,
 } from 'react-native'; // TouchableOpacity
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import type {StackNavigationProp} from '@react-navigation/stack';
 import * as Progress from 'react-native-progress';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -19,6 +19,8 @@ import Mission from '../components/Mission';
 import {useAuth} from '../contexts/AuthContext';
 import {useUserProfile} from '../api/userService';
 import {Dinosaur} from '../svg';
+import {missionService, Mission as MissionType} from '../api/missionService';
+import {transactionService} from '../api/transactionService';
 
 type RootStackParamList = {
   TransactionScreen: undefined;
@@ -44,51 +46,80 @@ const HomeScreen = () => {
   const [dinoImage, setDinoImage] = useState<ImageSourcePropType | null>(null);
   const [monthlySaving, setMonthlySaving] = useState('0');
   const [currentSaving, setCurrentSaving] = useState('0');
-
-  const missions = [
-    {title: '輸入交易紀錄', amount: 5000, isCompleted: false},
-    {title: '添加額外收入', amount: 500, isCompleted: false},
-    {title: '設定預算', amount: 2000, isCompleted: true},
-    {title: '設定目標存款', amount: 3000, isCompleted: true},
-  ];
+  const [missions, setMissions] = useState<MissionType[]>([]);
 
   const navigation = useNavigation<NavigationProp>();
 
+  const loadUserData = useCallback(async () => {
+    if (!user?.uid) {
+      return;
+    }
+
+    // Load dino image
+    const key = `dino-${user.uid}`;
+    const imageKey = await AsyncStorage.getItem(key);
+    if (imageKey && dinoImages[imageKey]) {
+      setDinoImage(dinoImages[imageKey]);
+    }
+
+    // Load monthly saving target
+    const savedMonthlySaving = await AsyncStorage.getItem(
+      `monthlySaving-${user.uid}`,
+    );
+    if (savedMonthlySaving) {
+      setMonthlySaving(savedMonthlySaving);
+    }
+
+    // Load current saving
+    const savedCurrentSaving = await AsyncStorage.getItem(
+      `currentSaving-${user.uid}`,
+    );
+    if (savedCurrentSaving) {
+      setCurrentSaving(savedCurrentSaving);
+    } else {
+      setCurrentSaving('0');
+    }
+
+    // Load missions
+    let loadedMissions = await missionService.getMissions();
+    if (loadedMissions.length === 0) {
+      loadedMissions = await missionService.initializeMissions();
+    }
+    setMissions(loadedMissions);
+
+    // Check transaction mission
+    const transactions = await transactionService.getTransactions();
+    const hasTransactions = transactions.transactions.length > 0;
+    if (hasTransactions) {
+      const updatedMissions = await missionService.updateMissionStatus(
+        'transaction',
+        true,
+      );
+      setMissions(updatedMissions);
+    }
+
+    // Check income mission
+    const hasIncome = transactions.transactions.some(
+      t => t.type === 'INCOME' && t.amount >= 500,
+    );
+    if (hasIncome) {
+      const updatedMissions = await missionService.updateMissionStatus(
+        'income',
+        true,
+      );
+      setMissions(updatedMissions);
+    }
+  }, [user?.uid]);
+
   useEffect(() => {
-    const loadUserData = async () => {
-      if (!user?.uid) {
-        return;
-      }
-
-      // Load dino image
-      const key = `dino-${user.uid}`;
-      const imageKey = await AsyncStorage.getItem(key);
-      if (imageKey && dinoImages[imageKey]) {
-        setDinoImage(dinoImages[imageKey]);
-      }
-
-      // Load monthly saving target
-      const savedMonthlySaving = await AsyncStorage.getItem(
-        `monthlySaving-${user.uid}`,
-      );
-      if (savedMonthlySaving) {
-        setMonthlySaving(savedMonthlySaving);
-        console.log('Loaded monthly saving:', savedMonthlySaving);
-      }
-
-      // Load current saving
-      const savedCurrentSaving = await AsyncStorage.getItem(
-        `currentSaving-${user.uid}`,
-      );
-      if (savedCurrentSaving) {
-        setCurrentSaving(savedCurrentSaving);
-      } else {
-        setCurrentSaving('0');
-      }
-    };
-
     loadUserData();
-  }, [user]);
+  }, [loadUserData]);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadUserData();
+    }, [loadUserData]),
+  );
 
   // Calculate progress percentage
   const progressPercentage = Math.min(

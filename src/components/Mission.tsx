@@ -1,20 +1,14 @@
 import {StyleSheet, View, Text} from 'react-native';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
-
 import {Diamond} from '../svg';
+import {Mission as MissionType} from '../api/missionService';
 
 type MissionProps = {
-  mission: {
-    title: string;
-    amount: number;
-    isCompleted: boolean;
-  };
+  mission: MissionType;
   diamonds: number;
 };
 
 const Mission = ({mission}: MissionProps) => {
-  // const [isSelected, setSelection] = useState(false);
-
   return (
     <View style={styles.mission}>
       <View style={styles.missionLeft}>
@@ -22,7 +16,6 @@ const Mission = ({mission}: MissionProps) => {
           <BouncyCheckbox
             isChecked={mission.isCompleted}
             useBuiltInState={false}
-            // onPress={(isChecked: boolean) => {mission.isCompleted = isChecked}}
             size={18}
             disableText={true}
           />

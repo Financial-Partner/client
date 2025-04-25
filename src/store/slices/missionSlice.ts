@@ -1,4 +1,5 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
+import type {RootState} from '../index';
 
 export interface Mission {
   id: string;
@@ -15,7 +16,7 @@ const initialState: MissionState = {
   missions: [],
 };
 
-const missionSlice = createSlice({
+export const missionSlice = createSlice({
   name: 'missions',
   initialState,
   reducers: {
@@ -39,4 +40,7 @@ const missionSlice = createSlice({
 
 export const {setMissions, addMission, updateMission, clearMissions} =
   missionSlice.actions;
+
+export const selectMissions = (state: RootState) => state.missions.missions;
+
 export default missionSlice.reducer;

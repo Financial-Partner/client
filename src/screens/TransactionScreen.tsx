@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -10,19 +10,15 @@ import {
 } from 'react-native';
 import TransactionForm from '../components/TransactionForm';
 import Layout from '../components/Layout';
-import {transactionService, Transaction} from '../api/transactionService';
-import {missionService} from '../api/missionService';
-import {userService} from '../api/userService';
-import {useAppSelector} from '../store';
+import {Transaction} from '../store/slices/transactionSlice';
+import {useTransactions} from '../api/transactionService';
+import {useMissions} from '../api/missionService';
 
 const TransactionScreen: React.FC = () => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [budget, setBudget] = useState<number>(10000);
-  const storeTransactions = useAppSelector(
-    state => state.transactions.transactions,
-  );
-  const [transactions, setTransactions] =
-    useState<Transaction[]>(storeTransactions);
+  const {transactions, addTransaction} = useTransactions();
+  const {updateMission} = useMissions();
 
   const totalIncome = transactions
     .filter(t => t.type === 'INCOME')
@@ -54,31 +50,15 @@ const TransactionScreen: React.FC = () => {
     };
 
     try {
-      await transactionService.createTransaction(newTransaction);
-      const updatedTransactions = await transactionService.getTransactions();
-      setTransactions(updatedTransactions.transactions);
+      await addTransaction(newTransaction);
       setModalVisible(false);
 
-      // Get current missions state
-      const missions = await missionService.getMissions();
-      const transactionMission = missions.find(m => m.id === 'transaction');
-      const incomeMission = missions.find(m => m.id === 'income');
-
       // Check and update transaction mission
-      if (transactionMission && !transactionMission.isCompleted) {
-        await missionService.updateMissionStatus('transaction', true);
-        await userService.updateDiamonds(transactionMission.amount);
-      }
+      await updateMission('transaction', true);
 
       // Check and update income mission
-      if (
-        incomeMission &&
-        !incomeMission.isCompleted &&
-        transaction_type === 'INCOME' &&
-        amount >= 500
-      ) {
-        await missionService.updateMissionStatus('income', true);
-        await userService.updateDiamonds(incomeMission.amount);
+      if (transaction_type === 'INCOME' && amount >= 500) {
+        await updateMission('income', true);
       }
     } catch (error) {
       console.error('Error handling transaction:', error);
@@ -89,22 +69,6 @@ const TransactionScreen: React.FC = () => {
     const now = new Date();
     return `${now.getFullYear()}年${now.getMonth() + 1}月`;
   };
-
-  useEffect(() => {
-    const fetchTransactions = async () => {
-      try {
-        const response = await transactionService.getTransactions();
-        const sortedTransactions = response.transactions.sort(
-          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-        );
-        setTransactions(sortedTransactions);
-      } catch (error) {
-        console.error('Error fetching transactions:', error);
-      }
-    };
-
-    fetchTransactions();
-  }, []);
 
   return (
     <Layout scrollable={false}>

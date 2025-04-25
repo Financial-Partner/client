@@ -7,6 +7,7 @@ interface SettingsState {
   monthlyIncome: string | null;
   monthlySaving: string | null;
   currentSaving: string | null;
+  diamonds: number;
 }
 
 const initialState: SettingsState = {
@@ -15,6 +16,7 @@ const initialState: SettingsState = {
   monthlyIncome: null,
   monthlySaving: null,
   currentSaving: null,
+  diamonds: 5000,
 };
 
 export const settingsSlice = createSlice({
@@ -36,12 +38,19 @@ export const settingsSlice = createSlice({
     setCurrentSaving: (state, action: PayloadAction<string>) => {
       state.currentSaving = action.payload;
     },
+    setDiamonds: (state, action: PayloadAction<number>) => {
+      state.diamonds = action.payload;
+    },
+    addDiamonds: (state, action: PayloadAction<number>) => {
+      state.diamonds += action.payload;
+    },
     clearSettings: state => {
       state.setupDone = false;
       state.selectedDino = null;
       state.monthlyIncome = null;
       state.monthlySaving = null;
       state.currentSaving = null;
+      state.diamonds = 5000;
     },
   },
 });
@@ -52,6 +61,8 @@ export const {
   setMonthlyIncome,
   setMonthlySaving,
   setCurrentSaving,
+  setDiamonds,
+  addDiamonds,
   clearSettings,
 } = settingsSlice.actions;
 

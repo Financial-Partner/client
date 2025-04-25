@@ -1,9 +1,10 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
+import type {RootState} from '../index';
 
 export interface Transaction {
   id: string;
-  amount: number;
   type: 'INCOME' | 'EXPENSE';
+  amount: number;
   category: string;
   date: string;
   description: string;
@@ -17,15 +18,15 @@ const initialState: TransactionState = {
   transactions: [],
 };
 
-const transactionSlice = createSlice({
+export const transactionSlice = createSlice({
   name: 'transactions',
   initialState,
   reducers: {
-    setTransactions: (state, action: PayloadAction<Transaction[]>) => {
-      state.transactions = action.payload;
-    },
     addTransaction: (state, action: PayloadAction<Transaction>) => {
       state.transactions.push(action.payload);
+    },
+    setTransactions: (state, action: PayloadAction<Transaction[]>) => {
+      state.transactions = action.payload;
     },
     clearTransactions: state => {
       state.transactions = [];
@@ -33,6 +34,10 @@ const transactionSlice = createSlice({
   },
 });
 
-export const {setTransactions, addTransaction, clearTransactions} =
+export const {addTransaction, setTransactions, clearTransactions} =
   transactionSlice.actions;
+
+export const selectTransactions = (state: RootState) =>
+  state.transactions.transactions;
+
 export default transactionSlice.reducer;

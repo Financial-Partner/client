@@ -1,5 +1,6 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useState, useEffect} from 'react';
+import {useAppDispatch, useAppSelector} from '../store';
+import {settingsSlice} from '../store/slices/settingsSlice';
 
 interface UserProfileResponse {
   wallet: {
@@ -7,54 +8,50 @@ interface UserProfileResponse {
   };
 }
 
-const WALLET_STORAGE_KEY = 'user_wallet';
-
 export const userService = {
   getUserProfile: async (): Promise<UserProfileResponse> => {
-    try {
-      const storedWallet = await AsyncStorage.getItem(WALLET_STORAGE_KEY);
-      return {
-        wallet: storedWallet ? JSON.parse(storedWallet) : {diamonds: 0},
-      };
-    } catch (error) {
-      console.error('Error getting user profile:', error);
-      return {wallet: {diamonds: 0}};
-    }
+    return {
+      wallet: {
+        diamonds: 5000,
+      },
+    };
   },
 
   updateDiamonds: async (amount: number): Promise<UserProfileResponse> => {
-    try {
-      const profile = await userService.getUserProfile();
-      const updatedProfile = {
-        ...profile,
-        wallet: {
-          ...profile.wallet,
-          diamonds: (profile.wallet?.diamonds || 0) + amount,
-        },
-      };
-      await AsyncStorage.setItem(
-        WALLET_STORAGE_KEY,
-        JSON.stringify(updatedProfile.wallet),
-      );
-      return updatedProfile;
-    } catch (error) {
-      console.error('Error updating diamonds:', error);
-      throw error;
-    }
+    return {
+      wallet: {
+        diamonds: amount,
+      },
+    };
   },
 };
 
 export const useUserProfile = () => {
+  const dispatch = useAppDispatch();
+  const diamonds = useAppSelector(state => state.settings.diamonds);
   const [user, setUser] = useState<UserProfileResponse | null>(null);
 
   useEffect(() => {
     const loadUserProfile = async () => {
       const profile = await userService.getUserProfile();
       setUser(profile);
+      dispatch(settingsSlice.actions.setDiamonds(profile.wallet.diamonds));
     };
 
     loadUserProfile();
-  }, []);
+  }, [dispatch]);
 
-  return {user, setUser};
+  const updateDiamonds = async (amount: number) => {
+    try {
+      dispatch(settingsSlice.actions.addDiamonds(amount));
+      const updatedProfile = await userService.updateDiamonds(
+        diamonds + amount,
+      );
+      setUser(updatedProfile);
+    } catch (error) {
+      console.error('Error updating diamonds:', error);
+    }
+  };
+
+  return {user, setUser, diamonds, updateDiamonds};
 };

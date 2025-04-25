@@ -1,72 +1,39 @@
-import useSWR from 'swr';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-export interface Transaction {
-  id: string;
-  type: 'INCOME' | 'EXPENSE';
-  amount: number;
-  category: string;
-  date: string;
-  description: string;
-}
+import {useAppDispatch, useAppSelector} from '../store';
+import {transactionSlice, Transaction} from '../store/slices/transactionSlice';
 
 export interface GetTransactionResponse {
   transactions: Transaction[];
 }
 
-const TRANSACTIONS_STORAGE_KEY = 'user_transactions';
-
 export const transactionService = {
   createTransaction: async (transaction: Transaction) => {
-    try {
-      const storedTransactions = await AsyncStorage.getItem(
-        TRANSACTIONS_STORAGE_KEY,
-      );
-      const transactions = storedTransactions
-        ? JSON.parse(storedTransactions)
-        : [];
-      const newTransaction = {
-        ...transaction,
-        id: Date.now().toString(),
-      };
-      transactions.push(newTransaction);
-      await AsyncStorage.setItem(
-        TRANSACTIONS_STORAGE_KEY,
-        JSON.stringify(transactions),
-      );
-      return newTransaction;
-    } catch (error) {
-      console.error('Error creating transaction:', error);
-      throw error;
-    }
+    const newTransaction = {
+      ...transaction,
+      id: Date.now().toString(),
+    };
+    return newTransaction;
   },
 
   getTransactions: async (): Promise<GetTransactionResponse> => {
-    try {
-      const storedTransactions = await AsyncStorage.getItem(
-        TRANSACTIONS_STORAGE_KEY,
-      );
-      const transactions = storedTransactions
-        ? JSON.parse(storedTransactions)
-        : [];
-      return {transactions};
-    } catch (error) {
-      console.error('Error getting transactions:', error);
-      return {transactions: []};
-    }
+    // This will be handled by Redux state
+    return {transactions: []};
   },
 };
 
 export const useTransactions = () => {
-  const {data, error, isLoading, mutate} = useSWR<GetTransactionResponse>(
-    'mock-transactions',
-    () => transactionService.getTransactions(),
-  );
+  const dispatch = useAppDispatch();
+  const transactions = useAppSelector(state => state.transactions.transactions);
+
+  const addTransaction = async (transaction: Transaction) => {
+    const newTransaction = await transactionService.createTransaction(
+      transaction,
+    );
+    dispatch(transactionSlice.actions.addTransaction(newTransaction));
+    return newTransaction;
+  };
 
   return {
-    transactions: data?.transactions || [],
-    isLoading,
-    isError: error,
-    mutate,
+    transactions,
+    addTransaction,
   };
 };

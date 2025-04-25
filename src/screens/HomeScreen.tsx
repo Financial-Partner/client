@@ -12,15 +12,15 @@ import {
 import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import type {StackNavigationProp} from '@react-navigation/stack';
 import * as Progress from 'react-native-progress';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Layout from '../components/Layout';
 import Mission from '../components/Mission';
 import {useAuth} from '../contexts/AuthContext';
 import {useUserProfile} from '../api/userService';
 import {Dinosaur} from '../svg';
-import {missionService, Mission as MissionType} from '../api/missionService';
+import {useMissions} from '../api/missionService';
 import {transactionService} from '../api/transactionService';
+import {useAppSelector} from '../store';
 
 type RootStackParamList = {
   TransactionScreen: undefined;
@@ -44,9 +44,10 @@ const HomeScreen = () => {
   const {user} = useAuth();
   const {user: userProfile} = useUserProfile();
   const [dinoImage, setDinoImage] = useState<ImageSourcePropType | null>(null);
-  const [monthlySaving, setMonthlySaving] = useState('0');
-  const [currentSaving, setCurrentSaving] = useState('0');
-  const [missions, setMissions] = useState<MissionType[]>([]);
+  const {monthlySaving, currentSaving, selectedDino} = useAppSelector(
+    state => state.settings,
+  );
+  const {missions, updateMission, initializeMissions} = useMissions();
 
   const navigation = useNavigation<NavigationProp>();
 
@@ -56,46 +57,21 @@ const HomeScreen = () => {
     }
 
     // Load dino image
-    const key = `dino-${user.uid}`;
-    const imageKey = await AsyncStorage.getItem(key);
-    if (imageKey && dinoImages[imageKey]) {
-      setDinoImage(dinoImages[imageKey]);
-    }
-
-    // Load monthly saving target
-    const savedMonthlySaving = await AsyncStorage.getItem(
-      `monthlySaving-${user.uid}`,
-    );
-    if (savedMonthlySaving) {
-      setMonthlySaving(savedMonthlySaving);
-    }
-
-    // Load current saving
-    const savedCurrentSaving = await AsyncStorage.getItem(
-      `currentSaving-${user.uid}`,
-    );
-    if (savedCurrentSaving) {
-      setCurrentSaving(savedCurrentSaving);
-    } else {
-      setCurrentSaving('0');
+    if (selectedDino && dinoImages[selectedDino]) {
+      setDinoImage(dinoImages[selectedDino]);
     }
 
     // Load missions
-    let loadedMissions = await missionService.getMissions();
+    let loadedMissions = await initializeMissions();
     if (loadedMissions.length === 0) {
-      loadedMissions = await missionService.initializeMissions();
+      loadedMissions = await initializeMissions();
     }
-    setMissions(loadedMissions);
 
     // Check transaction mission
     const transactions = await transactionService.getTransactions();
     const hasTransactions = transactions.transactions.length > 0;
     if (hasTransactions) {
-      const updatedMissions = await missionService.updateMissionStatus(
-        'transaction',
-        true,
-      );
-      setMissions(updatedMissions);
+      await updateMission('transaction', true);
     }
 
     // Check income mission
@@ -103,13 +79,9 @@ const HomeScreen = () => {
       t => t.type === 'INCOME' && t.amount >= 500,
     );
     if (hasIncome) {
-      const updatedMissions = await missionService.updateMissionStatus(
-        'income',
-        true,
-      );
-      setMissions(updatedMissions);
+      await updateMission('income', true);
     }
-  }, [user?.uid]);
+  }, [user?.uid, selectedDino, initializeMissions, updateMission]);
 
   useEffect(() => {
     loadUserData();
@@ -123,7 +95,8 @@ const HomeScreen = () => {
 
   // Calculate progress percentage
   const progressPercentage = Math.min(
-    (parseInt(currentSaving, 10) / parseInt(monthlySaving, 10)) * 100,
+    (parseInt(currentSaving || '0', 10) / parseInt(monthlySaving || '0', 10)) *
+      100,
     100,
   );
 
@@ -145,8 +118,8 @@ const HomeScreen = () => {
         <View style={styles.progressBar}>
           <Progress.Bar progress={progressPercentage / 100} width={200} />
           <Text style={styles.progressText}>
-            NT$ {parseInt(currentSaving, 10).toLocaleString()} / NT${' '}
-            {parseInt(monthlySaving, 10).toLocaleString()}
+            NT$ {parseInt(currentSaving || '0', 10).toLocaleString()} / NT${' '}
+            {parseInt(monthlySaving || '0', 10).toLocaleString()}
           </Text>
         </View>
 

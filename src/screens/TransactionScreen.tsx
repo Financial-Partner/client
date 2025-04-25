@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -10,21 +10,67 @@ import {
 } from 'react-native';
 import TransactionForm from '../components/TransactionForm';
 import Layout from '../components/Layout';
+import {transactionService, Transaction} from '../api/transactionService';
 
 const TransactionScreen: React.FC = () => {
-  const [transactions, setTransactions] = useState<
-    {category: string; amount: number}[]
-  >([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isModalVisible, setModalVisible] = useState(false);
   const [budget, setBudget] = useState<number>(10000); // setting Budget
-  const totalExpense = transactions.reduce((sum, t) => sum + t.amount, 0); // total Expense
-  const totalIncome = 15000; // total Revenue (assume to be fixed)
+  const totalIncome = transactions
+    .filter(t => t.transaction_type === 'Income')
+    .reduce((sum, t) => sum + t.amount, 0);
+  const totalExpense = transactions
+    .filter(t => t.transaction_type === 'Expense')
+    .reduce((sum, t) => sum + t.amount, 0);
   const remainingBudget = budget - totalExpense; // Remain balance
 
-  const handleAddTransaction = (amount: number, category: string) => {
-    setTransactions([{category, amount}, ...transactions]); //sort by newest
-    setModalVisible(false);
+  const formattedDate = (d: Date) => {
+    return `${d.getFullYear()}-${(d.getMonth() + 1)
+      .toString()
+      .padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`;
   };
+
+  const handleAddTransaction = async (
+    amount: number,
+    category: string,
+    transaction_type: 'Income' | 'Expense',
+    date: Date,
+  ) => {
+    const newTransaction: Transaction = {
+      amount,
+      description: '',
+      date: formattedDate(date),
+      category,
+      transaction_type: transaction_type,
+    };
+    const updatedTransactions = [newTransaction, ...transactions].sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+    );
+
+    setTransactions(updatedTransactions); //sort by newest
+    setModalVisible(false);
+    try {
+      await transactionService.createTransaction(newTransaction);
+    } catch (error) {
+      console.error('Error creating transaction:', error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        const response = await transactionService.getTransactions();
+        const sortedTransactions = response.transactions.sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+        );
+        setTransactions(sortedTransactions);
+      } catch (error) {
+        console.error('Error fetching transactions:', error);
+      }
+    };
+
+    fetchTransactions();
+  }, []);
 
   return (
     <Layout scrollable={false}>
@@ -61,8 +107,12 @@ const TransactionScreen: React.FC = () => {
             keyExtractor={(item, index) => index.toString()}
             renderItem={({item}) => (
               <View style={styles.transactionRow}>
+                <Text style={styles.transactionDate}>{item.date}</Text>
                 <Text style={styles.transactionCategory}>{item.category}</Text>
-                <Text style={styles.transactionAmount}>{item.amount}</Text>
+                <Text style={styles.transactionAmount}>
+                  {item.transaction_type === 'Income' ? '+' : '-'}
+                  {item.amount}
+                </Text>
               </View>
             )}
             ListEmptyComponent={
@@ -126,6 +176,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 18,
     fontWeight: 'bold',
+    marginBottom: 10,
   },
   amount: {
     fontSize: 32,
@@ -160,13 +211,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingVertical: 4,
+    fontSize: 16,
+  },
+  transactionDate: {
+    width: 160,
+    textAlign: 'left',
   },
   transactionCategory: {
-    fontSize: 16,
+    width: 80,
     textAlign: 'left',
   },
   transactionAmount: {
-    fontSize: 16,
+    width: 50,
     textAlign: 'right',
   },
   emptyText: {

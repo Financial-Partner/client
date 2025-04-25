@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
-import {View, StyleSheet, Modal, Text, TouchableOpacity} from 'react-native';
+import {View, StyleSheet} from 'react-native';
 
 import RadioButton from './RadioButton';
-import DateSelector from './DateSelector';
+import DateSelector from './DateSelectorModal';
 import DateController from '../DateController';
 
 export enum Duration {
@@ -53,19 +53,12 @@ const DurationSelector = ({duration, setDuration}: DurationSelectorProps) => {
         selectedDate={date}
         setSelectedDate={setDate}
       />
-
-      {open && (
-        <Modal animationType="slide" transparent={true} visible={open}>
-          <View style={styles.centerView}>
-            <View style={styles.modalView}>
-              <DateSelector setDate={setDate} date={date} />
-              <TouchableOpacity onPress={() => setOpen(false)}>
-                <Text>Close</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
-      )}
+      <DateSelector
+        setDate={setDate}
+        date={date}
+        setOpen={setOpen}
+        open={open}
+      />
     </View>
   );
 };

@@ -8,7 +8,7 @@ const InvestScreen = () => {
   const chances = [
     {
       title: '房地產',
-      min_amount: '$100',
+      min_amount: '100',
       isIncrease: true,
       status: 10,
       tags: ['低風險', '3個月'],
@@ -43,6 +43,15 @@ const InvestScreen = () => {
     },
   ];
   const isIncrease = false;
+  const [totalInvestment, setTotalInvestment] = React.useState(0);
+
+  const formatInvestment = (amount: number) => {
+    return new Intl.NumberFormat('en-US').format(amount);
+  };
+
+  const handleSubmitInvestment = (amount: number) => {
+    setTotalInvestment(prev => prev + amount);
+  };
 
   return (
     <Layout>
@@ -53,7 +62,9 @@ const InvestScreen = () => {
             <Text style={styles.summaryTitle}>總投資</Text>
             <View style={styles.summaryText}>
               <Diamond height={14} width={14} style={styles.icon} />
-              <Text style={styles.summaryContent}>1,000,000</Text>
+              <Text style={styles.summaryContent}>
+                {formatInvestment(totalInvestment)}
+              </Text>
             </View>
           </View>
           <View style={styles.summary}>
@@ -72,7 +83,11 @@ const InvestScreen = () => {
         <View style={styles.chanceContainer}>
           <Text style={styles.chanceTitle}>投資機會</Text>
           {chances.map((chance, index) => (
-            <InvestmentChance key={index} chance={chance} />
+            <InvestmentChance
+              key={index}
+              chance={chance}
+              onSubmit={handleSubmitInvestment}
+            />
           ))}
         </View>
       </View>

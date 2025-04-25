@@ -8,4 +8,7 @@ export const API_ENDPOINTS = {
   USER_UPDATE: '/users/me',
 
   TRANSACTION: '/transactions',
+
+  INVESTMENT: '/investments',
+  USER_INVESTMENT: '/user/me/investments',
 };

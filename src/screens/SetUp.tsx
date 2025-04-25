@@ -8,14 +8,15 @@ import {
   Image,
   StatusBar,
   ScrollView,
+  SafeAreaView,
 } from 'react-native';
 import * as Progress from 'react-native-progress';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {useAuth} from '../contexts/AuthContext';
-import Layout from '../components/Layout';
 import {useAppDispatch} from '../store';
 import {settingsSlice} from '../store/slices/settingsSlice';
+import {colors} from '../theme/colors';
 
 type RootStackParamList = {
   MainTabs: undefined;
@@ -229,137 +230,136 @@ const SetUp = () => {
   const progressValue = step === 1 ? 0.5 : 1.0;
 
   return (
-    <Layout>
+    <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
-      <View style={styles.container}>
-        <View style={styles.content}>
-          <View style={[styles.stepContainer]}>
-            {step === 1 ? (
-              <View style={styles.stepContent}>
-                <Text style={styles.title}>選擇一個萌寵</Text>
-                <View style={styles.dinosContainer}>
-                  {dinosaurs.map(dino => (
-                    <TouchableOpacity
-                      key={dino.id}
-                      style={[
-                        styles.dinoItem,
-                        selectedDino?.id === dino.id && styles.selectedDinoItem,
-                      ]}
-                      onPress={() => setSelectedDino(dino)}>
-                      <Image source={dino.image} style={styles.dinoImage} />
-                      <Text style={styles.dinoName}>{dino.name}</Text>
-                    </TouchableOpacity>
-                  ))}
+      <View style={styles.content}>
+        <View style={[styles.stepContainer]}>
+          {step === 1 ? (
+            <View style={styles.stepContent}>
+              <Text style={styles.title}>選擇一個萌寵</Text>
+              <View style={styles.dinosContainer}>
+                {dinosaurs.map(dino => (
+                  <TouchableOpacity
+                    key={dino.id}
+                    style={[
+                      styles.dinoItem,
+                      selectedDino?.id === dino.id && styles.selectedDinoItem,
+                    ]}
+                    onPress={() => setSelectedDino(dino)}>
+                    <Image source={dino.image} style={styles.dinoImage} />
+                    <Text style={styles.dinoName}>{dino.name}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          ) : (
+            <ScrollView
+              style={styles.stepContent}
+              contentContainerStyle={styles.scrollContentContainer}>
+              <View style={styles.petDialogueContainer}>
+                <Image source={selectedDino.image} style={styles.petImage} />
+                <View style={styles.dialogueBubble}>
+                  <Text style={styles.dialogueText}>{petMessage}</Text>
                 </View>
               </View>
-            ) : (
-              <ScrollView
-                style={styles.stepContent}
-                contentContainerStyle={styles.scrollContentContainer}>
-                <View style={styles.petDialogueContainer}>
-                  <Image source={selectedDino.image} style={styles.petImage} />
-                  <View style={styles.dialogueBubble}>
-                    <Text style={styles.dialogueText}>{petMessage}</Text>
-                  </View>
-                </View>
 
-                <View style={styles.inputContainer}>
-                  <Text style={styles.inputLabel}>每月收入</Text>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="請輸入你的每月收入"
-                    placeholderTextColor="#666"
-                    value={
-                      monthlyIncome
-                        ? `NT$ ${parseInt(monthlyIncome, 10).toLocaleString()}`
-                        : ''
-                    }
-                    onChangeText={value =>
-                      handleNumberInput(value, setMonthlyIncome)
-                    }
-                    keyboardType="numeric"
-                  />
-                </View>
+              <View style={styles.inputContainer}>
+                <Text style={styles.inputLabel}>每月收入</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="請輸入你的每月收入"
+                  placeholderTextColor="#666"
+                  value={
+                    monthlyIncome
+                      ? `NT$ ${parseInt(monthlyIncome, 10).toLocaleString()}`
+                      : ''
+                  }
+                  onChangeText={value =>
+                    handleNumberInput(value, setMonthlyIncome)
+                  }
+                  keyboardType="numeric"
+                />
+              </View>
 
-                <View style={styles.inputContainer}>
-                  <Text style={styles.inputLabel}>每月支出</Text>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="請輸入你的每月支出"
-                    placeholderTextColor="#666"
-                    value={
-                      monthlyExpense
-                        ? `NT$ ${parseInt(monthlyExpense, 10).toLocaleString()}`
-                        : ''
-                    }
-                    onChangeText={value =>
-                      handleNumberInput(value, setMonthlyExpense)
-                    }
-                    keyboardType="numeric"
-                  />
-                </View>
+              <View style={styles.inputContainer}>
+                <Text style={styles.inputLabel}>每月支出</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="請輸入你的每月支出"
+                  placeholderTextColor="#666"
+                  value={
+                    monthlyExpense
+                      ? `NT$ ${parseInt(monthlyExpense, 10).toLocaleString()}`
+                      : ''
+                  }
+                  onChangeText={value =>
+                    handleNumberInput(value, setMonthlyExpense)
+                  }
+                  keyboardType="numeric"
+                />
+              </View>
 
-                <View style={styles.inputContainer}>
-                  <Text style={styles.inputLabel}>每月存錢目標</Text>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="請輸入你的每月存錢目標"
-                    placeholderTextColor="#666"
-                    value={
-                      monthlySaving
-                        ? `NT$ ${parseInt(monthlySaving, 10).toLocaleString()}`
-                        : ''
-                    }
-                    onChangeText={value =>
-                      handleNumberInput(value, setMonthlySaving)
-                    }
-                    keyboardType="numeric"
-                  />
-                </View>
+              <View style={styles.inputContainer}>
+                <Text style={styles.inputLabel}>每月存錢目標</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="請輸入你的每月存錢目標"
+                  placeholderTextColor="#666"
+                  value={
+                    monthlySaving
+                      ? `NT$ ${parseInt(monthlySaving, 10).toLocaleString()}`
+                      : ''
+                  }
+                  onChangeText={value =>
+                    handleNumberInput(value, setMonthlySaving)
+                  }
+                  keyboardType="numeric"
+                />
+              </View>
 
-                <View style={styles.buttonContainer}>
-                  <TouchableOpacity
-                    style={styles.suggestButton}
-                    onPress={suggestSavingGoal}>
-                    <Text style={styles.suggestButtonText}>建議存錢目標</Text>
-                  </TouchableOpacity>
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                  style={styles.suggestButton}
+                  onPress={suggestSavingGoal}>
+                  <Text style={styles.suggestButtonText}>建議存錢目標</Text>
+                </TouchableOpacity>
 
-                  <TouchableOpacity
-                    style={styles.suggestButton}
-                    onPress={suggestFinancialGoal}>
-                    <Text style={styles.suggestButtonText}>建議理財目標</Text>
-                  </TouchableOpacity>
-                </View>
-              </ScrollView>
-            )}
-          </View>
-        </View>
-
-        <View style={styles.footer}>
-          <Progress.Bar progress={progressValue} width={null} />
-          <View style={styles.buttonRow}>
-            {step === 2 && (
-              <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-                <Text style={styles.backButtonText}>上一步</Text>
-              </TouchableOpacity>
-            )}
-            <TouchableOpacity
-              style={[styles.nextButton, {width: step === 2 ? '48%' : '100%'}]}
-              onPress={handleNext}>
-              <Text style={styles.nextButtonText}>
-                {step === 1 ? '下一步' : '完成'}
-              </Text>
-            </TouchableOpacity>
-          </View>
+                <TouchableOpacity
+                  style={styles.suggestButton}
+                  onPress={suggestFinancialGoal}>
+                  <Text style={styles.suggestButtonText}>建議理財目標</Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          )}
         </View>
       </View>
-    </Layout>
+
+      <View style={styles.footer}>
+        <Progress.Bar progress={progressValue} width={null} />
+        <View style={styles.buttonRow}>
+          {step === 2 && (
+            <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+              <Text style={styles.backButtonText}>上一步</Text>
+            </TouchableOpacity>
+          )}
+          <TouchableOpacity
+            style={[styles.nextButton, {width: step === 2 ? '48%' : '100%'}]}
+            onPress={handleNext}>
+            <Text style={styles.nextButtonText}>
+              {step === 1 ? '下一步' : '完成'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.background,
   },
   content: {
     flex: 1,

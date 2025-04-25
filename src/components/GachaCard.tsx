@@ -1,10 +1,14 @@
-import {View, StyleSheet, Text} from 'react-native';
+import {View, StyleSheet, Image} from 'react-native';
 import React from 'react';
 
-const GachaCard = () => {
+interface GachaCardProps {
+  image: any;
+}
+
+const GachaCard: React.FC<GachaCardProps> = ({image}) => {
   return (
     <View style={styles.container}>
-      <Text>Card</Text>
+      <Image source={image} style={styles.image} resizeMode="contain" />
     </View>
   );
 };
@@ -16,6 +20,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'pink',
     borderRadius: 10,
     margin: 8,
+  },
+  image: {
+    width: '100%',
+    height: '100%',
   },
 });
 

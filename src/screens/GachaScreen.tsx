@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   StyleSheet,
   StatusBar,
@@ -11,15 +11,46 @@ import Layout from '../components/Layout';
 import GachaCard from '../components/GachaCard';
 import {Diamond, ChangeIcon} from '../svg';
 
+// image (delete)
+const characterImages = [
+  require('../assets/characters/blue_1.png'),
+  require('../assets/characters/blue_2.png'),
+  require('../assets/characters/green_1.png'),
+  require('../assets/characters/green_2.png'),
+  require('../assets/characters/green_3.png'),
+  require('../assets/characters/pink_1.png'),
+  require('../assets/characters/yellow_1.png'),
+  require('../assets/characters/yellow_2.png'),
+  require('../assets/characters/main_character.png'),
+];
+
 const GachaScreen = () => {
-  const cards: number[] = Array.from({length: 9});
+  const [cards, setCards] = useState<number[]>([]);
+
+  const refreshCards = () => {
+    const newCards = Array.from({length: 9}, () =>
+      Math.floor(Math.random() * characterImages.length),
+    );
+    setCards(newCards);
+    // fetch('/gacha', { method: 'POST', body: { action: 'refresh' }})
+  };
+
+  const adoptCard = () => {
+    console.log('領養成功！');
+    // fetch('/gacha', { method: 'POST', body: { action: 'adopt' }})
+  };
+
+  useEffect(() => {
+    refreshCards();
+  }, []);
+
   return (
     <Layout>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <View style={styles.container}>
         <FlatList
           data={cards}
-          renderItem={({item}) => <GachaCard key={item} />}
+          renderItem={({item}) => <GachaCard image={characterImages[item]} />}
           keyExtractor={(item, index) => index.toString()}
           numColumns={3}
           contentContainerStyle={styles.content}
@@ -27,16 +58,15 @@ const GachaScreen = () => {
         />
 
         <View style={styles.btnGroup}>
-          <TouchableOpacity style={styles.button} onPress={() => {}}>
+          <TouchableOpacity style={styles.button} onPress={adoptCard}>
             <Text style={styles.buttonText}>領養</Text>
             <Diamond height={16} width={16} style={styles.diamond} />
             <Text style={styles.buttonText}>1,000</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity>
-            <Text>
-              <ChangeIcon height={12} width={12} /> 換一批 20
-            </Text>
+          <TouchableOpacity style={styles.refreshButton} onPress={refreshCards}>
+            <ChangeIcon height={12} width={12} />
+            <Text style={styles.refreshText}>換一批 20</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -77,6 +107,15 @@ const styles = StyleSheet.create({
   },
   diamond: {
     marginRight: 10,
+  },
+  refreshButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  refreshText: {
+    marginLeft: 6,
+    fontSize: 16,
+    color: '#007BFF',
   },
 });
 

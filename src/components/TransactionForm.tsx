@@ -12,16 +12,30 @@ const categories: string[] = [
   '水電',
   '其他',
 ];
+type TransactionTypes = 'Income' | 'Expense';
 
 interface TransactionFormProps {
-  onSubmit: (amount: number, category: string) => void;
+  onSubmit: (
+    amount: number,
+    category: string,
+    transaction_type: TransactionTypes,
+    date: Date,
+  ) => void;
 }
+
+const TransactionTypeLabels: Record<TransactionTypes, string> = {
+  Income: '收入',
+  Expense: '支出',
+};
 
 const TransactionForm: React.FC<TransactionFormProps> = ({onSubmit}) => {
   const [selectedCategory, setSelectedCategory] = useState<string>(
     categories[0],
   );
+  const [selectedType, setSelectedType] = useState<TransactionTypes>('Expense');
   const [amount, setAmount] = useState<string>('');
+  const [date, setDate] = useState(new Date());
+  const [showPicker, setShowPicker] = useState(false);
 
   const handleNumberPress = (num: string) => {
     setAmount(prev => prev + num);
@@ -34,13 +48,10 @@ const TransactionForm: React.FC<TransactionFormProps> = ({onSubmit}) => {
   const handleConfirm = () => {
     const parsedAmount = parseFloat(amount);
     if (!isNaN(parsedAmount) && parsedAmount > 0) {
-      onSubmit(parsedAmount, selectedCategory);
+      onSubmit(parsedAmount, selectedCategory, selectedType, date);
       setAmount('');
     }
   };
-
-  const [date, setDate] = useState(new Date());
-  const [showPicker, setShowPicker] = useState(false);
 
   const handleDateChange = (event: any, selectedDate?: Date) => {
     if (Platform.OS === 'android') {
@@ -58,6 +69,23 @@ const TransactionForm: React.FC<TransactionFormProps> = ({onSubmit}) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>選擇類別</Text>
+      <View style={styles.categoryContainer}>
+        {Object.keys(TransactionTypeLabels).map(type => (
+          <Pressable
+            key={type}
+            style={[
+              styles.categoryButton,
+              selectedType === type && styles.selectedCategory,
+            ]}
+            onPress={() => setSelectedType(type as TransactionTypes)}>
+            <Text style={styles.categoryText}>
+              {TransactionTypeLabels[type as TransactionTypes]}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+
+      <Text style={styles.title}>選擇種類</Text>
       <View style={styles.categoryContainer}>
         {categories.map(cat => (
           <Pressable

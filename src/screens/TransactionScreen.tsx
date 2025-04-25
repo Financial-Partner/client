@@ -13,11 +13,17 @@ import Layout from '../components/Layout';
 import {transactionService, Transaction} from '../api/transactionService';
 import {missionService} from '../api/missionService';
 import {userService} from '../api/userService';
+import {useAppSelector} from '../store';
 
 const TransactionScreen: React.FC = () => {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isModalVisible, setModalVisible] = useState(false);
   const [budget, setBudget] = useState<number>(10000);
+  const storeTransactions = useAppSelector(
+    state => state.transactions.transactions,
+  );
+  const [transactions, setTransactions] =
+    useState<Transaction[]>(storeTransactions);
+
   const totalIncome = transactions
     .filter(t => t.type === 'INCOME')
     .reduce((sum, t) => sum + t.amount, 0);
@@ -46,31 +52,25 @@ const TransactionScreen: React.FC = () => {
       category,
       type: transaction_type,
     };
-    const updatedTransactions = [newTransaction, ...transactions].sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-    );
 
-    setTransactions(updatedTransactions);
-    setModalVisible(false);
     try {
       await transactionService.createTransaction(newTransaction);
+      const updatedTransactions = await transactionService.getTransactions();
+      setTransactions(updatedTransactions.transactions);
+      setModalVisible(false);
 
-      // Update mission status and add diamonds
+      // Get current missions state
       const missions = await missionService.getMissions();
       const transactionMission = missions.find(m => m.id === 'transaction');
       const incomeMission = missions.find(m => m.id === 'income');
 
-      // Check if this is the first transaction
-      if (
-        transactionMission &&
-        !transactionMission.isCompleted &&
-        transactions.length === 0
-      ) {
+      // Check and update transaction mission
+      if (transactionMission && !transactionMission.isCompleted) {
         await missionService.updateMissionStatus('transaction', true);
         await userService.updateDiamonds(transactionMission.amount);
       }
 
-      // Check if this is an income transaction
+      // Check and update income mission
       if (
         incomeMission &&
         !incomeMission.isCompleted &&
@@ -81,7 +81,7 @@ const TransactionScreen: React.FC = () => {
         await userService.updateDiamonds(incomeMission.amount);
       }
     } catch (error) {
-      console.error('Error creating transaction:', error);
+      console.error('Error handling transaction:', error);
     }
   };
 

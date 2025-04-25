@@ -1,13 +1,22 @@
-import React, {createContext, useState, useContext, useEffect} from 'react';
+import React, {
+  createContext,
+  useState,
+  useContext,
+  useEffect,
+  useCallback,
+} from 'react';
 import {
   getAuth,
   FirebaseAuthTypes,
   firebase,
 } from '@react-native-firebase/auth';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import Config from 'react-native-config';
 import {authService} from '../api/authService';
+import {useAppDispatch, useAppSelector} from '../store';
+import {setTokens, clearTokens} from '../store/slices/authSlice';
+import {store} from '../store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type AuthContextType = {
   user: FirebaseAuthTypes.User | null;
@@ -30,126 +39,83 @@ type AuthContextType = {
 
 const auth = getAuth();
 
-const createDummyUser = (token: string, refreshToken: string): FirebaseAuthTypes.User => {
-  const dummyUser = {
-    uid: 'dummy-user-id',
-    email: 'dummy@example.com',
-    emailVerified: true,
-    isAnonymous: false,
-    displayName: null,
-    phoneNumber: null,
-    photoURL: null,
-    metadata: {
-      creationTime: new Date().toISOString(),
-      lastSignInTime: new Date().toISOString(),
-    },
-    providerData: [],
-    refreshToken: '',
-    tenantId: null,
-    delete: async () => {},
-    getIdToken: async () => token,
-    getIdTokenResult: async () => ({
-      token,
-      claims: {},
-      authTime: new Date().toISOString(),
-      issuedAtTime: new Date().toISOString(),
-      expirationTime: new Date(Date.now() + 3600000).toISOString(),
-      signInProvider: null,
-      signInSecondFactor: null,
-    }),
-    reload: async () => {},
-    toJSON: () => ({}),
-    multiFactor: {
-      enrolledFactors: [],
-      session: null,
-    },
-    stsTokenManager: {
-      accessToken: token,
-      refreshToken,
-      expirationTime: Date.now() + 3600000,
-    },
-    providerId: 'password',
-    updateEmail: async () => {},
-    updatePassword: async () => {},
-    updatePhoneNumber: async () => {},
-    updateProfile: async () => {},
-    linkWithCredential: async () => ({} as any),
-    linkWithPhoneNumber: async () => ({} as any),
-    reauthenticateWithCredential: async () => {},
-    reauthenticateWithPhoneNumber: async () => {},
-    unlink: async () => ({} as any),
-    linkWithPopup: async () => ({} as any),
-    linkWithRedirect: async () => ({} as any),
-    reauthenticateWithPopup: async () => ({} as any),
-    reauthenticateWithRedirect: async () => ({} as any),
-    getProviderData: () => [],
-    getProviderId: () => 'password',
-  } as unknown as FirebaseAuthTypes.User;
-
-  return dummyUser;
-};
-
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({children}: {children: React.ReactNode}) => {
+export const AuthProvider: React.FC<{children: React.ReactNode}> = ({
+  children,
+}) => {
+  const dispatch = useAppDispatch();
+  const {userToken, refreshToken} = useAppSelector(state => state.auth);
+
   const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState<string | null>(null);
-  const [serverToken, setServerToken] = useState<string | null>(null);
+  const [serverToken, setServerToken] = useState<string | null>(userToken);
   const [tokenExchangeError, setTokenExchangeError] = useState<string | null>(
     null,
   );
   const skipAuth = Config.SKIP_AUTH === 'true';
 
-  const refreshAccessToken = async () => {
-    try {
-      const refreshToken = await AsyncStorage.getItem('refreshToken');
-      if (!refreshToken) {
+  const refreshAccessToken = useCallback(
+    async (_: string) => {
+      try {
+        if (!refreshToken) {
+          return false;
+        }
+
+        setTokenExchangeError(null);
+        const response = await authService.refreshToken(refreshToken);
+
+        dispatch(
+          setTokens({
+            userToken: response.access_token,
+            refreshToken: response.refresh_token,
+          }),
+        );
+
+        setServerToken(response.access_token);
+        return true;
+      } catch (error: any) {
+        console.error('刷新 token 失敗:', error);
+        setTokenExchangeError('刷新 token 失敗，請重新登入');
+        setServerToken(null);
+        dispatch(clearTokens());
         return false;
       }
+    },
+    [dispatch, refreshToken],
+  );
 
-      setTokenExchangeError(null);
-      const response = await authService.refreshToken(refreshToken);
+  const exchangeFirebaseToken = useCallback(
+    async (firebaseToken: string) => {
+      try {
+        setTokenExchangeError(null);
+        const response = await authService.exchangeToken(firebaseToken);
 
-      await AsyncStorage.setItem('userToken', response.access_token);
-      await AsyncStorage.setItem('refreshToken', response.refresh_token);
+        dispatch(
+          setTokens({
+            userToken: response.access_token,
+            refreshToken: response.refresh_token,
+          }),
+        );
 
-      setServerToken(response.access_token);
-      return true;
-    } catch (error: any) {
-      console.error('刷新 token 失敗:', error);
-      setTokenExchangeError('刷新 token 失敗，請重新登入');
-      setServerToken(null);
-      await AsyncStorage.removeItem('userToken');
-      await AsyncStorage.removeItem('refreshToken');
-      return false;
-    }
-  };
+        setServerToken(response.access_token);
 
-  const exchangeFirebaseToken = async (firebaseToken: string) => {
-    try {
-      setTokenExchangeError(null);
-      const response = await authService.exchangeToken(firebaseToken);
+        return response;
+      } catch (error: any) {
+        const errorMessage =
+          error.response?.data?.message || error.message || '與服務器連接失敗';
+        setTokenExchangeError(errorMessage);
+        console.error('Token 交換失敗:', error);
 
-      await AsyncStorage.setItem('userToken', response.access_token);
-      await AsyncStorage.setItem('refreshToken', response.refresh_token);
+        setServerToken(null);
+        dispatch(clearTokens());
 
-      setServerToken(response.access_token);
-
-      return response;
-    } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.message || error.message || '與服務器連接失敗';
-      setTokenExchangeError(errorMessage);
-      console.error('Token 交換失敗:', error);
-
-      setServerToken(null);
-      await AsyncStorage.removeItem('userToken');
-      await AsyncStorage.removeItem('refreshToken');
-
-      throw error;
-    }
-  };
+        throw error;
+      }
+    },
+    [dispatch],
+  );
 
   const retryTokenExchange = async (): Promise<boolean> => {
     if (!user) {
@@ -169,74 +135,44 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
   };
 
   useEffect(() => {
-    const initAuth = async () => {
-      if (skipAuth) {
-        const DUMMY_TOKEN = 'dummy-token-for-development';
-        const DUMMY_REFRESH_TOKEN = 'dummy-refresh-token-for-development';
-
-        await AsyncStorage.setItem('userToken', DUMMY_TOKEN);
-        await AsyncStorage.setItem('refreshToken', DUMMY_REFRESH_TOKEN);
-        await AsyncStorage.setItem('isDummyToken', 'true');
-
-        setToken(DUMMY_TOKEN);
-        setServerToken(DUMMY_TOKEN);
-        setUser(createDummyUser(DUMMY_TOKEN, DUMMY_REFRESH_TOKEN));
-        setLoading(false);
-        return;
-      } else {
-        const isDummyToken = await AsyncStorage.getItem('isDummyToken');
-        if (isDummyToken === 'true') {
-          console.log(
-            '檢測到環境變數變更：從 dummy 模式切換到正常模式，清除舊的 token',
-          );
-          await AsyncStorage.removeItem('userToken');
-          await AsyncStorage.removeItem('refreshToken');
-          await AsyncStorage.removeItem('isDummyToken');
-          setToken(null);
-          setServerToken(null);
+    const initializeAuth = async () => {
+      try {
+        setLoading(true);
+        const storedToken = await AsyncStorage.getItem('userToken');
+        if (storedToken) {
+          setToken(storedToken);
+          await exchangeFirebaseToken(storedToken);
+          await refreshAccessToken(storedToken);
         }
-      }
-
-      const storedToken = await AsyncStorage.getItem('userToken');
-      if (storedToken) {
-        setServerToken(storedToken);
-        await refreshAccessToken();
-      }
-
-      GoogleSignin.configure({
-        webClientId: Config.GOOGLE_WEB_CLIENT_ID,
-      });
-
-      const unsubscribe = auth.onAuthStateChanged(async userState => {
-        setUser(userState);
-
-        if (userState) {
-          const idToken = await userState.getIdToken();
-          setToken(idToken);
-
-          if (!serverToken) {
-            try {
-              await exchangeFirebaseToken(idToken);
-            } catch (error) {
-              console.error('Firebase token 交換失敗:', error);
-            }
-          }
-        } else {
-          setToken(null);
-          setServerToken(null);
-          setTokenExchangeError(null);
-          await AsyncStorage.removeItem('userToken');
-          await AsyncStorage.removeItem('refreshToken');
-        }
-
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+      } finally {
         setLoading(false);
-      });
-
-      return unsubscribe;
+      }
     };
 
-    initAuth();
-  }, [skipAuth, serverToken]);
+    initializeAuth();
+  }, [dispatch, exchangeFirebaseToken, refreshAccessToken]);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(async user => {
+      setUser(user);
+      if (user) {
+        try {
+          const firebaseToken = await user.getIdToken();
+          setToken(firebaseToken);
+          await exchangeFirebaseToken(firebaseToken);
+        } catch (error) {
+          console.error('Error getting Firebase token:', error);
+        }
+      } else {
+        setToken(null);
+        setServerToken(null);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [exchangeFirebaseToken]);
 
   const signIn = async (email: string, password: string) => {
     try {
@@ -351,9 +287,10 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
     try {
       if (serverToken) {
         try {
-          const refreshToken = await AsyncStorage.getItem('refreshToken');
-          if (refreshToken) {
-            await authService.logout(refreshToken);
+          const state = store.getState();
+          const currentRefreshToken = state.auth.refreshToken;
+          if (currentRefreshToken) {
+            await authService.logout(currentRefreshToken);
           } else {
             console.warn('找不到 refresh_token 進行登出');
           }
@@ -370,8 +307,7 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
         console.error('Google 登出錯誤:', googleError);
       }
 
-      await AsyncStorage.removeItem('userToken');
-      await AsyncStorage.removeItem('refreshToken');
+      dispatch(clearTokens());
 
       setToken(null);
       setServerToken(null);
@@ -499,7 +435,7 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth 必須在 AuthProvider 內使用');
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };

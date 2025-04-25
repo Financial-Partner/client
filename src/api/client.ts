@@ -1,7 +1,7 @@
 import axios, {AxiosError, AxiosRequestConfig} from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Config from 'react-native-config';
 import {API_ENDPOINTS} from './endpoints';
+import {store} from '../store';
 
 const API_BASE_URL = Config.API_BASE_URL || 'http://localhost:8080/api';
 const SKIP_AUTH = Config.SKIP_AUTH === 'true';
@@ -16,7 +16,9 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   async config => {
-    const token = await AsyncStorage.getItem('userToken');
+    const state = store.getState();
+    const token = state.auth.userToken;
+
     if (
       token &&
       !config.url?.includes(API_ENDPOINTS.AUTH_LOGIN) &&
@@ -48,7 +50,8 @@ apiClient.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        const refreshToken = await AsyncStorage.getItem('refreshToken');
+        const state = store.getState();
+        const refreshToken = state.auth.refreshToken;
 
         if (!refreshToken) {
           throw new Error('No refresh token available');
@@ -63,8 +66,13 @@ apiClient.interceptors.response.use(
 
         const {access_token, refresh_token} = response.data;
 
-        await AsyncStorage.setItem('userToken', access_token);
-        await AsyncStorage.setItem('refreshToken', refresh_token);
+        store.dispatch({
+          type: 'auth/setTokens',
+          payload: {
+            userToken: access_token,
+            refreshToken: refresh_token,
+          },
+        });
 
         apiClient.defaults.headers.common.Authorization = `Bearer ${access_token}`;
 
@@ -74,12 +82,8 @@ apiClient.interceptors.response.use(
 
         return apiClient(originalRequest);
       } catch (refreshError) {
-        await AsyncStorage.removeItem('userToken');
-        await AsyncStorage.removeItem('refreshToken');
-        await AsyncStorage.removeItem('isDummyToken');
-
+        store.dispatch({type: 'auth/clearTokens'});
         console.error('Token refresh failed, user needs to login again');
-
         return Promise.reject(error);
       }
     }

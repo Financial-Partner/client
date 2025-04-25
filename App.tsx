@@ -8,6 +8,8 @@ import LoadingScreen from './src/screens/LoadingScreen';
 import {initializeApp, getApps} from '@react-native-firebase/app';
 import {SWRProvider} from './src/api/swrConfig';
 import Config from 'react-native-config';
+import {Provider} from 'react-redux';
+import {store} from './src/store';
 
 const firebaseConfig = {
   apiKey: Config.FIREBASE_API_KEY || '',
@@ -46,11 +48,13 @@ const AppContent = () => {
 
 function App(): React.JSX.Element {
   return (
-    <SWRProvider>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
-    </SWRProvider>
+    <Provider store={store}>
+      <SWRProvider>
+        <AuthProvider>
+          <AppContent />
+        </AuthProvider>
+      </SWRProvider>
+    </Provider>
   );
 }
 

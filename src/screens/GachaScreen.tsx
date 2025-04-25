@@ -22,17 +22,32 @@ const characterImages = [
   require('../assets/characters/yellow_1.png'),
   require('../assets/characters/yellow_2.png'),
   require('../assets/characters/main_character.png'),
+  require('../assets/characters/blue_3.png'),
+  require('../assets/characters/green_4.png'),
+  require('../assets/characters/green_5.png'),
+  require('../assets/characters/green_6.png'),
+  require('../assets/characters/pink_2.png'),
+  require('../assets/characters/yellow_3.png'),
+  require('../assets/characters/yellow_4.png'),
+  require('../assets/characters/main_character2.png'),
 ];
 
 const GachaScreen = () => {
   const [cards, setCards] = useState<number[]>([]);
 
   const refreshCards = () => {
-    const newCards = Array.from({length: 9}, () =>
-      Math.floor(Math.random() * characterImages.length),
-    );
+    // Create an array of indices (0 to 17)
+    const indices = Array.from({length: characterImages.length}, (_, i) => i);
+
+    // Shuffle the array
+    for (let i = indices.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [indices[i], indices[j]] = [indices[j], indices[i]];
+    }
+
+    // Select the first 9 items
+    const newCards = indices.slice(0, 9);
     setCards(newCards);
-    // fetch('/gacha', { method: 'POST', body: { action: 'refresh' }})
   };
 
   const adoptCard = () => {

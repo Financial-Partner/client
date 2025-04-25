@@ -11,10 +11,19 @@ type chanceProps = {
     status: number;
     tags: string[];
   };
+  onSubmit: (amount: number) => void;
 };
 
-const InvestmentChance = ({chance}: chanceProps) => {
+const InvestmentChance = ({chance, onSubmit}: chanceProps) => {
   const [investmentAmount, setInvestmentAmount] = useState('');
+
+  const handleSubmit = () => {
+    const amount = parseInt(investmentAmount, 10);
+    if (!isNaN(amount) && amount >= parseInt(chance.min_amount, 10)) {
+      onSubmit(amount);
+      setInvestmentAmount(''); // Clear the input after submission
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -22,7 +31,7 @@ const InvestmentChance = ({chance}: chanceProps) => {
         <View style={styles.chanceHeader}>
           <Text style={styles.chanceTitle}>{chance.title}</Text>
           <Text style={styles.chanceDescription}>
-            最少投資 {chance.min_amount}
+            最少投資 ${chance.min_amount}
           </Text>
         </View>
 
@@ -52,10 +61,7 @@ const InvestmentChance = ({chance}: chanceProps) => {
           onChangeText={setInvestmentAmount}
           keyboardType="numeric"
         />
-        <Button
-          title="投資"
-          onPress={() => console.log(`Investing ${investmentAmount}`)}
-        />
+        <Button title="投資" onPress={() => handleSubmit()} />
       </View>
     </View>
   );

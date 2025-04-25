@@ -17,25 +17,6 @@ export const updateMockUserProfile = (
 
 export {mockUserProfile};
 
-export const mockTransactions = [
-  {
-    id: '1',
-    type: 'INCOME' as const,
-    amount: 5000,
-    category: 'SALARY',
-    date: '2024-03-20',
-    description: 'Monthly salary',
-  },
-  {
-    id: '2',
-    type: 'EXPENSE' as const,
-    amount: 1000,
-    category: 'FOOD',
-    date: '2024-03-19',
-    description: 'Groceries',
-  },
-];
-
 export const mockInvestments = [
   {
     id: '1',

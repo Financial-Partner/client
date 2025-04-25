@@ -1,5 +1,5 @@
-import {mockTransactions} from '../mock/data';
 import useSWR from 'swr';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export interface Transaction {
   id: string;
@@ -14,18 +14,46 @@ export interface GetTransactionResponse {
   transactions: Transaction[];
 }
 
+const TRANSACTIONS_STORAGE_KEY = 'user_transactions';
+
 export const transactionService = {
   createTransaction: async (transaction: Transaction) => {
-    const newTransaction = {
-      ...transaction,
-      id: (mockTransactions.length + 1).toString(),
-    };
-    mockTransactions.push(newTransaction);
-    return newTransaction;
+    try {
+      const storedTransactions = await AsyncStorage.getItem(
+        TRANSACTIONS_STORAGE_KEY,
+      );
+      const transactions = storedTransactions
+        ? JSON.parse(storedTransactions)
+        : [];
+      const newTransaction = {
+        ...transaction,
+        id: Date.now().toString(),
+      };
+      transactions.push(newTransaction);
+      await AsyncStorage.setItem(
+        TRANSACTIONS_STORAGE_KEY,
+        JSON.stringify(transactions),
+      );
+      return newTransaction;
+    } catch (error) {
+      console.error('Error creating transaction:', error);
+      throw error;
+    }
   },
 
   getTransactions: async (): Promise<GetTransactionResponse> => {
-    return {transactions: mockTransactions};
+    try {
+      const storedTransactions = await AsyncStorage.getItem(
+        TRANSACTIONS_STORAGE_KEY,
+      );
+      const transactions = storedTransactions
+        ? JSON.parse(storedTransactions)
+        : [];
+      return {transactions};
+    } catch (error) {
+      console.error('Error getting transactions:', error);
+      return {transactions: []};
+    }
   },
 };
 

@@ -15,14 +15,14 @@ import {transactionService, Transaction} from '../api/transactionService';
 const TransactionScreen: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isModalVisible, setModalVisible] = useState(false);
-  const [budget, setBudget] = useState<number>(10000); // setting Budget
+  const [budget, setBudget] = useState<number>(10000);
   const totalIncome = transactions
     .filter(t => t.type === 'INCOME')
     .reduce((sum, t) => sum + t.amount, 0);
   const totalExpense = transactions
     .filter(t => t.type === 'EXPENSE')
     .reduce((sum, t) => sum + t.amount, 0);
-  const monthlyBalance = totalIncome - totalExpense; // Monthly balance
+  const monthlyBalance = totalIncome - totalExpense;
 
   const formattedDate = (d: Date) => {
     return `${d.getFullYear()}-${(d.getMonth() + 1)
@@ -48,13 +48,18 @@ const TransactionScreen: React.FC = () => {
       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
     );
 
-    setTransactions(updatedTransactions); //sort by newest
+    setTransactions(updatedTransactions);
     setModalVisible(false);
     try {
       await transactionService.createTransaction(newTransaction);
     } catch (error) {
       console.error('Error creating transaction:', error);
     }
+  };
+
+  const getCurrentYearMonth = () => {
+    const now = new Date();
+    return `${now.getFullYear()}年${now.getMonth() + 1}月`;
   };
 
   useEffect(() => {
@@ -77,6 +82,8 @@ const TransactionScreen: React.FC = () => {
     <Layout scrollable={false}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <View style={styles.container}>
+        <Text style={styles.yearMonth}>{getCurrentYearMonth()}</Text>
+
         {/* First block：Monthly Summary */}
         <View style={[styles.module, styles.grayBackground]}>
           <Text style={styles.label}>本月收支</Text>
@@ -106,17 +113,23 @@ const TransactionScreen: React.FC = () => {
         {/* Second block：Budget & remain balance */}
         <View style={[styles.module, styles.blueBackground]}>
           <View style={styles.row}>
-            <Text style={styles.label}>本月預算</Text>
-            <View style={styles.budgetContainer}>
-              <Text style={styles.amount}>${budget}</Text>
-              <Pressable
-                style={styles.editButton}
-                onPress={() => setBudget(budget + 1000)}>
-                <Text style={styles.buttonText}>修改</Text>
-              </Pressable>
-            </View>
+            <Text style={styles.label}>剩餘額度</Text>
+            <Text
+              style={[
+                styles.amount,
+                monthlyBalance >= 0 ? styles.positive : styles.negative,
+              ]}>
+              ${budget - totalExpense}
+            </Text>
           </View>
-          <Text style={styles.subText}>剩餘額度：${monthlyBalance}</Text>
+          <View style={styles.budgetContainer}>
+            <Text style={styles.subText}>本月預算：${budget}</Text>
+            <Pressable
+              style={styles.editButton}
+              onPress={() => setBudget(budget + 1000)}>
+              <Text style={styles.buttonText}>修改</Text>
+            </Pressable>
+          </View>
         </View>
 
         {/* Third block：details */}
@@ -179,19 +192,25 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
   },
+  yearMonth: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
   module: {
     padding: 16,
     borderRadius: 10,
     marginBottom: 10,
   },
   grayBackground: {
-    backgroundColor: 'rgba(200, 160, 230, 0.8)', // light purple
+    backgroundColor: 'rgba(200, 160, 230, 0.8)',
   },
   blueBackground: {
-    backgroundColor: 'rgba(173, 216, 230, 0.8)', // light blue
+    backgroundColor: 'rgba(173, 216, 230, 0.8)',
   },
   whiteBackground: {
-    backgroundColor: 'rgba(255, 255, 255, 0.8)', // white
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
   },
   label: {
     fontSize: 18,
@@ -204,20 +223,21 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   subText: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#666',
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 8,
   },
   budgetContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
   },
   editButton: {
-    marginLeft: 10,
     paddingVertical: 4,
     paddingHorizontal: 8,
     backgroundColor: '#007bff',

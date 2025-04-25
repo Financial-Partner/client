@@ -12,7 +12,7 @@ const categories: string[] = [
   '水電',
   '其他',
 ];
-type TransactionTypes = 'Income' | 'Expense';
+type TransactionTypes = 'INCOME' | 'EXPENSE';
 
 interface TransactionFormProps {
   onSubmit: (
@@ -24,15 +24,15 @@ interface TransactionFormProps {
 }
 
 const TransactionTypeLabels: Record<TransactionTypes, string> = {
-  Income: '收入',
-  Expense: '支出',
+  INCOME: '收入',
+  EXPENSE: '支出',
 };
 
 const TransactionForm: React.FC<TransactionFormProps> = ({onSubmit}) => {
   const [selectedCategory, setSelectedCategory] = useState<string>(
     categories[0],
   );
-  const [selectedType, setSelectedType] = useState<TransactionTypes>('Expense');
+  const [selectedType, setSelectedType] = useState<TransactionTypes>('EXPENSE');
   const [amount, setAmount] = useState<string>('');
   const [date, setDate] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);

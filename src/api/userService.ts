@@ -1,5 +1,4 @@
-import apiClient from './client';
-import {API_ENDPOINTS} from './endpoints';
+import {mockUserProfile} from '../mock/data';
 import useSWR from 'swr';
 import {useAuth} from '../contexts/AuthContext';
 
@@ -12,20 +11,19 @@ interface UserProfileResponse {
 
 export const userService = {
   getUserProfile: async (): Promise<UserProfileResponse> => {
-    const response = await apiClient.get(API_ENDPOINTS.USER_ME);
-    return response.data;
+    return mockUserProfile;
   },
 
   updateUserProfile: async (userData: any) => {
-    const response = await apiClient.put(API_ENDPOINTS.USER_UPDATE, userData);
-    return response.data;
+    return {...mockUserProfile, ...userData};
   },
 };
 
 export const useUserProfile = () => {
   const {serverToken} = useAuth();
   const {data, error, isLoading, mutate} = useSWR<UserProfileResponse>(
-    serverToken ? API_ENDPOINTS.USER_ME : null,
+    serverToken ? 'mock-user-profile' : null,
+    () => userService.getUserProfile(),
   );
 
   return {

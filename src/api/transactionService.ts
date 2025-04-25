@@ -1,29 +1,44 @@
-import apiClient from './client';
-import {API_ENDPOINTS} from './endpoints';
+import {mockTransactions} from '../mock/data';
+import useSWR from 'swr';
 
 export interface Transaction {
+  id: string;
+  type: 'INCOME' | 'EXPENSE';
   amount: number;
-  description: string;
-  date: string;
   category: string;
-  transaction_type: 'Income' | 'Expense';
+  date: string;
+  description: string;
 }
 
-interface GetTransactionResponse {
+export interface GetTransactionResponse {
   transactions: Transaction[];
 }
 
 export const transactionService = {
   createTransaction: async (transaction: Transaction) => {
-    const response = await apiClient.post(
-      API_ENDPOINTS.TRANSACTION,
-      transaction,
-    );
-    return response.data;
+    const newTransaction = {
+      ...transaction,
+      id: (mockTransactions.length + 1).toString(),
+    };
+    mockTransactions.push(newTransaction);
+    return newTransaction;
   },
 
   getTransactions: async (): Promise<GetTransactionResponse> => {
-    const response = await apiClient.get(API_ENDPOINTS.TRANSACTION);
-    return response.data;
+    return {transactions: mockTransactions};
   },
+};
+
+export const useTransactions = () => {
+  const {data, error, isLoading, mutate} = useSWR<GetTransactionResponse>(
+    'mock-transactions',
+    () => transactionService.getTransactions(),
+  );
+
+  return {
+    transactions: data?.transactions || [],
+    isLoading,
+    isError: error,
+    mutate,
+  };
 };

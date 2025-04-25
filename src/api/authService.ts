@@ -1,6 +1,3 @@
-import apiClient from './client';
-import {API_ENDPOINTS} from './endpoints';
-
 interface LoginCredentials {
   email: string;
   password: string;
@@ -12,41 +9,30 @@ interface AuthResponse {
   expires_in: number;
 }
 
+const mockAuthResponse: AuthResponse = {
+  access_token: 'mock-access-token',
+  refresh_token: 'mock-refresh-token',
+  expires_in: 3600,
+};
+
 export const authService = {
-  exchangeToken: async (firebaseToken: string): Promise<AuthResponse> => {
-    const response = await apiClient.post(API_ENDPOINTS.AUTH_LOGIN, {
-      firebase_token: firebaseToken,
-    });
-    return response.data;
+  exchangeToken: async (_: string): Promise<AuthResponse> => {
+    return mockAuthResponse;
   },
 
-  login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
-    const response = await apiClient.post(
-      API_ENDPOINTS.AUTH_LOGIN,
-      credentials,
-    );
-    return response.data;
+  login: async (_: LoginCredentials): Promise<AuthResponse> => {
+    return mockAuthResponse;
   },
 
-  register: async (userData: any) => {
-    const response = await apiClient.post(
-      API_ENDPOINTS.AUTH_REGISTER,
-      userData,
-    );
-    return response.data;
+  register: async (_: any) => {
+    return mockAuthResponse;
   },
 
-  logout: async (refreshToken: string) => {
-    const response = await apiClient.post(API_ENDPOINTS.AUTH_LOGOUT, {
-      refresh_token: refreshToken,
-    });
-    return response.data;
+  logout: async (_: string) => {
+    return {success: true};
   },
 
-  refreshToken: async (refreshToken: string): Promise<AuthResponse> => {
-    const response = await apiClient.post(API_ENDPOINTS.AUTH_REFRESH, {
-      refresh_token: refreshToken,
-    });
-    return response.data;
+  refreshToken: async (_: string): Promise<AuthResponse> => {
+    return mockAuthResponse;
   },
 };

@@ -17,10 +17,10 @@ const TransactionScreen: React.FC = () => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [budget, setBudget] = useState<number>(10000); // setting Budget
   const totalIncome = transactions
-    .filter(t => t.transaction_type === 'Income')
+    .filter(t => t.type === 'INCOME')
     .reduce((sum, t) => sum + t.amount, 0);
   const totalExpense = transactions
-    .filter(t => t.transaction_type === 'Expense')
+    .filter(t => t.type === 'EXPENSE')
     .reduce((sum, t) => sum + t.amount, 0);
   const remainingBudget = budget - totalExpense; // Remain balance
 
@@ -33,15 +33,16 @@ const TransactionScreen: React.FC = () => {
   const handleAddTransaction = async (
     amount: number,
     category: string,
-    transaction_type: 'Income' | 'Expense',
+    transaction_type: 'INCOME' | 'EXPENSE',
     date: Date,
   ) => {
     const newTransaction: Transaction = {
+      id: Date.now().toString(),
       amount,
       description: '',
       date: formattedDate(date),
       category,
-      transaction_type: transaction_type,
+      type: transaction_type,
     };
     const updatedTransactions = [newTransaction, ...transactions].sort(
       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
@@ -110,7 +111,7 @@ const TransactionScreen: React.FC = () => {
                 <Text style={styles.transactionDate}>{item.date}</Text>
                 <Text style={styles.transactionCategory}>{item.category}</Text>
                 <Text style={styles.transactionAmount}>
-                  {item.transaction_type === 'Income' ? '+' : '-'}
+                  {item.type === 'INCOME' ? '+' : '-'}
                   {item.amount}
                 </Text>
               </View>

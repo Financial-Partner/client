@@ -9,6 +9,7 @@ type MissionProps = {
     amount: number;
     isCompleted: boolean;
   };
+  diamonds: number;
 };
 
 const Mission = ({mission}: MissionProps) => {

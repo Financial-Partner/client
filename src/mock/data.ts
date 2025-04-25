@@ -1,9 +1,21 @@
-export const mockUserProfile = {
+let mockUserProfile = {
   wallet: {
-    diamonds: 1000,
+    diamonds: 5000,
     saving: 50000,
   },
 };
+
+export const updateMockUserProfile = (
+  updates: Partial<typeof mockUserProfile>,
+) => {
+  mockUserProfile = {
+    ...mockUserProfile,
+    ...updates,
+  };
+  return mockUserProfile;
+};
+
+export {mockUserProfile};
 
 export const mockTransactions = [
   {

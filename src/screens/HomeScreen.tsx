@@ -17,6 +17,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Layout from '../components/Layout';
 import Mission from '../components/Mission';
 import {useAuth} from '../contexts/AuthContext';
+import {useUserProfile} from '../api/userService';
 import {Dinosaur} from '../svg';
 
 type RootStackParamList = {
@@ -39,15 +40,16 @@ type NavigationProp = StackNavigationProp<RootStackParamList>;
 
 const HomeScreen = () => {
   const {user} = useAuth();
+  const {user: userProfile} = useUserProfile();
   const [dinoImage, setDinoImage] = useState<ImageSourcePropType | null>(null);
   const [monthlySaving, setMonthlySaving] = useState('0');
   const [currentSaving, setCurrentSaving] = useState('0');
 
   const missions = [
-    {title: '輸入交易紀錄', amount: 1000, isCompleted: false},
+    {title: '輸入交易紀錄', amount: 5000, isCompleted: false},
     {title: '添加額外收入', amount: 500, isCompleted: false},
     {title: '設定預算', amount: 2000, isCompleted: true},
-    {title: '設定目標存款', amount: 3000, isCompleted: false},
+    {title: '設定目標存款', amount: 3000, isCompleted: true},
   ];
 
   const navigation = useNavigation<NavigationProp>();
@@ -118,9 +120,12 @@ const HomeScreen = () => {
         </View>
 
         <View style={styles.missionContainer}>
-          <Text style={styles.missionTitle}>每日任務</Text>
           {missions.map((mission, index) => (
-            <Mission key={index} mission={mission} />
+            <Mission
+              key={index}
+              mission={mission}
+              diamonds={userProfile?.wallet?.diamonds || 0}
+            />
           ))}
         </View>
 
@@ -155,11 +160,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginBottom: 30,
     marginTop: 10,
-  },
-  missionTitle: {
-    fontWeight: 'bold',
-    fontSize: 24,
-    marginBottom: 20,
   },
   button: {
     backgroundColor: '#007BFF',

@@ -1,6 +1,7 @@
 import {mockUserProfile} from '../mock/data';
 import useSWR from 'swr';
 import {useAuth} from '../contexts/AuthContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface UserProfileResponse {
   wallet: {
@@ -9,13 +10,46 @@ interface UserProfileResponse {
   };
 }
 
+const WALLET_STORAGE_KEY = 'user_wallet';
+
 export const userService = {
   getUserProfile: async (): Promise<UserProfileResponse> => {
-    return mockUserProfile;
+    try {
+      const storedWallet = await AsyncStorage.getItem(WALLET_STORAGE_KEY);
+      if (storedWallet) {
+        return {
+          ...mockUserProfile,
+          wallet: JSON.parse(storedWallet),
+        };
+      }
+      // If no stored wallet, initialize with default values
+      await AsyncStorage.setItem(
+        WALLET_STORAGE_KEY,
+        JSON.stringify(mockUserProfile.wallet),
+      );
+      return mockUserProfile;
+    } catch (error) {
+      console.error('Error getting user profile:', error);
+      return mockUserProfile;
+    }
   },
 
-  updateUserProfile: async (userData: any) => {
-    return {...mockUserProfile, ...userData};
+  updateUserProfile: async (userData: Partial<UserProfileResponse>) => {
+    try {
+      if (userData.wallet) {
+        await AsyncStorage.setItem(
+          WALLET_STORAGE_KEY,
+          JSON.stringify(userData.wallet),
+        );
+      }
+      return {
+        ...mockUserProfile,
+        ...userData,
+      };
+    } catch (error) {
+      console.error('Error updating user profile:', error);
+      throw error;
+    }
   },
 };
 
@@ -37,7 +71,7 @@ export const useUserProfile = () => {
 export const useUserProfileManager = () => {
   const {user, isLoading, isError, mutate} = useUserProfile();
 
-  const updateProfile = async (userData: any) => {
+  const updateProfile = async (userData: Partial<UserProfileResponse>) => {
     try {
       const updatedUser = await userService.updateUserProfile(userData);
       mutate(updatedUser, false);

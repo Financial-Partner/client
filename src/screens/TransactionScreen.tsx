@@ -22,7 +22,7 @@ const TransactionScreen: React.FC = () => {
   const totalExpense = transactions
     .filter(t => t.type === 'EXPENSE')
     .reduce((sum, t) => sum + t.amount, 0);
-  const remainingBudget = budget - totalExpense; // Remain balance
+  const monthlyBalance = totalIncome - totalExpense; // Monthly balance
 
   const formattedDate = (d: Date) => {
     return `${d.getFullYear()}-${(d.getMonth() + 1)
@@ -77,11 +77,30 @@ const TransactionScreen: React.FC = () => {
     <Layout scrollable={false}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <View style={styles.container}>
-        {/* First block：Expense & Revenue */}
+        {/* First block：Monthly Summary */}
         <View style={[styles.module, styles.grayBackground]}>
-          <Text style={styles.label}>本月支出</Text>
-          <Text style={styles.amount}>-${totalExpense}</Text>
-          <Text style={styles.subText}>本月收入：${totalIncome}</Text>
+          <Text style={styles.label}>本月收支</Text>
+          <View style={styles.summaryContainer}>
+            <View style={styles.summaryItem}>
+              <Text style={styles.summaryLabel}>收入</Text>
+              <Text style={styles.summaryAmount}>+${totalIncome}</Text>
+            </View>
+            <View style={styles.summaryItem}>
+              <Text style={styles.summaryLabel}>支出</Text>
+              <Text style={styles.summaryAmount}>-${totalExpense}</Text>
+            </View>
+            <View style={styles.summaryItem}>
+              <Text style={styles.summaryLabel}>結餘</Text>
+              <Text
+                style={[
+                  styles.summaryAmount,
+                  monthlyBalance >= 0 ? styles.positive : styles.negative,
+                ]}>
+                {monthlyBalance >= 0 ? '+' : ''}
+                {monthlyBalance}
+              </Text>
+            </View>
+          </View>
         </View>
 
         {/* Second block：Budget & remain balance */}
@@ -97,7 +116,7 @@ const TransactionScreen: React.FC = () => {
               </Pressable>
             </View>
           </View>
-          <Text style={styles.subText}>剩餘額度：${remainingBudget}</Text>
+          <Text style={styles.subText}>剩餘額度：${monthlyBalance}</Text>
         </View>
 
         {/* Third block：details */}
@@ -277,6 +296,31 @@ const styles = StyleSheet.create({
   closeButtonText: {
     fontSize: 24,
     color: '#666',
+  },
+  summaryContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
+  },
+  summaryItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  summaryLabel: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 5,
+  },
+  summaryAmount: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  positive: {
+    color: '#28a745',
+  },
+  negative: {
+    color: '#dc3545',
   },
 });
 

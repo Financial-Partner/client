@@ -7,6 +7,7 @@ import {
   StatusBar,
   Image,
   Platform,
+  ImageSourcePropType,
 } from 'react-native'; // TouchableOpacity
 import {useNavigation} from '@react-navigation/native';
 import type {StackNavigationProp} from '@react-navigation/stack';
@@ -22,7 +23,7 @@ type RootStackParamList = {
   TransactionScreen: undefined;
 };
 
-const dinoImages: {[key: string]: any} = {
+const dinoImages: {[key: string]: ImageSourcePropType} = {
   blue_1: require('../assets/characters/blue_1.png'),
   blue_2: require('../assets/characters/blue_2.png'),
   green_1: require('../assets/characters/green_1.png'),
@@ -38,31 +39,60 @@ type NavigationProp = StackNavigationProp<RootStackParamList>;
 
 const HomeScreen = () => {
   const {user} = useAuth();
-  const [dinoImage, setDinoImage] = useState(null);
+  const [dinoImage, setDinoImage] = useState<ImageSourcePropType | null>(null);
+  const [monthlySaving, setMonthlySaving] = useState('0');
+  const [currentSaving, setCurrentSaving] = useState('0');
+
   const missions = [
     {title: '輸入交易紀錄', amount: 1000, isCompleted: false},
     {title: '添加額外收入', amount: 500, isCompleted: false},
     {title: '設定預算', amount: 2000, isCompleted: true},
     {title: '設定目標存款', amount: 3000, isCompleted: false},
   ];
-  const targetAmount = 10000;
-  const currentAmount = 5000;
 
   const navigation = useNavigation<NavigationProp>();
 
   useEffect(() => {
-    const loadDino = async () => {
+    const loadUserData = async () => {
       if (!user?.uid) {
         return;
       }
+
+      // Load dino image
       const key = `dino-${user.uid}`;
       const imageKey = await AsyncStorage.getItem(key);
       if (imageKey && dinoImages[imageKey]) {
         setDinoImage(dinoImages[imageKey]);
       }
+
+      // Load monthly saving target
+      const savedMonthlySaving = await AsyncStorage.getItem(
+        `monthlySaving-${user.uid}`,
+      );
+      if (savedMonthlySaving) {
+        setMonthlySaving(savedMonthlySaving);
+        console.log('Loaded monthly saving:', savedMonthlySaving);
+      }
+
+      // Load current saving
+      const savedCurrentSaving = await AsyncStorage.getItem(
+        `currentSaving-${user.uid}`,
+      );
+      if (savedCurrentSaving) {
+        setCurrentSaving(savedCurrentSaving);
+      } else {
+        setCurrentSaving('0');
+      }
     };
-    loadDino();
+
+    loadUserData();
   }, [user]);
+
+  // Calculate progress percentage
+  const progressPercentage = Math.min(
+    (parseInt(currentSaving, 10) / parseInt(monthlySaving, 10)) * 100,
+    100,
+  );
 
   return (
     <Layout>
@@ -73,19 +103,17 @@ const HomeScreen = () => {
             <Text style={styles.speechText}>一起往目標前進吧！</Text>
           </View>
           {dinoImage ? (
-            <Image
-              source={dinoImage}
-              style={[styles.mainCharacter, {width: 200, height: 200}]}
-            />
+            <Image source={dinoImage} style={styles.mainCharacter} />
           ) : (
             <Dinosaur height={200} width={200} style={styles.mainCharacter} />
           )}
         </View>
 
         <View style={styles.progressBar}>
-          <Progress.Bar progress={currentAmount / targetAmount} width={200} />
+          <Progress.Bar progress={progressPercentage / 100} width={200} />
           <Text style={styles.progressText}>
-            ${currentAmount}/${targetAmount}
+            NT$ {parseInt(currentSaving, 10).toLocaleString()} / NT${' '}
+            {parseInt(monthlySaving, 10).toLocaleString()}
           </Text>
         </View>
 
@@ -163,8 +191,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     alignSelf: 'flex-start',
     resizeMode: 'contain',
-    width: 150,
-    height: 150,
+    width: 200,
+    height: 200,
   },
   speechBubble: {
     backgroundColor: '#fff',

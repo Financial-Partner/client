@@ -22,7 +22,13 @@ apiClient.interceptors.request.use(
       !config.url?.includes(API_ENDPOINTS.AUTH_LOGIN) &&
       !config.url?.includes(API_ENDPOINTS.AUTH_REGISTER)
     ) {
-      config.headers.Authorization = `Bearer ${token}`;
+      if (token.split('.').length === 3) {
+        config.headers.Authorization = `Bearer ${token}`;
+      } else {
+        console.error('Invalid token format');
+        await AsyncStorage.removeItem('userToken');
+        await AsyncStorage.removeItem('refreshToken');
+      }
     }
     return config;
   },
@@ -42,10 +48,22 @@ apiClient.interceptors.response.use(
 
     const originalRequest = error.config as AxiosRequestConfig & {
       _retry?: boolean;
+      _refreshAttempts?: number;
     };
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
+      originalRequest._refreshAttempts =
+        (originalRequest._refreshAttempts || 0) + 1;
+
+      // Prevent infinite refresh loops
+      if (originalRequest._refreshAttempts > 3) {
+        await AsyncStorage.removeItem('userToken');
+        await AsyncStorage.removeItem('refreshToken');
+        await AsyncStorage.removeItem('isDummyToken');
+        console.error('Too many token refresh attempts, logging out user');
+        return Promise.reject(error);
+      }
 
       try {
         const refreshToken = await AsyncStorage.getItem('refreshToken');

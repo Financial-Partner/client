@@ -9,6 +9,9 @@ export const colors = {
   moneyBackground: '#8E8989',
   pressedBackground: '#f0f0f0',
   borderColor: '#eee',
+  accent: '#4CAF50',
+  disabled: '#CCCCCC',
+  white: '#FFFFFF',
 } as const;
 
 export type ColorKeys = keyof typeof colors;

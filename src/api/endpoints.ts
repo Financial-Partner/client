@@ -6,6 +6,7 @@ export const API_ENDPOINTS = {
 
   USER_ME: '/users/me',
   USER_UPDATE: '/users/me',
+  USER_CHARACTER: '/users/me/character',
 
   TRANSACTION: '/transactions',
 

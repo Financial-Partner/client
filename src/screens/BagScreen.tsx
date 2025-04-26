@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
   View,
   Text,
@@ -8,13 +8,15 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-import {useSelector} from 'react-redux';
+import {useSelector, useDispatch} from 'react-redux';
 import Layout from '../components/Layout';
 import {
   selectAllCharacters,
   selectInventory,
 } from '../store/selectors/characterSelectors';
 import {Character} from '../types/character';
+import {useAppSelector} from '../store';
+import {setSelectedDino} from '../store/slices/settingsSlice';
 
 const characterImages = {
   blue_1: require('../assets/characters/blue_1.png'),
@@ -29,17 +31,33 @@ const characterImages = {
 };
 
 const BagScreen = () => {
+  const dispatch = useDispatch();
   const allCharacters = useSelector(selectAllCharacters);
   const inventory = useSelector(selectInventory);
+  const {selectedDino} = useAppSelector(state => state.settings);
   const [selectedCharacter, setSelectedCharacter] =
     React.useState<Character | null>(null);
 
+  useEffect(() => {
+    // Update selected character when selectedDino changes
+    if (selectedDino) {
+      const character = allCharacters.find(char => char.id === selectedDino);
+      if (character) {
+        setSelectedCharacter(character);
+      }
+    }
+  }, [selectedDino, allCharacters]);
+
   const handleSelect = (character: Character) => {
-    setSelectedCharacter(character);
+    const quantity = getCharacterQuantity(character.id);
+    if (quantity > 0) {
+      setSelectedCharacter(character);
+      dispatch(setSelectedDino(character.id));
+    }
   };
 
   const getCharacterQuantity = (characterId: string) => {
-    const item = inventory.find(item => item.characterId === characterId);
+    const item = inventory.find(it => it.characterId === characterId);
     return item ? item.quantity : 0;
   };
 
@@ -47,59 +65,69 @@ const BagScreen = () => {
     <Layout>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <View style={styles.content}>
-        {selectedCharacter && (
-          <View style={styles.characterImg}>
-            <Image
-              source={
-                characterImages[
-                  selectedCharacter.id as keyof typeof characterImages
-                ] || characterImages.main_character
-              }
-              style={styles.mainImage}
-              resizeMode="contain"
-            />
-          </View>
-        )}
+        <View style={styles.previewSection}>
+          <Text style={styles.previewTitle}>當前夥伴角色</Text>
+          {selectedCharacter ? (
+            <View style={styles.characterImg}>
+              <Image
+                source={
+                  characterImages[
+                    selectedCharacter.id as keyof typeof characterImages
+                  ] || characterImages.main_character
+                }
+                style={styles.mainImage}
+                resizeMode="contain"
+              />
+            </View>
+          ) : (
+            <View style={styles.emptyPreview}>
+              <Text style={styles.emptyPreviewText}>尚未選擇夥伴角色</Text>
+            </View>
+          )}
+        </View>
 
-        <FlatList
-          data={allCharacters}
-          renderItem={({item: character}) => {
-            const quantity = getCharacterQuantity(character.id);
-            const isOwned = quantity > 0;
+        <View style={styles.characterListSection}>
+          <Text style={styles.listTitle}>角色列表</Text>
+          <FlatList
+            data={allCharacters}
+            renderItem={({item: character}) => {
+              const quantity = getCharacterQuantity(character.id);
+              const isOwned = quantity > 0;
 
-            return (
-              <TouchableOpacity
-                style={[
-                  styles.characterItem,
-                  selectedCharacter?.id === character.id && styles.selected,
-                  !isOwned && styles.unowned,
-                ]}
-                onPress={() => handleSelect(character)}>
-                <Image
-                  source={
-                    characterImages[
-                      character.id as keyof typeof characterImages
-                    ] || characterImages.main_character
-                  }
-                  style={styles.characterImage}
-                  resizeMode="contain"
-                />
-                {isOwned ? (
-                  <View style={styles.quantityBadge}>
-                    <Text style={styles.quantityText}>x{quantity}</Text>
-                  </View>
-                ) : (
-                  <View style={styles.lockOverlay}>
-                    <Text style={styles.lockText}>未擁有</Text>
-                  </View>
-                )}
-              </TouchableOpacity>
-            );
-          }}
-          keyExtractor={item => item.id}
-          numColumns={3}
-          contentContainerStyle={styles.characterContainer}
-        />
+              return (
+                <TouchableOpacity
+                  style={[
+                    styles.characterItem,
+                    selectedCharacter?.id === character.id && styles.selected,
+                    !isOwned && styles.unowned,
+                  ]}
+                  onPress={() => handleSelect(character)}>
+                  <Image
+                    source={
+                      characterImages[
+                        character.id as keyof typeof characterImages
+                      ] || characterImages.main_character
+                    }
+                    style={styles.characterImage}
+                    resizeMode="contain"
+                  />
+                  {isOwned ? (
+                    <View style={styles.quantityBadge}>
+                      <Text style={styles.quantityText}>x{quantity}</Text>
+                    </View>
+                  ) : (
+                    <View style={styles.lockOverlay}>
+                      <Text style={styles.lockText}>未擁有</Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              );
+            }}
+            keyExtractor={item => item.id}
+            numColumns={3}
+            contentContainerStyle={styles.characterContainer}
+          />
+        </View>
       </View>
     </Layout>
   );
@@ -110,17 +138,46 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
+  previewSection: {
+    marginBottom: 20,
+  },
+  previewTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
   characterImg: {
     width: '100%',
     height: 200,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 20,
-    marginBottom: 20,
+    backgroundColor: 'rgba(247, 245, 242, 0.6)',
   },
   mainImage: {
     width: 200,
     height: 200,
+  },
+  emptyPreview: {
+    width: '100%',
+    height: 200,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 20,
+    backgroundColor: 'rgba(247, 245, 242, 0.6)',
+  },
+  emptyPreviewText: {
+    fontSize: 16,
+    color: '#666',
+  },
+  characterListSection: {
+    flex: 1,
+  },
+  listTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
   },
   characterContainer: {
     backgroundColor: 'rgba(247, 245, 242, 0.6)',

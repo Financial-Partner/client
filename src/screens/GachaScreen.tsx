@@ -18,20 +18,9 @@ import {Character} from '../types/character';
 import {useAppSelector} from '../store';
 import {setDiamonds} from '../store/slices/settingsSlice';
 import {Diamond} from '../svg';
+import {getCharacterImage} from '../constants/characterImages';
 
 const GACHA_COST = 1000;
-
-const characterImages = {
-  blue_1: require('../assets/characters/blue_1.png'),
-  blue_2: require('../assets/characters/blue_2.png'),
-  green_1: require('../assets/characters/green_1.png'),
-  green_2: require('../assets/characters/green_2.png'),
-  green_3: require('../assets/characters/green_3.png'),
-  pink_1: require('../assets/characters/pink_1.png'),
-  yellow_1: require('../assets/characters/yellow_1.png'),
-  yellow_2: require('../assets/characters/yellow_2.png'),
-  main_character: require('../assets/characters/main_character.png'),
-};
 
 const GachaScreen = () => {
   const dispatch = useDispatch();
@@ -126,12 +115,9 @@ const GachaScreen = () => {
             <Animated.View
               style={[styles.spinningContainer, {transform: [{rotate: spin}]}]}>
               <Image
-                source={
-                  characterImages[
-                    allCharacters[currentCharacterIndex]
-                      .id as keyof typeof characterImages
-                  ] || characterImages.main_character
-                }
+                source={getCharacterImage(
+                  allCharacters[currentCharacterIndex].id,
+                )}
                 style={styles.spinningImage}
                 resizeMode="contain"
               />
@@ -143,10 +129,7 @@ const GachaScreen = () => {
                 {transform: [{scale: scaleValue}]},
               ]}>
               <Image
-                source={
-                  characterImages[result.id as keyof typeof characterImages] ||
-                  characterImages.main_character
-                }
+                source={getCharacterImage(result.id)}
                 style={styles.resultImage}
                 resizeMode="contain"
               />
@@ -155,7 +138,7 @@ const GachaScreen = () => {
           ) : (
             <View style={styles.placeholderContainer}>
               <Image
-                source={characterImages.main_character}
+                source={getCharacterImage('main_character')}
                 style={styles.placeholderImage}
                 resizeMode="contain"
               />

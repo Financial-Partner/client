@@ -1,5 +1,6 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {Character, CharacterInventory} from '../../types/character';
+import {characters} from '../../constants/characters';
 
 interface CharacterState {
   characters: Character[];
@@ -9,40 +10,10 @@ interface CharacterState {
 }
 
 const initialState: CharacterState = {
-  characters: [
-    {
-      id: 'blue_1',
-      imageUrl: '/assets/characters/blue_1.png',
-    },
-    {
-      id: 'blue_2',
-      imageUrl: '/assets/characters/blue_2.png',
-    },
-    {
-      id: 'green_1',
-      imageUrl: '/assets/characters/green_1.png',
-    },
-    {
-      id: 'green_2',
-      imageUrl: '/assets/characters/green_2.png',
-    },
-    {
-      id: 'green_3',
-      imageUrl: '/assets/characters/green_3.png',
-    },
-    {
-      id: 'pink_1',
-      imageUrl: '/assets/characters/pink_1.png',
-    },
-    {
-      id: 'yellow_1',
-      imageUrl: '/assets/characters/yellow_1.png',
-    },
-    {
-      id: 'yellow_2',
-      imageUrl: '/assets/characters/yellow_2.png',
-    },
-  ],
+  characters: characters.map(char => ({
+    id: char.id,
+    imageUrl: char.imageKey,
+  })),
   inventory: [],
   isLoading: false,
   error: null,

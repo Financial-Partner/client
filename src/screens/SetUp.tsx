@@ -20,6 +20,7 @@ import {settingsSlice} from '../store/slices/settingsSlice';
 import {colors} from '../theme/colors';
 import {useDispatch} from 'react-redux';
 import {addToInventory} from '../store/slices/characterSlice';
+import {characters} from '../constants/characters';
 
 type RootStackParamList = {
   MainTabs: undefined;
@@ -142,62 +143,7 @@ const SetUp = () => {
   };
 
   // Mock data for pet images
-  const dinosaurs = [
-    {
-      id: 1,
-      name: '寵物一',
-      imageKey: 'blue_1',
-      image: require('../assets/characters/blue_1.png'),
-    },
-    {
-      id: 2,
-      name: '寵物二',
-      imageKey: 'blue_2',
-      image: require('../assets/characters/blue_2.png'),
-    },
-    {
-      id: 3,
-      name: '寵物三',
-      imageKey: 'green_1',
-      image: require('../assets/characters/green_1.png'),
-    },
-    {
-      id: 4,
-      name: '寵物四',
-      imageKey: 'green_2',
-      image: require('../assets/characters/green_2.png'),
-    },
-    {
-      id: 5,
-      name: '寵物五',
-      imageKey: 'green_3',
-      image: require('../assets/characters/green_3.png'),
-    },
-    {
-      id: 6,
-      name: '寵物六',
-      imageKey: 'main_character',
-      image: require('../assets/characters/main_character.png'),
-    },
-    {
-      id: 7,
-      name: '寵物七',
-      imageKey: 'pink_1',
-      image: require('../assets/characters/pink_1.png'),
-    },
-    {
-      id: 8,
-      name: '寵物八',
-      imageKey: 'yellow_1',
-      image: require('../assets/characters/yellow_1.png'),
-    },
-    {
-      id: 9,
-      name: '寵物九',
-      imageKey: 'yellow_2',
-      image: require('../assets/characters/yellow_2.png'),
-    },
-  ];
+  const dinosaurs = characters;
 
   const handleNext = async () => {
     if (step === 1) {

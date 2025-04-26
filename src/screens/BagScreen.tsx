@@ -17,18 +17,7 @@ import {
 import {Character} from '../types/character';
 import {useAppSelector} from '../store';
 import {setSelectedDino} from '../store/slices/settingsSlice';
-
-const characterImages = {
-  blue_1: require('../assets/characters/blue_1.png'),
-  blue_2: require('../assets/characters/blue_2.png'),
-  green_1: require('../assets/characters/green_1.png'),
-  green_2: require('../assets/characters/green_2.png'),
-  green_3: require('../assets/characters/green_3.png'),
-  pink_1: require('../assets/characters/pink_1.png'),
-  yellow_1: require('../assets/characters/yellow_1.png'),
-  yellow_2: require('../assets/characters/yellow_2.png'),
-  main_character: require('../assets/characters/main_character.png'),
-};
+import {getCharacterImage} from '../constants/characterImages';
 
 const BagScreen = () => {
   const dispatch = useDispatch();
@@ -70,11 +59,7 @@ const BagScreen = () => {
           {selectedCharacter ? (
             <View style={styles.characterImg}>
               <Image
-                source={
-                  characterImages[
-                    selectedCharacter.id as keyof typeof characterImages
-                  ] || characterImages.main_character
-                }
+                source={getCharacterImage(selectedCharacter.id)}
                 style={styles.mainImage}
                 resizeMode="contain"
               />
@@ -103,11 +88,7 @@ const BagScreen = () => {
                   ]}
                   onPress={() => handleSelect(character)}>
                   <Image
-                    source={
-                      characterImages[
-                        character.id as keyof typeof characterImages
-                      ] || characterImages.main_character
-                    }
+                    source={getCharacterImage(character.id)}
                     style={styles.characterImage}
                     resizeMode="contain"
                   />

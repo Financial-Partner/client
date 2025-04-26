@@ -9,6 +9,7 @@ import {
   StatusBar,
   ScrollView,
   SafeAreaView,
+  Platform,
 } from 'react-native';
 import * as Progress from 'react-native-progress';
 import {useNavigation} from '@react-navigation/native';
@@ -263,7 +264,11 @@ const SetUp = () => {
                 </View>
               </View>
 
-              <View style={styles.inputContainer}>
+              <View
+                style={[
+                  styles.inputContainer,
+                  step === 2 && styles.inputContainerStep2,
+                ]}>
                 <Text style={styles.inputLabel}>每月收入</Text>
                 <TextInput
                   style={styles.input}
@@ -281,7 +286,11 @@ const SetUp = () => {
                 />
               </View>
 
-              <View style={styles.inputContainer}>
+              <View
+                style={[
+                  styles.inputContainer,
+                  step === 2 && styles.inputContainerStep2,
+                ]}>
                 <Text style={styles.inputLabel}>每月支出</Text>
                 <TextInput
                   style={styles.input}
@@ -299,7 +308,11 @@ const SetUp = () => {
                 />
               </View>
 
-              <View style={styles.inputContainer}>
+              <View
+                style={[
+                  styles.inputContainer,
+                  step === 2 && styles.inputContainerStep2,
+                ]}>
                 <Text style={styles.inputLabel}>每月存錢目標</Text>
                 <TextInput
                   style={styles.input}
@@ -344,7 +357,7 @@ const SetUp = () => {
             </TouchableOpacity>
           )}
           <TouchableOpacity
-            style={[styles.nextButton, {width: step === 2 ? '48%' : '100%'}]}
+            style={[styles.nextButton, step === 2 && styles.nextButtonStep2]}
             onPress={handleNext}>
             <Text style={styles.nextButtonText}>
               {step === 1 ? '下一步' : '完成'}
@@ -360,6 +373,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
+    paddingTop: Platform.select({
+      android: StatusBar.currentHeight,
+      ios: 44, // iOS 的安全區域高度
+    }),
   },
   content: {
     flex: 1,
@@ -439,7 +456,10 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   inputContainer: {
-    marginBottom: 20,
+    width: '100%',
+  },
+  inputContainerStep2: {
+    width: '48%',
   },
   inputLabel: {
     fontSize: 16,
@@ -494,6 +514,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#2196f3',
     padding: 15,
     borderRadius: 5,
+    width: '100%',
+  },
+  nextButtonStep2: {
+    width: '48%',
   },
   nextButtonText: {
     color: '#fff',

@@ -15,8 +15,9 @@ export const transactionService = {
   },
 
   getTransactions: async (): Promise<GetTransactionResponse> => {
-    // This will be handled by Redux state
-    return {transactions: []};
+    // Get transactions from Redux store
+    const state = require('../store').store.getState();
+    return {transactions: state.transactions.transactions};
   },
 };
 

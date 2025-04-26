@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import AppNavigator from './src/navigation/AppNavigator';
@@ -10,6 +10,7 @@ import {SWRProvider} from './src/api/swrConfig';
 import Config from 'react-native-config';
 import {Provider} from 'react-redux';
 import {store} from './src/store';
+import {initializationService} from './src/api/initializationService';
 
 const firebaseConfig = {
   apiKey: Config.FIREBASE_API_KEY || '',
@@ -29,6 +30,21 @@ const Stack = createStackNavigator();
 const AppContent = () => {
   const {loading, serverToken} = useAuth();
 
+  useEffect(() => {
+    console.log('AppContent mounted, starting initialization...');
+    const initializeAppData = async () => {
+      console.log('Calling initializeApp...');
+      try {
+        await initializationService.initializeApp();
+      } catch (error) {
+        console.error('Error initializing app:', error);
+      }
+      console.log('Initialization completed');
+    };
+
+    initializeAppData();
+  }, []);
+
   if (loading) {
     return <LoadingScreen />;
   }
@@ -47,6 +63,7 @@ const AppContent = () => {
 };
 
 function App(): React.JSX.Element {
+  console.log('App rendering...');
   return (
     <Provider store={store}>
       <SWRProvider>

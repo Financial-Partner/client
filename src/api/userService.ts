@@ -10,17 +10,21 @@ interface UserProfileResponse {
 
 export const userService = {
   getUserProfile: async (): Promise<UserProfileResponse> => {
+    const store = require('../store').store;
+    const state = store.getState();
     return {
       wallet: {
-        diamonds: 5000,
+        diamonds: state.settings.diamonds,
       },
     };
   },
 
   updateDiamonds: async (amount: number): Promise<UserProfileResponse> => {
+    const store = require('../store').store;
+    const state = store.getState();
     return {
       wallet: {
-        diamonds: amount,
+        diamonds: state.settings.diamonds + amount,
       },
     };
   },
@@ -35,18 +39,15 @@ export const useUserProfile = () => {
     const loadUserProfile = async () => {
       const profile = await userService.getUserProfile();
       setUser(profile);
-      dispatch(settingsSlice.actions.setDiamonds(profile.wallet.diamonds));
     };
 
     loadUserProfile();
-  }, [dispatch]);
+  }, [diamonds]);
 
   const updateDiamonds = async (amount: number) => {
     try {
       dispatch(settingsSlice.actions.addDiamonds(amount));
-      const updatedProfile = await userService.updateDiamonds(
-        diamonds + amount,
-      );
+      const updatedProfile = await userService.updateDiamonds(amount);
       setUser(updatedProfile);
     } catch (error) {
       console.error('Error updating diamonds:', error);

@@ -40,6 +40,14 @@ const TransactionScreen: React.FC = () => {
     transaction_type: 'INCOME' | 'EXPENSE',
     date: Date,
   ) => {
+    console.log(
+      'Adding transaction:',
+      amount,
+      category,
+      transaction_type,
+      date,
+    );
+
     const newTransaction: Transaction = {
       id: Date.now().toString(),
       amount,
@@ -50,16 +58,23 @@ const TransactionScreen: React.FC = () => {
     };
 
     try {
+      // Add the transaction
+      console.log('Dispatching addTransaction');
       await addTransaction(newTransaction);
+
+      // Update mission status based on transaction type
+      if (transaction_type === 'INCOME' && amount >= 500) {
+        // Only update income mission if it's a new income transaction
+        await updateMission('income', true);
+      } else if (transaction_type === 'EXPENSE') {
+        // Only update transaction mission if it's a new expense transaction
+        await updateMission('transaction', true);
+      }
+
+      // Close modal after transaction is added
       setModalVisible(false);
 
-      // Check and update transaction mission
-      await updateMission('transaction', true);
-
-      // Check and update income mission
-      if (transaction_type === 'INCOME' && amount >= 500) {
-        await updateMission('income', true);
-      }
+      console.log('Transaction added successfully');
     } catch (error) {
       console.error('Error handling transaction:', error);
     }

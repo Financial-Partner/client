@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -8,18 +8,16 @@ import {
   Image,
   Platform,
   ImageSourcePropType,
-} from 'react-native'; // TouchableOpacity
-import {useNavigation, useFocusEffect} from '@react-navigation/native';
+} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 import type {StackNavigationProp} from '@react-navigation/stack';
 import * as Progress from 'react-native-progress';
 
 import Layout from '../components/Layout';
 import Mission from '../components/Mission';
-import {useAuth} from '../contexts/AuthContext';
 import {useUserProfile} from '../api/userService';
 import {Dinosaur} from '../svg';
 import {useMissions} from '../api/missionService';
-import {transactionService} from '../api/transactionService';
 import {useAppSelector} from '../store';
 
 type RootStackParamList = {
@@ -41,57 +39,19 @@ const dinoImages: {[key: string]: ImageSourcePropType} = {
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 
 const HomeScreen = () => {
-  const {user} = useAuth();
   const {user: userProfile} = useUserProfile();
   const [dinoImage, setDinoImage] = useState<ImageSourcePropType | null>(null);
   const {monthlySaving, currentSaving, selectedDino} = useAppSelector(
     state => state.settings,
   );
-  const {missions, updateMission, initializeMissions} = useMissions();
-
+  const {missions} = useMissions();
   const navigation = useNavigation<NavigationProp>();
 
-  const loadUserData = useCallback(async () => {
-    if (!user?.uid) {
-      return;
-    }
-
-    // Load dino image
+  useEffect(() => {
     if (selectedDino && dinoImages[selectedDino]) {
       setDinoImage(dinoImages[selectedDino]);
     }
-
-    // Load missions
-    let loadedMissions = await initializeMissions();
-    if (loadedMissions.length === 0) {
-      loadedMissions = await initializeMissions();
-    }
-
-    // Check transaction mission
-    const transactions = await transactionService.getTransactions();
-    const hasTransactions = transactions.transactions.length > 0;
-    if (hasTransactions) {
-      await updateMission('transaction', true);
-    }
-
-    // Check income mission
-    const hasIncome = transactions.transactions.some(
-      t => t.type === 'INCOME' && t.amount >= 500,
-    );
-    if (hasIncome) {
-      await updateMission('income', true);
-    }
-  }, [user?.uid, selectedDino, initializeMissions, updateMission]);
-
-  useEffect(() => {
-    loadUserData();
-  }, [loadUserData]);
-
-  useFocusEffect(
-    useCallback(() => {
-      loadUserData();
-    }, [loadUserData]),
-  );
+  }, [selectedDino]);
 
   // Calculate progress percentage
   const progressPercentage = Math.min(
@@ -124,13 +84,18 @@ const HomeScreen = () => {
         </View>
 
         <View style={styles.missionContainer}>
-          {missions.map((mission, index) => (
-            <Mission
-              key={index}
-              mission={mission}
-              diamonds={userProfile?.wallet?.diamonds || 0}
-            />
-          ))}
+          <Text style={styles.missionTitle}>任務清單</Text>
+          {missions && missions.length > 0 ? (
+            missions.map(mission => (
+              <Mission
+                key={mission.id}
+                mission={mission}
+                diamonds={userProfile?.wallet?.diamonds || 0}
+              />
+            ))
+          ) : (
+            <Text style={styles.noMissionsText}>目前沒有任務</Text>
+          )}
         </View>
 
         <Pressable
@@ -146,7 +111,7 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   content: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'center',
     padding: 20,
   },
@@ -158,11 +123,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   missionContainer: {
-    flexDirection: 'column',
-    justifyContent: 'space-between',
     width: '100%',
     paddingHorizontal: 20,
     marginBottom: 30,
+    marginTop: 10,
+  },
+  missionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#333',
+  },
+  noMissionsText: {
+    fontSize: 14,
+    color: '#666',
+    textAlign: 'center',
     marginTop: 10,
   },
   button: {

@@ -56,6 +56,12 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({
   );
   const skipAuth = Config.SKIP_AUTH === 'true';
 
+  useEffect(() => {
+    GoogleSignin.configure({
+      webClientId: Config.GOOGLE_WEB_CLIENT_ID,
+    });
+  }, []);
+
   const refreshAccessToken = useCallback(
     async (_: string) => {
       try {
@@ -155,11 +161,11 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({
   }, [dispatch, exchangeFirebaseToken, refreshAccessToken]);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async user => {
-      setUser(user);
-      if (user) {
+    const unsubscribe = auth.onAuthStateChanged(async currentUser => {
+      setUser(currentUser);
+      if (currentUser) {
         try {
-          const firebaseToken = await user.getIdToken();
+          const firebaseToken = await currentUser.getIdToken();
           setToken(firebaseToken);
           await exchangeFirebaseToken(firebaseToken);
         } catch (error) {

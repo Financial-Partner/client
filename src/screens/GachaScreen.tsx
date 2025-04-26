@@ -8,12 +8,18 @@ import {
   Image,
   Animated,
   Easing,
+  Alert,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import Layout from '../components/Layout';
 import {selectAllCharacters} from '../store/selectors/characterSelectors';
 import {addToInventory} from '../store/slices/characterSlice';
 import {Character} from '../types/character';
+import {useAppSelector} from '../store';
+import {setDiamonds} from '../store/slices/settingsSlice';
+import {Diamond} from '../svg';
+
+const GACHA_COST = 1000;
 
 const characterImages = {
   blue_1: require('../assets/characters/blue_1.png'),
@@ -30,6 +36,7 @@ const characterImages = {
 const GachaScreen = () => {
   const dispatch = useDispatch();
   const allCharacters = useSelector(selectAllCharacters);
+  const {diamonds} = useAppSelector(state => state.settings);
   const [isSpinning, setIsSpinning] = useState(false);
   const [result, setResult] = useState<Character | null>(null);
   const [showResult, setShowResult] = useState(false);
@@ -44,7 +51,13 @@ const GachaScreen = () => {
   });
 
   const handleGacha = () => {
-    if (isSpinning) {return;}
+    if (isSpinning) {
+      return;
+    }
+    if (diamonds < GACHA_COST) {
+      Alert.alert('鑽石不足', '需要 100 鑽石才能抽卡');
+      return;
+    }
 
     setIsSpinning(true);
     setShowResult(false);
@@ -69,8 +82,9 @@ const GachaScreen = () => {
       const randomIndex = Math.floor(Math.random() * allCharacters.length);
       const selectedCharacter = allCharacters[randomIndex];
 
-      // Add to inventory
+      // Add to inventory and deduct diamonds
       dispatch(addToInventory(selectedCharacter.id));
+      dispatch(setDiamonds(diamonds - GACHA_COST));
 
       // Show result with animation
       setResult(selectedCharacter);
@@ -138,11 +152,20 @@ const GachaScreen = () => {
         </View>
 
         <TouchableOpacity
-          style={[styles.gachaButton, isSpinning && styles.disabledButton]}
+          style={[
+            styles.gachaButton,
+            (isSpinning || diamonds < GACHA_COST) && styles.disabledButton,
+          ]}
           onPress={handleGacha}
-          disabled={isSpinning}>
+          disabled={isSpinning || diamonds < GACHA_COST}>
           <Text style={styles.buttonText}>
             {isSpinning ? '抽卡中...' : '抽卡'}
+            {!isSpinning && (
+              <>
+                <Diamond height={16} width={16} style={styles.diamond} />
+                <Text style={styles.buttonText}>1,000</Text>
+              </>
+            )}
           </Text>
         </TouchableOpacity>
       </View>
@@ -159,7 +182,23 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 30,
+    marginBottom: 20,
+  },
+  diamondInfo: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: 20,
+    paddingHorizontal: 20,
+  },
+  diamondText: {
+    fontSize: 16,
+    color: '#007BFF',
+    fontWeight: 'bold',
+  },
+  costText: {
+    fontSize: 16,
+    color: '#666',
   },
   gachaContainer: {
     width: '100%',
@@ -224,6 +263,9 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  diamond: {
+    marginRight: 5,
   },
 });
 

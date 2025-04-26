@@ -62,7 +62,7 @@ const BagScreen = () => {
   };
 
   return (
-    <Layout>
+    <Layout scrollable={false}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <View style={styles.content}>
         <View style={styles.previewSection}>
@@ -126,6 +126,7 @@ const BagScreen = () => {
             keyExtractor={item => item.id}
             numColumns={3}
             contentContainerStyle={styles.characterContainer}
+            ListFooterComponent={<View style={styles.footer} />}
           />
         </View>
       </View>
@@ -235,6 +236,9 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 12,
     fontWeight: 'bold',
+  },
+  footer: {
+    height: 20,
   },
 });
 

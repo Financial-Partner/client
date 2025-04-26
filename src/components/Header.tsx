@@ -30,7 +30,6 @@ const Header = () => {
   const navigation = useNavigation<NavigationProp>();
   const {diamonds} = useUserProfile();
   const isLoading = false;
-  console.log('diamonds', diamonds);
 
   return (
     <View style={styles.container}>

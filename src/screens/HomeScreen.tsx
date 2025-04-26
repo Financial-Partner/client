@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback, useMemo} from 'react';
 import {
   View,
   Text,
@@ -46,6 +46,30 @@ const HomeScreen = () => {
   );
   const {missions} = useMissions();
   const navigation = useNavigation<NavigationProp>();
+  const [greating, setGreating] = useState<string | null>(null);
+
+  const greatings = useMemo(
+    () => [
+      '主人 ! 今天還沒填寫交易紀錄喔~',
+      '加油 ! 距離目標還差一點點 !',
+      '今天天氣很好呢~',
+      '哇 ! 主人今天賺好多 ! 百萬富翁就是你 !',
+      '好喜歡看到存款變胖胖的樣子呢～',
+      '錢包又瘦了，趕緊存錢阿～',
+      '一起慢慢變有錢的小恐龍吧🦖',
+      '跌倒沒關係，主人我陪你一起再站起來！',
+    ],
+    [],
+  );
+
+  const randomizeGreating = useCallback(() => {
+    const randomIndex = Math.floor(Math.random() * greatings.length);
+    setGreating(greatings[randomIndex]);
+  }, [greatings]);
+
+  useEffect(() => {
+    randomizeGreating();
+  }, [randomizeGreating]);
 
   useEffect(() => {
     if (selectedDino && dinoImages[selectedDino]) {
@@ -66,10 +90,12 @@ const HomeScreen = () => {
       <View style={styles.content}>
         <View style={styles.characterContainer}>
           <View style={styles.speechBubble}>
-            <Text style={styles.speechText}>一起往目標前進吧！</Text>
+            <Text style={styles.speechText}>{greating}</Text>
           </View>
           {dinoImage ? (
-            <Image source={dinoImage} style={styles.mainCharacter} />
+            <Pressable onPress={randomizeGreating}>
+              <Image source={dinoImage} style={styles.mainCharacter} />
+            </Pressable>
           ) : (
             <Dinosaur height={200} width={200} style={styles.mainCharacter} />
           )}

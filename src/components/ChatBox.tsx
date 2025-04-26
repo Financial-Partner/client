@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useRef, useState, useEffect, useMemo, useCallback} from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,10 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
+  Image,
+  ImageSourcePropType,
 } from 'react-native';
+import {useAppSelector} from '../store';
 
 type Message = {
   id: string;
@@ -20,24 +23,63 @@ const generateUniqueId = (): string => {
   return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 };
 
+const dinoImages: {[key: string]: ImageSourcePropType} = {
+  blue_1: require('../assets/characters/blue_1.png'),
+  blue_2: require('../assets/characters/blue_2.png'),
+  green_1: require('../assets/characters/green_1.png'),
+  green_2: require('../assets/characters/green_2.png'),
+  green_3: require('../assets/characters/green_3.png'),
+  main_character: require('../assets/characters/main_character.png'),
+  pink_1: require('../assets/characters/pink_1.png'),
+  yellow_1: require('../assets/characters/yellow_1.png'),
+  yellow_2: require('../assets/characters/yellow_2.png'),
+};
+
 const ChatBox: React.FC = () => {
   const [message, setMessage] = useState<string>('');
   const [messages, setMessages] = useState<Message[]>([]);
   const scrollViewRef = useRef<ScrollView>(null);
+  const [dinoImage, setDinoImage] = useState<ImageSourcePropType>(
+    dinoImages.main_character,
+  );
+  const {selectedDino} = useAppSelector(state => state.settings);
 
-  const generateAIResponse = () => {
-    const responses = [
-      "I'm here to help!",
-      "That's interesting. Can you tell me more?",
-      'I see. What do you think?',
-      'Great question! Let me think...',
-      'Hmm, let me look into that.',
-    ];
+  const responses = useMemo(
+    () => [
+      '最近吃的有點多? 主人吃了甚麼好吃的',
+      '哇 ! 賽克希也想嚐嚐看 !',
+      '主人好厲害 ! 最近投資報酬率很高喔~ ',
+      '主人別灰心 ! 投資有風險~ 試試看其他的吧?',
+      '這週的開銷比上週少了1000元，請繼續加油喔 !',
+    ],
+    [],
+  );
+
+  const generateAIResponse = useCallback(() => {
     return responses[Math.floor(Math.random() * responses.length)];
-  };
+  }, [responses]);
+
+  useEffect(() => {
+    if (selectedDino && dinoImages[selectedDino]) {
+      setDinoImage(dinoImages[selectedDino]);
+    }
+  }, [selectedDino]);
+
+  useEffect(() => {
+    // set a render message when the component mounts
+    const initialMessage: Message = {
+      id: generateUniqueId(),
+      text: generateAIResponse(),
+      sender: 'ai',
+    };
+    setMessages(prev => [...prev, initialMessage]);
+    scrollViewRef.current?.scrollToEnd({animated: true});
+  }, [generateAIResponse]);
 
   const sendMessage = () => {
-    if (message.trim() === '') {return;}
+    if (message.trim() === '') {
+      return;
+    }
 
     setMessages(prev => [
       ...prev,
@@ -65,16 +107,22 @@ const ChatBox: React.FC = () => {
         onContentSizeChange={() =>
           scrollViewRef.current?.scrollToEnd({animated: true})
         }>
-        {messages.map(item => (
-          <View
-            key={item.id}
-            style={[
-              styles.chatBubble,
-              item.sender === 'user' ? styles.userBubble : styles.aiBubble,
-            ]}>
-            <Text style={styles.chatText}>{item.text}</Text>
-          </View>
-        ))}
+        {messages.map(item =>
+          item.sender === 'user' ? (
+            <View key={item.id} style={[styles.chatBubble, styles.userBubble]}>
+              <Text style={styles.chatText}>{item.text}</Text>
+            </View>
+          ) : (
+            <View key={item.id} style={styles.aiContainer}>
+              <View style={styles.avatarContainer}>
+                <Image source={dinoImage} style={styles.avatar} />
+              </View>
+              <View style={[styles.chatBubble, styles.aiBubble]}>
+                <Text style={styles.aiChatText}>{item.text}</Text>
+              </View>
+            </View>
+          ),
+        )}
       </ScrollView>
 
       {/* Chat Input */}
@@ -123,10 +171,19 @@ const styles = StyleSheet.create({
   },
   aiBubble: {
     backgroundColor: '#e0e0e0',
-    alignSelf: 'flex-start',
+    // alignSelf: 'flex-start',
+  },
+  aiContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginVertical: 5,
   },
   chatText: {
     color: '#fff',
+    fontSize: 16,
+  },
+  aiChatText: {
+    color: '#333',
     fontSize: 16,
   },
   chatInputContainer: {
@@ -158,6 +215,20 @@ const styles = StyleSheet.create({
   sendButtonText: {
     color: '#fff',
     fontWeight: 'bold',
+  },
+  avatarContainer: {
+    width: 30,
+    height: 30,
+    marginRight: 10,
+  },
+  avatar: {
+    alignSelf: 'flex-start',
+    resizeMode: 'cover',
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    borderWidth: 2,
+    borderColor: '#ddd',
   },
 });
 

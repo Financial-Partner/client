@@ -7,6 +7,7 @@ import {
   FlatList,
   TouchableOpacity,
   Image,
+  Platform,
 } from 'react-native';
 import {useSelector, useDispatch} from 'react-redux';
 import Layout from '../components/Layout';

@@ -37,6 +37,7 @@ const GachaScreen = () => {
   const dispatch = useDispatch();
   const allCharacters = useSelector(selectAllCharacters);
   const {diamonds} = useAppSelector(state => state.settings);
+  const [currentCharacterIndex, setCurrentCharacterIndex] = useState(0);
   const [isSpinning, setIsSpinning] = useState(false);
   const [result, setResult] = useState<Character | null>(null);
   const [showResult, setShowResult] = useState(false);
@@ -61,6 +62,12 @@ const GachaScreen = () => {
 
     setIsSpinning(true);
     setShowResult(false);
+    setCurrentCharacterIndex(0);
+
+    // Start character rotation animation
+    const characterInterval = setInterval(() => {
+      setCurrentCharacterIndex(prev => (prev + 1) % allCharacters.length);
+    }, 100);
 
     // Start spinning animation
     Animated.loop(
@@ -74,7 +81,8 @@ const GachaScreen = () => {
 
     // Simulate gacha process
     setTimeout(() => {
-      // Stop spinning
+      // Stop spinning and character rotation
+      clearInterval(characterInterval);
       spinValue.stopAnimation();
       spinValue.setValue(0);
 
@@ -118,7 +126,12 @@ const GachaScreen = () => {
             <Animated.View
               style={[styles.spinningContainer, {transform: [{rotate: spin}]}]}>
               <Image
-                source={characterImages.main_character}
+                source={
+                  characterImages[
+                    allCharacters[currentCharacterIndex]
+                      .id as keyof typeof characterImages
+                  ] || characterImages.main_character
+                }
                 style={styles.spinningImage}
                 resizeMode="contain"
               />

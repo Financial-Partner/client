@@ -55,7 +55,7 @@ const GachaScreen = () => {
       return;
     }
     if (diamonds < GACHA_COST) {
-      Alert.alert('鑽石不足', '需要 100 鑽石才能抽卡');
+      Alert.alert('鑽石不足', '需要 1000 鑽石才能抽卡');
       return;
     }
 
@@ -158,15 +158,17 @@ const GachaScreen = () => {
           ]}
           onPress={handleGacha}
           disabled={isSpinning || diamonds < GACHA_COST}>
-          <Text style={styles.buttonText}>
-            {isSpinning ? '抽卡中...' : '抽卡'}
+          <View style={styles.buttonContent}>
+            <Text style={styles.buttonText}>
+              {isSpinning ? '抽卡中...' : '抽卡'}
+            </Text>
             {!isSpinning && (
-              <>
+              <View style={styles.costContainer}>
                 <Diamond height={16} width={16} style={styles.diamond} />
                 <Text style={styles.buttonText}>1,000</Text>
-              </>
+              </View>
             )}
-          </Text>
+          </View>
         </TouchableOpacity>
       </View>
     </Layout>
@@ -259,10 +261,20 @@ const styles = StyleSheet.create({
   disabledButton: {
     backgroundColor: '#999',
   },
+  buttonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   buttonText: {
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  costContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 5,
   },
   diamond: {
     marginRight: 5,

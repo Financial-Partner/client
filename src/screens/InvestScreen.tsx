@@ -3,8 +3,13 @@ import {View, Text, StyleSheet, StatusBar} from 'react-native';
 import Layout from '../components/Layout';
 import InvestmentChance from '../components/InvestmentChance';
 import {Diamond, UpArrow, DownArrow} from '../svg';
+import {setDiamonds} from '../store/slices/settingsSlice';
+import {useDispatch} from 'react-redux';
+import {useAppSelector} from '../store';
 
 const InvestScreen = () => {
+  const dispatch = useDispatch();
+  const {diamonds} = useAppSelector(state => state.settings);
   const chances = [
     {
       title: '房地產',
@@ -42,7 +47,7 @@ const InvestScreen = () => {
       tags: ['高風險', '1年'],
     },
   ];
-  const isIncrease = false;
+  const isIncrease = true;
   const [totalInvestment, setTotalInvestment] = React.useState(0);
 
   const formatInvestment = (amount: number) => {
@@ -51,6 +56,7 @@ const InvestScreen = () => {
 
   const handleSubmitInvestment = (amount: number) => {
     setTotalInvestment(prev => prev + amount);
+    dispatch(setDiamonds(diamonds - amount));
   };
 
   return (
@@ -75,7 +81,7 @@ const InvestScreen = () => {
               ) : (
                 <DownArrow width={18} height={18} style={styles.icon} />
               )}
-              <Text style={styles.summaryContent}>10.5%</Text>
+              <Text style={styles.summaryContent}>0%</Text>
             </View>
           </View>
         </View>

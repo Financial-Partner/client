@@ -1,4 +1,4 @@
-import {View, Text, StyleSheet, Button, TextInput} from 'react-native';
+import {View, Text, StyleSheet, Button, TextInput, Alert} from 'react-native';
 import React, {useState} from 'react';
 
 import {DownArrow, UpArrow} from '../svg';
@@ -22,6 +22,8 @@ const InvestmentChance = ({chance, onSubmit}: chanceProps) => {
     if (!isNaN(amount) && amount >= parseInt(chance.min_amount, 10)) {
       onSubmit(amount);
       setInvestmentAmount(''); // Clear the input after submission
+    } else {
+      Alert.alert('請輸入有效的投資金額(大於最小投資金額)');
     }
   };
 

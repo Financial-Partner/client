@@ -70,6 +70,11 @@ const BagScreen = () => {
           <Text style={styles.previewTitle}>當前夥伴角色</Text>
           {selectedCharacter ? (
             <View style={styles.characterImg}>
+              <View style={styles.speechBubble}>
+                <Text style={styles.speechText}>
+                  {selectedCharacter.message}
+                </Text>
+              </View>
               <Image
                 source={
                   characterImages[
@@ -155,11 +160,38 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 20,
-    backgroundColor: 'rgba(247, 245, 242, 0.6)',
+    flexDirection: 'row',
   },
   mainImage: {
     width: 200,
     height: 200,
+  },
+  speechBubble: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 10,
+    marginLeft: 10,
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: {
+          width: 0,
+          height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+      },
+      android: {
+        elevation: 0,
+      },
+    }),
+  },
+  speechText: {
+    fontSize: 16,
+    color: '#333',
   },
   emptyPreview: {
     width: '100%',

@@ -1,36 +1,40 @@
-import {StyleSheet, View, Text} from 'react-native';
+import {StyleSheet, View, Text, Platform} from 'react-native';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
-
 import {Diamond} from '../svg';
+import type {Mission as MissionType} from '../store/slices/missionSlice';
 
 type MissionProps = {
-  mission: {
-    title: string;
-    amount: number;
-    isCompleted: boolean;
-  };
+  mission: MissionType;
+  diamonds: number;
 };
 
 const Mission = ({mission}: MissionProps) => {
-  // const [isSelected, setSelection] = useState(false);
-
   return (
     <View style={styles.mission}>
       <View style={styles.missionLeft}>
         <View style={styles.checkbox}>
           <BouncyCheckbox
             isChecked={mission.isCompleted}
-            useBuiltInState={false}
-            // onPress={(isChecked: boolean) => {mission.isCompleted = isChecked}}
+            useBuiltInState={true}
             size={18}
             disableText={true}
+            fillColor="#007BFF"
+            unFillColor="#FFFFFF"
+            iconStyle={styles.checkboxIcon}
+            disabled={true}
           />
         </View>
-        <Text style={styles.missionTitle}>{mission.title}</Text>
+        <Text
+          style={[
+            styles.missionTitle,
+            mission.isCompleted && styles.completedMission,
+          ]}>
+          {mission.title}
+        </Text>
       </View>
       <View style={styles.missionReward}>
         <Diamond width={20} height={20} />
-        <Text>{mission.amount}</Text>
+        <Text style={styles.rewardAmount}>{mission.amount}</Text>
       </View>
     </View>
   );
@@ -38,7 +42,6 @@ const Mission = ({mission}: MissionProps) => {
 
 const styles = StyleSheet.create({
   mission: {
-    flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -48,9 +51,29 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     width: '100%',
     borderRadius: 10,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: {
+          width: 0,
+          height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+      },
+      android: {
+        elevation: 5,
+      },
+    }),
   },
   missionTitle: {
     fontSize: 14,
+    color: '#000',
+    flex: 1,
+  },
+  completedMission: {
+    textDecorationLine: 'line-through',
+    color: '#666',
   },
   missionText: {
     fontSize: 14,
@@ -58,16 +81,23 @@ const styles = StyleSheet.create({
   checkbox: {
     marginRight: 10,
   },
+  checkboxIcon: {
+    borderColor: '#007BFF',
+  },
   missionLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'flex-start',
+    flex: 1,
   },
   missionReward: {
-    width: 70,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    marginLeft: 10,
+  },
+  rewardAmount: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginLeft: 5,
   },
 });
 

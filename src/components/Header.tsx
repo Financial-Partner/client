@@ -28,8 +28,9 @@ const formatNumber = (num: number): string => {
 
 const Header = () => {
   const navigation = useNavigation<NavigationProp>();
-  const {user, isLoading} = useUserProfile();
-  const diamonds = user?.wallet?.diamonds || 0;
+  const {diamonds} = useUserProfile();
+  const isLoading = false;
+  console.log('diamonds', diamonds);
 
   return (
     <View style={styles.container}>

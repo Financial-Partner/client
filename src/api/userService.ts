@@ -1,58 +1,58 @@
-import apiClient from './client';
-import {API_ENDPOINTS} from './endpoints';
-import useSWR from 'swr';
-import {useAuth} from '../contexts/AuthContext';
+import {useState, useEffect} from 'react';
+import {useAppDispatch, useAppSelector} from '../store';
+import {settingsSlice} from '../store/slices/settingsSlice';
 
 interface UserProfileResponse {
   wallet: {
     diamonds: number;
-    saving: number;
   };
 }
 
 export const userService = {
   getUserProfile: async (): Promise<UserProfileResponse> => {
-    const response = await apiClient.get(API_ENDPOINTS.USER_ME);
-    return response.data;
+    const store = require('../store').store;
+    const state = store.getState();
+    return {
+      wallet: {
+        diamonds: state.settings.diamonds,
+      },
+    };
   },
 
-  updateUserProfile: async (userData: any) => {
-    const response = await apiClient.put(API_ENDPOINTS.USER_UPDATE, userData);
-    return response.data;
+  updateDiamonds: async (amount: number): Promise<UserProfileResponse> => {
+    const store = require('../store').store;
+    const state = store.getState();
+    return {
+      wallet: {
+        diamonds: state.settings.diamonds + amount,
+      },
+    };
   },
 };
 
 export const useUserProfile = () => {
-  const {serverToken} = useAuth();
-  const {data, error, isLoading, mutate} = useSWR<UserProfileResponse>(
-    serverToken ? API_ENDPOINTS.USER_ME : null,
-  );
+  const dispatch = useAppDispatch();
+  const diamonds = useAppSelector(state => state.settings.diamonds);
+  const [user, setUser] = useState<UserProfileResponse | null>(null);
 
-  return {
-    user: data,
-    isLoading,
-    isError: error,
-    mutate,
-  };
-};
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      const profile = await userService.getUserProfile();
+      setUser(profile);
+    };
 
-export const useUserProfileManager = () => {
-  const {user, isLoading, isError, mutate} = useUserProfile();
+    loadUserProfile();
+  }, [diamonds]);
 
-  const updateProfile = async (userData: any) => {
+  const updateDiamonds = async (amount: number) => {
     try {
-      const updatedUser = await userService.updateUserProfile(userData);
-      mutate(updatedUser, false);
-      return updatedUser;
+      dispatch(settingsSlice.actions.addDiamonds(amount));
+      const updatedProfile = await userService.updateDiamonds(amount);
+      setUser(updatedProfile);
     } catch (error) {
-      throw error;
+      console.error('Error updating diamonds:', error);
     }
   };
 
-  return {
-    user,
-    isLoading,
-    isError,
-    updateProfile,
-  };
+  return {user, setUser, diamonds, updateDiamonds};
 };

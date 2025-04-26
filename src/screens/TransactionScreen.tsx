@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -10,19 +10,23 @@ import {
 } from 'react-native';
 import TransactionForm from '../components/TransactionForm';
 import Layout from '../components/Layout';
-import {transactionService, Transaction} from '../api/transactionService';
+import {Transaction} from '../store/slices/transactionSlice';
+import {useTransactions} from '../api/transactionService';
+import {useMissions} from '../api/missionService';
 
 const TransactionScreen: React.FC = () => {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isModalVisible, setModalVisible] = useState(false);
-  const [budget, setBudget] = useState<number>(10000); // setting Budget
+  const [budget, setBudget] = useState<number>(10000);
+  const {transactions, addTransaction} = useTransactions();
+  const {updateMission} = useMissions();
+
   const totalIncome = transactions
-    .filter(t => t.transaction_type === 'Income')
+    .filter(t => t.type === 'INCOME')
     .reduce((sum, t) => sum + t.amount, 0);
   const totalExpense = transactions
-    .filter(t => t.transaction_type === 'Expense')
+    .filter(t => t.type === 'EXPENSE')
     .reduce((sum, t) => sum + t.amount, 0);
-  const remainingBudget = budget - totalExpense; // Remain balance
+  const monthlyBalance = totalIncome - totalExpense;
 
   const formattedDate = (d: Date) => {
     return `${d.getFullYear()}-${(d.getMonth() + 1)
@@ -33,70 +37,106 @@ const TransactionScreen: React.FC = () => {
   const handleAddTransaction = async (
     amount: number,
     category: string,
-    transaction_type: 'Income' | 'Expense',
+    transaction_type: 'INCOME' | 'EXPENSE',
     date: Date,
   ) => {
+    console.log(
+      'Adding transaction:',
+      amount,
+      category,
+      transaction_type,
+      date,
+    );
+
     const newTransaction: Transaction = {
+      id: Date.now().toString(),
       amount,
       description: '',
       date: formattedDate(date),
       category,
-      transaction_type: transaction_type,
+      type: transaction_type,
     };
-    const updatedTransactions = [newTransaction, ...transactions].sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-    );
 
-    setTransactions(updatedTransactions); //sort by newest
-    setModalVisible(false);
     try {
-      await transactionService.createTransaction(newTransaction);
+      // Add the transaction
+      console.log('Dispatching addTransaction');
+      await addTransaction(newTransaction);
+
+      // Update mission status based on transaction type
+      if (transaction_type === 'INCOME' && amount >= 500) {
+        // Only update income mission if it's a new income transaction
+        await updateMission('income', true);
+      } else if (transaction_type === 'EXPENSE') {
+        // Only update transaction mission if it's a new expense transaction
+        await updateMission('transaction', true);
+      }
+
+      // Close modal after transaction is added
+      setModalVisible(false);
+
+      console.log('Transaction added successfully');
     } catch (error) {
-      console.error('Error creating transaction:', error);
+      console.error('Error handling transaction:', error);
     }
   };
 
-  useEffect(() => {
-    const fetchTransactions = async () => {
-      try {
-        const response = await transactionService.getTransactions();
-        const sortedTransactions = response.transactions.sort(
-          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-        );
-        setTransactions(sortedTransactions);
-      } catch (error) {
-        console.error('Error fetching transactions:', error);
-      }
-    };
-
-    fetchTransactions();
-  }, []);
+  const getCurrentYearMonth = () => {
+    const now = new Date();
+    return `${now.getFullYear()}年${now.getMonth() + 1}月`;
+  };
 
   return (
     <Layout scrollable={false}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <View style={styles.container}>
-        {/* First block：Expense & Revenue */}
+        <Text style={styles.yearMonth}>{getCurrentYearMonth()}</Text>
+
+        {/* First block：Monthly Summary */}
         <View style={[styles.module, styles.grayBackground]}>
-          <Text style={styles.label}>本月支出</Text>
-          <Text style={styles.amount}>-${totalExpense}</Text>
-          <Text style={styles.subText}>本月收入：${totalIncome}</Text>
+          <Text style={styles.label}>本月收支</Text>
+          <View style={styles.summaryContainer}>
+            <View style={styles.summaryItem}>
+              <Text style={styles.summaryLabel}>收入</Text>
+              <Text style={styles.summaryAmount}>+${totalIncome}</Text>
+            </View>
+            <View style={styles.summaryItem}>
+              <Text style={styles.summaryLabel}>支出</Text>
+              <Text style={styles.summaryAmount}>-${totalExpense}</Text>
+            </View>
+            <View style={styles.summaryItem}>
+              <Text style={styles.summaryLabel}>結餘</Text>
+              <Text
+                style={[
+                  styles.summaryAmount,
+                  monthlyBalance >= 0 ? styles.positive : styles.negative,
+                ]}>
+                {monthlyBalance >= 0 ? '+' : ''}
+                {monthlyBalance}
+              </Text>
+            </View>
+          </View>
         </View>
 
         {/* Second block：Budget & remain balance */}
         <View style={[styles.module, styles.blueBackground]}>
           <View style={styles.row}>
-            <Text style={styles.label}>本月預算</Text>
-            <View style={styles.budgetContainer}>
-              <Text style={styles.amount}>${budget}</Text>
-              <Pressable
-                style={styles.editButton}
-                onPress={() => setBudget(budget + 1000)}>
-                <Text style={styles.buttonText}>修改</Text>
-              </Pressable>
-            </View>
+            <Text style={styles.label}>剩餘額度</Text>
+            <Text
+              style={[
+                styles.amount,
+                monthlyBalance >= 0 ? styles.positive : styles.negative,
+              ]}>
+              ${budget - totalExpense}
+            </Text>
           </View>
-          <Text style={styles.subText}>剩餘額度：${remainingBudget}</Text>
+          <View style={styles.budgetContainer}>
+            <Text style={styles.subText}>本月預算：${budget}</Text>
+            <Pressable
+              style={styles.editButton}
+              onPress={() => setBudget(budget + 1000)}>
+              <Text style={styles.buttonText}>修改</Text>
+            </Pressable>
+          </View>
         </View>
 
         {/* Third block：details */}
@@ -110,7 +150,7 @@ const TransactionScreen: React.FC = () => {
                 <Text style={styles.transactionDate}>{item.date}</Text>
                 <Text style={styles.transactionCategory}>{item.category}</Text>
                 <Text style={styles.transactionAmount}>
-                  {item.transaction_type === 'Income' ? '+' : '-'}
+                  {item.type === 'INCOME' ? '+' : '-'}
                   {item.amount}
                 </Text>
               </View>
@@ -159,19 +199,25 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
   },
+  yearMonth: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
   module: {
     padding: 16,
     borderRadius: 10,
     marginBottom: 10,
   },
   grayBackground: {
-    backgroundColor: 'rgba(200, 160, 230, 0.8)', // light purple
+    backgroundColor: 'rgba(200, 160, 230, 0.8)',
   },
   blueBackground: {
-    backgroundColor: 'rgba(173, 216, 230, 0.8)', // light blue
+    backgroundColor: 'rgba(173, 216, 230, 0.8)',
   },
   whiteBackground: {
-    backgroundColor: 'rgba(255, 255, 255, 0.8)', // white
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
   },
   label: {
     fontSize: 18,
@@ -184,20 +230,21 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   subText: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#666',
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 8,
   },
   budgetContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
   },
   editButton: {
-    marginLeft: 10,
     paddingVertical: 4,
     paddingHorizontal: 8,
     backgroundColor: '#007bff',
@@ -276,6 +323,31 @@ const styles = StyleSheet.create({
   closeButtonText: {
     fontSize: 24,
     color: '#666',
+  },
+  summaryContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
+  },
+  summaryItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  summaryLabel: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 5,
+  },
+  summaryAmount: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  positive: {
+    color: '#28a745',
+  },
+  negative: {
+    color: '#dc3545',
   },
 });
 

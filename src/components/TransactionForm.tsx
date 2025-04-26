@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {View, Text, Pressable, StyleSheet, Platform} from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-const categories: string[] = [
+const expenseCategories: string[] = [
   '餐飲',
   '交通',
   '娛樂',
@@ -12,7 +12,10 @@ const categories: string[] = [
   '水電',
   '其他',
 ];
-type TransactionTypes = 'Income' | 'Expense';
+
+const incomeCategories: string[] = ['薪資', '獎金', '投資', '兼職', '其他'];
+
+type TransactionTypes = 'INCOME' | 'EXPENSE';
 
 interface TransactionFormProps {
   onSubmit: (
@@ -24,15 +27,15 @@ interface TransactionFormProps {
 }
 
 const TransactionTypeLabels: Record<TransactionTypes, string> = {
-  Income: '收入',
-  Expense: '支出',
+  INCOME: '收入',
+  EXPENSE: '支出',
 };
 
 const TransactionForm: React.FC<TransactionFormProps> = ({onSubmit}) => {
   const [selectedCategory, setSelectedCategory] = useState<string>(
-    categories[0],
+    expenseCategories[0],
   );
-  const [selectedType, setSelectedType] = useState<TransactionTypes>('Expense');
+  const [selectedType, setSelectedType] = useState<TransactionTypes>('EXPENSE');
   const [amount, setAmount] = useState<string>('');
   const [date, setDate] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
@@ -66,6 +69,16 @@ const TransactionForm: React.FC<TransactionFormProps> = ({onSubmit}) => {
     setShowPicker(!showPicker);
   };
 
+  const handleTypeChange = (type: TransactionTypes) => {
+    setSelectedType(type);
+    setSelectedCategory(
+      type === 'INCOME' ? incomeCategories[0] : expenseCategories[0],
+    );
+  };
+
+  const currentCategories =
+    selectedType === 'INCOME' ? incomeCategories : expenseCategories;
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>選擇類別</Text>
@@ -77,7 +90,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({onSubmit}) => {
               styles.categoryButton,
               selectedType === type && styles.selectedCategory,
             ]}
-            onPress={() => setSelectedType(type as TransactionTypes)}>
+            onPress={() => handleTypeChange(type as TransactionTypes)}>
             <Text style={styles.categoryText}>
               {TransactionTypeLabels[type as TransactionTypes]}
             </Text>
@@ -87,7 +100,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({onSubmit}) => {
 
       <Text style={styles.title}>選擇種類</Text>
       <View style={styles.categoryContainer}>
-        {categories.map(cat => (
+        {currentCategories.map(cat => (
           <Pressable
             key={cat}
             style={[

@@ -6,6 +6,7 @@ import settingsReducer from './slices/settingsSlice';
 import transactionReducer from './slices/transactionSlice';
 import missionReducer from './slices/missionSlice';
 import walletReducer from './slices/walletSlice';
+import characterReducer from './slices/characterSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Middleware to save settings to AsyncStorage
@@ -36,6 +37,7 @@ export const store = configureStore({
     transactions: transactionReducer,
     missions: missionReducer,
     wallet: walletReducer,
+    character: characterReducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({

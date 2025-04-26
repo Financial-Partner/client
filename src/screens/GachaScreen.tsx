@@ -1,89 +1,150 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {
+  View,
+  Text,
   StyleSheet,
   StatusBar,
-  FlatList,
   TouchableOpacity,
-  Text,
-  View,
+  Image,
+  Animated,
+  Easing,
 } from 'react-native';
+import {useDispatch, useSelector} from 'react-redux';
 import Layout from '../components/Layout';
-import GachaCard from '../components/GachaCard';
-import {Diamond, ChangeIcon} from '../svg';
+import {selectAllCharacters} from '../store/selectors/characterSelectors';
+import {addToInventory} from '../store/slices/characterSlice';
+import {Character} from '../types/character';
 
-// image (delete)
-const characterImages = [
-  require('../assets/characters/blue_1.png'),
-  require('../assets/characters/blue_2.png'),
-  require('../assets/characters/green_1.png'),
-  require('../assets/characters/green_2.png'),
-  require('../assets/characters/green_3.png'),
-  require('../assets/characters/pink_1.png'),
-  require('../assets/characters/yellow_1.png'),
-  require('../assets/characters/yellow_2.png'),
-  require('../assets/characters/main_character.png'),
-  require('../assets/characters/blue_3.png'),
-  require('../assets/characters/green_4.png'),
-  require('../assets/characters/green_5.png'),
-  require('../assets/characters/green_6.png'),
-  require('../assets/characters/pink_2.png'),
-  require('../assets/characters/yellow_3.png'),
-  require('../assets/characters/yellow_4.png'),
-  require('../assets/characters/main_character2.png'),
-];
+const characterImages = {
+  blue_1: require('../assets/characters/blue_1.png'),
+  blue_2: require('../assets/characters/blue_2.png'),
+  green_1: require('../assets/characters/green_1.png'),
+  green_2: require('../assets/characters/green_2.png'),
+  green_3: require('../assets/characters/green_3.png'),
+  pink_1: require('../assets/characters/pink_1.png'),
+  yellow_1: require('../assets/characters/yellow_1.png'),
+  yellow_2: require('../assets/characters/yellow_2.png'),
+  main_character: require('../assets/characters/main_character.png'),
+};
 
 const GachaScreen = () => {
-  const [cards, setCards] = useState<number[]>([]);
+  const dispatch = useDispatch();
+  const allCharacters = useSelector(selectAllCharacters);
+  const [isSpinning, setIsSpinning] = useState(false);
+  const [result, setResult] = useState<Character | null>(null);
+  const [showResult, setShowResult] = useState(false);
 
-  const refreshCards = () => {
-    // Create an array of indices (0 to 17)
-    const indices = Array.from({length: characterImages.length}, (_, i) => i);
+  // Animation values
+  const spinValue = new Animated.Value(0);
+  const scaleValue = new Animated.Value(1);
 
-    // Shuffle the array
-    for (let i = indices.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [indices[i], indices[j]] = [indices[j], indices[i]];
-    }
+  const spin = spinValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
 
-    // Select the first 9 items
-    const newCards = indices.slice(0, 9);
-    setCards(newCards);
+  const handleGacha = () => {
+    if (isSpinning) {return;}
+
+    setIsSpinning(true);
+    setShowResult(false);
+
+    // Start spinning animation
+    Animated.loop(
+      Animated.timing(spinValue, {
+        toValue: 1,
+        duration: 1000,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }),
+    ).start();
+
+    // Simulate gacha process
+    setTimeout(() => {
+      // Stop spinning
+      spinValue.stopAnimation();
+      spinValue.setValue(0);
+
+      // Randomly select a character
+      const randomIndex = Math.floor(Math.random() * allCharacters.length);
+      const selectedCharacter = allCharacters[randomIndex];
+
+      // Add to inventory
+      dispatch(addToInventory(selectedCharacter.id));
+
+      // Show result with animation
+      setResult(selectedCharacter);
+      setShowResult(true);
+      setIsSpinning(false);
+
+      // Pop animation
+      Animated.sequence([
+        Animated.timing(scaleValue, {
+          toValue: 1.2,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleValue, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }, 3000); // 3 seconds spinning
   };
-
-  const adoptCard = () => {
-    console.log('領養成功！');
-    // fetch('/gacha', { method: 'POST', body: { action: 'adopt' }})
-  };
-
-  useEffect(() => {
-    refreshCards();
-  }, []);
 
   return (
     <Layout>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-      <View style={styles.container}>
-        <FlatList
-          data={cards}
-          renderItem={({item}) => <GachaCard image={characterImages[item]} />}
-          keyExtractor={(item, index) => index.toString()}
-          numColumns={3}
-          contentContainerStyle={styles.content}
-          scrollEnabled={false}
-        />
+      <View style={styles.content}>
+        <Text style={styles.title}>抽卡</Text>
 
-        <View style={styles.btnGroup}>
-          <TouchableOpacity style={styles.button} onPress={adoptCard}>
-            <Text style={styles.buttonText}>領養</Text>
-            <Diamond height={16} width={16} style={styles.diamond} />
-            <Text style={styles.buttonText}>1,000</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.refreshButton} onPress={refreshCards}>
-            <ChangeIcon height={12} width={12} />
-            <Text style={styles.refreshText}>換一批 20</Text>
-          </TouchableOpacity>
+        <View style={styles.gachaContainer}>
+          {isSpinning ? (
+            <Animated.View
+              style={[styles.spinningContainer, {transform: [{rotate: spin}]}]}>
+              <Image
+                source={characterImages.main_character}
+                style={styles.spinningImage}
+                resizeMode="contain"
+              />
+            </Animated.View>
+          ) : showResult && result ? (
+            <Animated.View
+              style={[
+                styles.resultContainer,
+                {transform: [{scale: scaleValue}]},
+              ]}>
+              <Image
+                source={
+                  characterImages[result.id as keyof typeof characterImages] ||
+                  characterImages.main_character
+                }
+                style={styles.resultImage}
+                resizeMode="contain"
+              />
+              <Text style={styles.resultText}>恭喜獲得！</Text>
+            </Animated.View>
+          ) : (
+            <View style={styles.placeholderContainer}>
+              <Image
+                source={characterImages.main_character}
+                style={styles.placeholderImage}
+                resizeMode="contain"
+              />
+              <Text style={styles.placeholderText}>點擊下方按鈕開始抽卡</Text>
+            </View>
+          )}
         </View>
+
+        <TouchableOpacity
+          style={[styles.gachaButton, isSpinning && styles.disabledButton]}
+          onPress={handleGacha}
+          disabled={isSpinning}>
+          <Text style={styles.buttonText}>
+            {isSpinning ? '抽卡中...' : '抽卡'}
+          </Text>
+        </TouchableOpacity>
       </View>
     </Layout>
   );
@@ -91,46 +152,78 @@ const GachaScreen = () => {
 
 const styles = StyleSheet.create({
   content: {
-    margin: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  container: {
     flex: 1,
+    alignItems: 'center',
+    padding: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 30,
+  },
+  gachaContainer: {
+    width: '100%',
+    height: 300,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 30,
+  },
+  spinningContainer: {
+    width: 200,
+    height: 200,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  button: {
-    backgroundColor: '#007BFF',
-    padding: 10,
-    borderRadius: 5,
-    width: 300,
-    flexDirection: 'row',
-    alignItems: 'center',
+  spinningImage: {
+    width: '100%',
+    height: '100%',
+  },
+  resultContainer: {
+    width: 200,
+    height: 200,
     justifyContent: 'center',
+    alignItems: 'center',
+  },
+  resultImage: {
+    width: '100%',
+    height: '100%',
+  },
+  resultText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 10,
+    color: '#007BFF',
+  },
+  placeholderContainer: {
+    width: 200,
+    height: 200,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  placeholderImage: {
+    width: '100%',
+    height: '100%',
+    opacity: 0.5,
+  },
+  placeholderText: {
+    fontSize: 16,
+    marginTop: 10,
+    color: '#666',
+  },
+  gachaButton: {
+    backgroundColor: '#007BFF',
+    paddingVertical: 15,
+    paddingHorizontal: 40,
+    borderRadius: 10,
+    marginTop: 20,
+  },
+  disabledButton: {
+    backgroundColor: '#999',
   },
   buttonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
-    marginRight: 20,
-  },
-  btnGroup: {
-    flexDirection: 'column',
-    alignItems: 'flex-end',
-    justifyContent: 'center',
-  },
-  diamond: {
-    marginRight: 10,
-  },
-  refreshButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  refreshText: {
-    marginLeft: 6,
-    fontSize: 16,
-    color: '#007BFF',
   },
 });
 

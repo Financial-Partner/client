@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -8,10 +8,14 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
+import {useSelector} from 'react-redux';
 import Layout from '../components/Layout';
-//import Character from '../components/Character';
+import {
+  selectAllCharacters,
+  selectInventory,
+} from '../store/selectors/characterSelectors';
+import {Character} from '../types/character';
 
-// image (delete)
 const characterImages = {
   blue_1: require('../assets/characters/blue_1.png'),
   blue_2: require('../assets/characters/blue_2.png'),
@@ -24,82 +28,77 @@ const characterImages = {
   main_character: require('../assets/characters/main_character.png'),
 };
 
-type CharacterKey = keyof typeof characterImages;
-interface CharacterType {
-  id: number;
-  key: CharacterKey;
-  hasOwned: boolean;
-  isUsed: boolean;
-}
-
 const BagScreen = () => {
-  const [characters, setCharacters] = useState<CharacterType[]>([]);
-  const [mainCharacterKey, setMainCharacterKey] =
-    useState<CharacterKey>('main_character');
+  const allCharacters = useSelector(selectAllCharacters);
+  const inventory = useSelector(selectInventory);
+  const [selectedCharacter, setSelectedCharacter] =
+    React.useState<Character | null>(null);
 
-  const fetchCharacters = async () => {
-    // GET /components/characters
-    const mockData: CharacterType[] = [
-      {id: 1, key: 'blue_1', hasOwned: true, isUsed: false},
-      {id: 2, key: 'blue_2', hasOwned: true, isUsed: true},
-      {id: 3, key: 'green_1', hasOwned: false, isUsed: false},
-      {id: 4, key: 'green_2', hasOwned: true, isUsed: false},
-      {id: 5, key: 'pink_1', hasOwned: true, isUsed: false},
-      {id: 6, key: 'yellow_1', hasOwned: false, isUsed: false},
-      {id: 7, key: 'yellow_2', hasOwned: false, isUsed: false},
-      {id: 8, key: 'green_3', hasOwned: true, isUsed: false},
-    ];
-    setCharacters(mockData);
-    const current = mockData.find(c => c.isUsed);
-    if (current) {setMainCharacterKey(current.key);}
+  const handleSelect = (character: Character) => {
+    setSelectedCharacter(character);
   };
 
-  const handleSelect = (key: CharacterKey) => {
-    setMainCharacterKey(key);
-    setCharacters(prev => prev.map(c => ({...c, isUsed: c.key === key})));
-    // await fetch('/user/main-character', { method: 'POST', body: JSON.stringify({ key }) });
+  const getCharacterQuantity = (characterId: string) => {
+    const item = inventory.find(item => item.characterId === characterId);
+    return item ? item.quantity : 0;
   };
-
-  useEffect(() => {
-    fetchCharacters();
-  }, []);
 
   return (
     <Layout>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <View style={styles.content}>
-        <View style={styles.characterImg}>
-          <Image
-            source={characterImages[mainCharacterKey]}
-            style={styles.mainImage}
-            resizeMode="contain"
-          />
-        </View>
+        {selectedCharacter && (
+          <View style={styles.characterImg}>
+            <Image
+              source={
+                characterImages[
+                  selectedCharacter.id as keyof typeof characterImages
+                ] || characterImages.main_character
+              }
+              style={styles.mainImage}
+              resizeMode="contain"
+            />
+          </View>
+        )}
 
         <FlatList
-          data={characters}
-          renderItem={({item}) => (
-            <TouchableOpacity
-              key={item.id}
-              style={[styles.characterItem, item.isUsed && styles.selected]}
-              onPress={() => item.hasOwned && handleSelect(item.key)}
-              disabled={!item.hasOwned}>
-              <Image
-                source={characterImages[item.key]}
-                style={styles.characterImage}
-                resizeMode="contain"
-              />
-              {!item.hasOwned && (
-                <View style={styles.lockOverlay}>
-                  <Text style={styles.lockText}>未擁有</Text>
-                </View>
-              )}
-            </TouchableOpacity>
-          )}
-          keyExtractor={item => item.id.toString()}
+          data={allCharacters}
+          renderItem={({item: character}) => {
+            const quantity = getCharacterQuantity(character.id);
+            const isOwned = quantity > 0;
+
+            return (
+              <TouchableOpacity
+                style={[
+                  styles.characterItem,
+                  selectedCharacter?.id === character.id && styles.selected,
+                  !isOwned && styles.unowned,
+                ]}
+                onPress={() => handleSelect(character)}>
+                <Image
+                  source={
+                    characterImages[
+                      character.id as keyof typeof characterImages
+                    ] || characterImages.main_character
+                  }
+                  style={styles.characterImage}
+                  resizeMode="contain"
+                />
+                {isOwned ? (
+                  <View style={styles.quantityBadge}>
+                    <Text style={styles.quantityText}>x{quantity}</Text>
+                  </View>
+                ) : (
+                  <View style={styles.lockOverlay}>
+                    <Text style={styles.lockText}>未擁有</Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+            );
+          }}
+          keyExtractor={item => item.id}
           numColumns={3}
           contentContainerStyle={styles.characterContainer}
-          scrollEnabled={false}
         />
       </View>
     </Layout>
@@ -109,27 +108,25 @@ const BagScreen = () => {
 const styles = StyleSheet.create({
   content: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
     padding: 20,
   },
   characterImg: {
-    width: 200,
-    height: 250,
+    width: '100%',
+    height: 200,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 20,
+    marginBottom: 20,
   },
   mainImage: {
-    width: '100%',
-    height: '100%',
+    width: 200,
+    height: 200,
   },
   characterContainer: {
     backgroundColor: 'rgba(247, 245, 242, 0.6)',
     padding: 10,
     borderRadius: 10,
     width: '100%',
-    height: '100%',
   },
   characterItem: {
     width: 100,
@@ -148,20 +145,38 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: '#007BFF',
   },
+  unowned: {
+    opacity: 0.7,
+  },
+  quantityBadge: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: 'rgba(0, 123, 255, 0.8)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderTopLeftRadius: 10,
+    borderBottomRightRadius: 10,
+  },
+  quantityText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
   lockOverlay: {
     position: 'absolute',
     top: 0,
     left: 0,
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
   },
   lockText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: 'bold',
   },
 });

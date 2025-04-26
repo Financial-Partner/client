@@ -18,6 +18,8 @@ import {useAuth} from '../contexts/AuthContext';
 import {useAppDispatch} from '../store';
 import {settingsSlice} from '../store/slices/settingsSlice';
 import {colors} from '../theme/colors';
+import {useDispatch} from 'react-redux';
+import {addToInventory} from '../store/slices/characterSlice';
 
 type RootStackParamList = {
   MainTabs: undefined;
@@ -38,6 +40,7 @@ const SetUp = () => {
   const navigation = useNavigation<NavigationProp>();
   const {user} = useAuth();
   const dispatch = useAppDispatch();
+  const redDispatch = useDispatch();
 
   const handleNumberInput = (
     value: string,
@@ -199,6 +202,7 @@ const SetUp = () => {
   const handleNext = async () => {
     if (step === 1) {
       if (selectedDino) {
+        redDispatch(addToInventory(selectedDino.imageKey));
         setStep(2);
       }
     } else if (step === 2) {
@@ -459,7 +463,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   inputContainerStep2: {
-    width: '48%',
+    width: '100%',
   },
   inputLabel: {
     fontSize: 16,
